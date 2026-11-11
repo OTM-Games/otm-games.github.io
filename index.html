@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA and Overlay SNES.">
+<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) and /open line engine (webcam hand tracking).">
 <meta property="og:title" content="OTM Games">
-<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA and Overlay SNES.">
+<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) and /open line engine (webcam hand tracking).">
 <title>OTM Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Doodle+Shadow&family=Rubik:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -183,6 +183,10 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
 @media (prefers-reduced-motion: reduce) {
   .drawer, .scrim, .toast, .game { transition: none; }
 }
+#panel .creator { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; font: 600 13px system-ui, sans-serif; }
+#panel .creator input { font: 14px system-ui, sans-serif; padding: 6px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: transparent; color: inherit; width: 140px; }
+#panel .creator button { font: 600 13px system-ui, sans-serif; padding: 6px 12px; border-radius: 8px; border: 1.5px solid var(--line); background: transparent; color: inherit; cursor: pointer; }
+#creator-msg.ok { color: #7a4fd6; } #creator-msg.bad { color: #d33; }
 </style>
 </head>
 <body>
@@ -208,6 +212,10 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       </div>
       <p class="site-note" id="gba-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .gba file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them.</p>
       <p class="site-note" id="snes-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .sfc or .smc file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them. Games with extra chips inside the cartridge (Star Fox, Super Mario Kart, Yoshi's Island) don't work yet.</p>
+      <p class="site-note" id="mori-note" hidden><b>Moribund is a full game page</b>, so there's no console code to copy. Press <b>▶ Play</b> to open it. Use headphones, and click the game so the mouse can look around. Your save files stay in your browser.</p>
+      <p class="site-note" id="lines-note" hidden><b>/open line engine</b> uses your webcam to track your hands. Press <b>▶ Play</b>, then <b>Turn on camera</b> and allow it. Keys: 1 strings · 2 window · 3 laser · 4 all · F filter · S skeleton · C customize how everything looks. The video stays on your computer. School computers might block the camera.</p>
+      <p class="site-note" id="speed-note" hidden><b>Godspeed</b> is a 3D movement game. Press <b>▶ Play</b>, click the game so the mouse can look around, and run the course as fast as you can. WASD move · Space jump · C/Ctrl slide · E or right click ⚡ lightning dash · R checkpoint. Slide, then jump, to keep your speed.</p>
+      <form class="creator" id="creator" hidden autocomplete="off"><label for="creator-code">Creator code</label><input id="creator-code" type="password" placeholder="enter code" spellcheck="false"><button type="submit">Enter</button><span id="creator-msg" aria-live="polite"></span></form>
       <p class="site-note" id="online-note" hidden><b>Pasting it:</b> this version has everything, including online play. Paste it on a website (example.com works best), then click Play → 🌐 Online. One person hosts and gets a 4-letter code, the other types it in. No accounts needed. Some websites and school WiFi block online play.</p>
       <ol class="steps">
         <li>Go to any website (for example IXL or Google).</li>
@@ -242,6 +250,21 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <span class="name">Overlay SNES</span>
       <span class="sub">SNES emulator • load your own game</span>
     </button>
+    <button class="game" id="g-mori" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-mori" aria-hidden="true"></canvas>
+      <span class="name">Moribund</span>
+      <span class="sub">Horror • Act 1 • in development</span>
+    </button>
+    <button class="game" id="g-lines" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-lines" aria-hidden="true"></canvas>
+      <span class="name">/open line engine</span>
+      <span class="sub">Hand tracking • uses your webcam</span>
+    </button>
+    <button class="game" id="g-speed" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-speed" aria-hidden="true"></canvas>
+      <span class="name">Godspeed</span>
+      <span class="sub">Movement • slide, jump, lightning dash</span>
+    </button>
   </footer>
 </div>
 
@@ -258,12 +281,15 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
     <button type="button" data-g="mono" aria-pressed="false">Monochrome</button>
     <button type="button" data-g="gba" aria-pressed="false">GBA</button>
     <button type="button" data-g="snes" aria-pressed="false">SNES</button>
+    <button type="button" data-g="mori" aria-pressed="false">Moribund</button>
+    <button type="button" data-g="lines" aria-pressed="false">/open line engine</button>
+    <button type="button" data-g="speed" aria-pressed="false">Godspeed</button>
   </div>
   <div class="releases" id="releases"></div>
 </aside>
 <div class="toast" id="toast">Copied!</div>
 
-<script type="text/plain" id="otm-online-code">// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder).
+<script type="text/plain" id="otm-online-code">// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder, online build breaks).
 // Paste this whole thing into the Chrome dev console (F12 → Console) on any page and press Enter.
 // Spawn fighters with the buttons, drag and throw them with the mouse. Esc (or the Quit button) closes it.
 (() => {
@@ -313,7 +339,7 @@ border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 20px 40px -10px rgba(0,
 });
 const head = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' });
 head.appendChild(el('div', { fontSize: '20px', fontWeight: '800', color: '#1e293b' }, 'OTM Stickmen'));
-head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.2 • online'));
+head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.4 • online'));
 const hideBtn = el('button', { marginLeft: '8px', width: '28px', height: '28px', border: 'none', borderRadius: '8px', background: '#e2e8f0', color: '#334155', fontWeight: '900', fontSize: '15px', cursor: 'pointer', lineHeight: '1' }, '–');
 hideBtn.title = 'Hide the spawn menu';
 head.appendChild(hideBtn);
@@ -824,7 +850,7 @@ if (!mode) mode = 'watch';
 showToast('Blank stage! Build some ground, then spawn fighters 🧱');
 }
 function setBuilder(open) {
-if (open && !noFloor) startCustomStage();
+if (open && !noFloor && !net) startCustomStage(); // online build breaks keep the fight as it is
 builder.open = open; builder.drag = null; builder.painting = null; builder.sel = null; builder.resize = null;
 builder.hidden = false; builderPanel.style.display = open ? 'block' : 'none'; bpShow.style.display = 'none';
 if (open) settings.style.display = 'none';
@@ -833,7 +859,7 @@ stageBtn.style.color = open ? 'white' : '#1e293b';
 refreshBuilder();
 }
 stageBtn.onclick = () => setBuilder(!builder.open);
-bpClose.onclick = () => setBuilder(false);
+bpClose.onclick = () => { if (net && net.paused) netResume(); else setBuilder(false); };
 bloodSlider.oninput = () => setGore(+bloodSlider.value);
 bgCheck.onchange = () => setOverlay(!bgCheck.checked);
 function setGore(v) {
@@ -987,7 +1013,7 @@ const block = (e) => { e.preventDefault(); e.stopPropagation(); };
 const tgt = (e) => (e.target instanceof Node ? e.target : null); // safe event target
 const onMouseDown = (e) => {
 if (panel.contains(tgt(e)) || gearBtn.contains(tgt(e)) || settings.contains(tgt(e)) || menu.contains(tgt(e)) || controlsCard.contains(tgt(e)) || stageBtn.contains(tgt(e)) || builderPanel.contains(tgt(e)) || bpShow.contains(tgt(e))) return;
-if (net && net.started) return;
+if (net && net.started && !net.paused) return;
 if (builder.open && menu.style.display !== 'flex') { builderMouseDown(e); return; } // building, not fighting
 if (e.button !== 0) return;
 const hit = findHit(e.clientX, e.clientY);
@@ -1089,7 +1115,9 @@ if (e.key === 'Escape' && net) { e.preventDefault(); netLeave('You left the game
 if (e.key === 'Escape') { quit(); return; }
 if (net && net.started && !isTyping(e)) { // online: your keys go into the shared input stream
 const a = physToAction[keyName(e)];
+if (!a && keyName(e) === 'b') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) netToggleBreak(); return; } // B: build break
 if (!a) return;
+if (net.paused) return;
 e.preventDefault(); e.stopPropagation();
 if (a === 'h') { if (!e.repeat) controlsCard.style.display = controlsCard.style.display === 'none' ? 'block' : 'none'; return; }
 if (!e.repeat && !net.held.has(a)) net.pressed.add(a);
@@ -4981,6 +5009,9 @@ else if (m.t === 'start' && net.role === 'guest') netStart(m);
 else if (m.t === 'i') net.theirs[m.f] = m;
 else if (m.t === 'hash') { const mine = net.hashes[m.f]; if (mine != null && mine !== m.v && !net.warned) { net.warned = true; showToast('⚠️ The two computers got out of sync. Finish this round and play again.'); } }
 else if (m.t === 'again' && !net.started) netPickFighter();
+else if (m.t === 'stage' && net.paused) { if (builder.drag || builder.resize || builder.painting) net.pendingStage = m.d; else netApplyStage(m.d); }
+else if (m.t === 'resume' && net.role === 'host' && net.paused) netResume();
+else if (m.t === 'go' && net.role === 'guest' && net.paused) netGo(m.stage);
 }
 function netStart(cfg) {
 if (!net.saved) net.saved = { gore, diff: difficulty, stage: stageData(), noFloor };
@@ -4995,11 +5026,12 @@ for (const k in keys) keys[k] = false; for (const k in pressAt) pressAt[k] = nul
 net.mine = {}; net.theirs = {}; net.hashes = {}; net.frame = 0; net.acc = 0; net.last = performance.now(); net.held.clear(); net.pressed.clear(); net.warned = false;
 for (const ui of [panel, stageBtn, gearBtn, settings]) ui.style.display = 'none';
 if (cfg.kind === 'coop') startCoop(cfg.r1, cfg.r2); else startVersus(cfg.r1, cfg.r2);
-controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • Esc leaves`));
+controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • B build break 🧱 • Esc leaves`));
 controlsCard.style.display = 'block';
 net.started = true;
 }
 function netLoop(now) {
+if (net.paused) { netBuildTick(now); net.last = now; net.acc = 0; return; }
 net.acc += Math.min(100, now - net.last); net.last = now;
 const myPre = net.role === 'host' ? '1:' : '2:', theirPre = net.role === 'host' ? '2:' : '1:';
 let n = 0;
@@ -5007,11 +5039,13 @@ while (net.acc >= TICK && n < 4 && net.started) {
 const D = net.delay, F = net.frame, fi = F + D;
 if (!net.mine[fi]) { // record my keys for a frame a little in the future and send them
 const inp = { t: 'i', f: fi, h: toMask(net.held), p: toMask(net.pressed) }; net.pressed.clear();
+if (net.wantBreak) { inp.b = 1; net.wantBreak = false; }
 net.mine[fi] = inp; netSend(inp);
 }
 const mine = F < D ? { h: 0, p: 0 } : net.mine[F], theirs = F < D ? { h: 0, p: 0 } : net.theirs[F];
 if (!theirs) { net.stall++; break; } // wait for the other computer
 net.stall = 0;
+if (mine.b || theirs.b) { mine.b = 0; theirs.b = 0; netPause(); break; } // both computers stop on the same frame
 for (const [pre, inp] of [[myPre, mine], [theirPre, theirs]]) NET_ACTS.forEach((a, i) => {
 const k = pre + a, held = !!(inp.h & (1 << i)), press = !!(inp.p & (1 << i));
 if (press) registerPress(k);
@@ -5025,7 +5059,45 @@ net.frame++; net.acc -= TICK; n++;
 if (net && n === 4) net.acc = 0;
 if (net && net.stall > 90 && net.stall % 60 === 0) showToast('Waiting for the other computer...');
 }
+// ---------- online build breaks: either player presses B (or the button), the fight freezes on both computers, and you both build ----------
+function netToggleBreak() { if (!net || !net.started) return; if (net.paused) netResume(); else { net.wantBreak = true; showToast('🧱 Build break coming up...'); } }
+function netPause() {
+net.paused = true; net.lastStage = JSON.stringify(stageData()); net.stageCheck = 0;
+net.held.clear(); net.pressed.clear();
+stageBtn.style.display = ''; setBuilder(true);
+showToast('🧱 Build break! You can both build. Press B or ✕ to fight again');
+}
+function netApplyStage(d) { loadStageData(d); net.lastStage = JSON.stringify(stageData()); net.pendingStage = null; }
+function netBuildTick(now) { // while paused: send my changes, draw the frozen fight
+if (net.pendingStage && !builder.drag && !builder.resize && !builder.painting) netApplyStage(net.pendingStage);
+if (now - (net.stageCheck || 0) > 150 && !builder.drag && !builder.resize && !builder.painting) {
+net.stageCheck = now;
+const d = stageData(), j = JSON.stringify(d);
+if (j !== net.lastStage) { net.lastStage = j; netSend({ t: 'stage', d }); }
+}
+const keep = rngFn; rngFn = Math.random; // drawing must not touch the shared random numbers
+ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, width, height);
+drawWorld(); drawStage(); drawDecals(); for (let i = agents.length - 1; i >= 0; i--) agents[i].draw();
+rngFn = keep;
+ctx.setTransform(1, 0, 0, 1, 0, 0);
+const msg = '🧱 BUILD BREAK • you can both build • B or ✕ to fight';
+ctx.font = '800 18px sans-serif'; const tw = ctx.measureText(msg).width;
+ctx.fillStyle = 'rgba(15,23,42,0.8)'; ctx.beginPath(); ctx.roundRect(width / 2 - tw / 2 - 16, 18, tw + 32, 38, 12); ctx.fill();
+ctx.fillStyle = 'white'; ctx.fillText(msg, width / 2 - tw / 2, 43);
+}
+function netResume() { // the host has the final say on the stage, so both computers fight on exactly the same one
+if (!net || !net.paused) return;
+if (net.role === 'host') { const d = stageData(); netSend({ t: 'go', stage: d }); netGo(d); }
+else { netSend({ t: 'stage', d: stageData() }); netSend({ t: 'resume' }); showToast('Starting...'); }
+}
+function netGo(d) {
+loadStageData(d);
+setBuilder(false); stageBtn.style.display = 'none';
+net.paused = false; net.last = performance.now(); net.acc = 0;
+showToast('Fight! ⚔️');
+}
 function netMatchOver(title, sub) {
+if (net.paused) { setBuilder(false); net.paused = false; }
 net.started = false; net.myPick = null; net.theirPick = null;
 openMenu(title, sub, [
 bigButton('🔁 Play again', 'Pick fighters again', 'linear-gradient(135deg, #0891b2, #4f46e5)', () => { netSend({ t: 'again' }); netPickFighter(); }),
@@ -5035,6 +5107,7 @@ bigButton('🚪 Leave', '', '#64748b', () => netLeave('You left the game.')),
 function netLeave(msg, quiet) {
 if (!net) return;
 const n0 = net; net = null;
+if (builder.open) setBuilder(false);
 closeChannels();
 try { n0.dc && n0.dc.close(); } catch (e) {}
 try { n0.pc && n0.pc.close(); } catch (e) {}
@@ -5474,31 +5547,100 @@ return notes;
 }
 
 // your own song: listen for the beats and make notes from them
-async function chartFromAudio(buffer, diff) {
+// How it hears the song: it splits the sound into its pitches many times a second (an FFT), and a note is made
+// only where some pitches suddenly get louder (a drum hit, a new note, a word). Quiet or silent parts never get notes.
+let fftCache = null;
+function fftSetup(N) {
+if (fftCache && fftCache.N === N) return fftCache;
+const rev = new Uint32Array(N), bits = Math.log2(N);
+for (let i = 0; i < N; i++) { let r = 0; for (let b = 0; b < bits; b++) r |= ((i >> b) & 1) << (bits - 1 - b); rev[i] = r; }
+const cos = new Float32Array(N / 2), sin = new Float32Array(N / 2);
+for (let i = 0; i < N / 2; i++) { cos[i] = Math.cos((2 * Math.PI * i) / N); sin[i] = -Math.sin((2 * Math.PI * i) / N); }
+const win = new Float32Array(N); for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / N);
+return (fftCache = { N, rev, cos, sin, win, re: new Float32Array(N), im: new Float32Array(N) });
+}
+function fftMag(F, x, start, out) { // magnitudes of one window of the song
+const { N, rev, cos, sin, win, re, im } = F;
+for (let i = 0; i < N; i++) { const j = start + i; re[rev[i]] = j >= 0 && j < x.length ? x[j] * win[i] : 0; im[rev[i]] = 0; }
+for (let size = 2; size <= N; size <<= 1) {
+const half = size >> 1, step = N / size;
+for (let i = 0; i < N; i += size) for (let k = 0; k < half; k++) {
+const c = cos[k * step], sn = sin[k * step], a = i + k, b = a + half;
+const tr = re[b] * c - im[b] * sn, ti = re[b] * sn + im[b] * c;
+re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
+}
+}
+for (let k = 0; k < out.length; k++) out[k] = Math.hypot(re[k], im[k]);
+}
+const heard = new WeakMap(); // each song is only listened to once, then all 3 difficulties use it
+async function hearSong(buffer) {
+if (heard.has(buffer)) return heard.get(buffer);
 const sr = buffer.sampleRate, ch0 = buffer.getChannelData(0), ch1 = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : ch0;
 const hop = 512, frames = Math.floor(ch0.length / hop);
-const low = new Float32Array(frames), high = new Float32Array(frames);
+const x = new Float32Array(ch0.length); for (let i = 0; i < x.length; i++) x[i] = (ch0[i] + ch1[i]) * 0.5;
+// loudness of the bass and the rest (used for long notes)
+const low = new Float32Array(frames), high = new Float32Array(frames), rms = new Float32Array(frames);
 let lp = 0;
 for (let f = 0; f < frames; f++) {
-let el = 0, eh = 0;
-for (let i = f * hop, end = i + hop; i < end; i++) {
-const x = (ch0[i] + ch1[i]) * 0.5;
-lp += 0.04 * (x - lp); // simple low-pass filter: the "bass" part
-el += lp * lp; eh += (x - lp) * (x - lp);
+let el = 0, eh = 0, ea = 0;
+for (let i = f * hop, end = i + hop; i < end; i++) { const v = x[i]; lp += 0.04 * (v - lp); el += lp * lp; eh += (v - lp) * (v - lp); ea += v * v; }
+low[f] = Math.sqrt(el / hop); high[f] = Math.sqrt(eh / hop); rms[f] = Math.sqrt(ea / hop);
 }
-low[f] = Math.sqrt(el / hop); high[f] = Math.sqrt(eh / hop);
+// how loud the loud parts are: anything much quieter than that counts as silence
+const sorted = Array.from(rms).sort((a, b) => a - b), loud = sorted[Math.floor(sorted.length * 0.9)] || 0;
+const quietLine = Math.max(0.004, loud * 0.12); // about 18 dB below the loud parts
+const quiet = new Uint8Array(frames);
+for (let f = 0; f < frames; f++) { let m = 0; for (let k = Math.max(0, f - 2); k <= Math.min(frames - 1, f + 2); k++) m = Math.max(m, rms[k]); quiet[f] = m < quietLine ? 1 : 0; }
+// spectral flux: how much each pitch got louder since the last moment
+const N = 1024, F = fftSetup(N), bins = N / 2, kLow = Math.max(2, Math.round((180 * N) / sr)), kHigh = Math.min(bins, Math.round((9000 * N) / sr));
+const mag = new Float32Array(bins); let prev = new Float32Array(bins), cur = new Float32Array(bins);
+const fl = new Float32Array(frames), fh = new Float32Array(frames);
+for (let f = 0; f < frames; f++) {
+fftMag(F, x, f * hop + hop / 2 - N / 2, mag);
+for (let k = 0; k < bins; k++) cur[k] = Math.log1p(100 * mag[k]);
+if (f > 0 && !quiet[f]) {
+let a = 0, b = 0;
+for (let k = 1; k < kLow; k++) { const d = cur[k] - Math.max(prev[k], k > 1 ? prev[k - 1] : 0, prev[k + 1]); if (d > 0) a += d; }
+for (let k = kLow; k < kHigh; k++) { const d = cur[k] - Math.max(prev[k], prev[k - 1], prev[k + 1]); if (d > 0) b += d; }
+fl[f] = a / kLow; fh[f] = b / (kHigh - kLow);
+}
+const t = prev; prev = cur; cur = t;
+if (f % 2000 === 1999) await new Promise((r) => setTimeout(r, 0)); // let the page breathe on long songs
 }
 const onsets = [];
-const flux = (arr) => { const o = new Float32Array(frames); for (let f = 1; f < frames; f++) o[f] = Math.max(0, arr[f] - arr[f - 1]); return o; };
-const fl = flux(low), fh = flux(high);
 for (const [arr, band] of [[fl, 'low'], [fh, 'high']]) {
-for (let f = 8; f < frames - 8; f++) {
-let sum = 0; for (let k = f - 8; k <= f + 8; k++) sum += arr[k];
-const thr = (sum / 17) * 1.7 + 0.004;
-if (arr[f] > thr && arr[f] >= arr[f - 1] && arr[f] >= arr[f + 1]) onsets.push({ t: (f * hop) / sr, f, s: arr[f] / thr, band });
+// typical size of a real hit in this song (ignoring silence)
+const vals = []; for (let f = 0; f < frames; f++) if (!quiet[f] && arr[f] > 0) vals.push(arr[f]);
+vals.sort((a, b) => a - b);
+const typical = vals.length ? vals[Math.floor(vals.length * 0.5)] : 0, big = vals.length ? vals[Math.floor(vals.length * 0.97)] : 0;
+if (!big) continue;
+const W = 12, win = new Float32Array(2 * W + 1);
+for (let f = 3; f < frames - 3; f++) {
+const v = arr[f];
+if (quiet[f] || v <= 0) continue;
+let isPeak = true; for (let k = f - 3; k <= f + 3; k++) if (k !== f && arr[k] > v) { isPeak = false; break; } // the biggest jump nearby
+if (!isPeak) continue;
+let n = 0; for (let k = Math.max(0, f - W); k <= Math.min(frames - 1, f + W); k++) win[n++] = arr[k];
+const loc = Array.from(win.subarray(0, n)).sort((a, b) => a - b)[n >> 1]; // the local median
+const thr = loc * 1.15 + typical * 0.9 + big * 0.06;
+if (v < thr) continue;
+// a real hit makes that part of the sound louder; wobbles and echoes in a held sound don't
+const env0 = band === 'low' ? low : high; let before = Infinity, after = 0;
+for (let k = Math.max(0, f - 4); k < f; k++) before = Math.min(before, env0[k]);
+for (let k = f; k <= Math.min(frames - 1, f + 3); k++) after = Math.max(after, env0[k]);
+if (after < before * 1.12 && v < big * 0.8) continue;
+const a = arr[f - 1], c = arr[f + 1], den = a - 2 * v + c, off = den < 0 ? Math.max(-0.5, Math.min(0.5, (0.5 * (a - c)) / den)) : 0; // between two frames
+onsets.push({ t: ((f + off) * hop + N * 0.38) / sr, f, s: 1 + (v - thr) / (big * 0.35), band });
 }
 }
+// a bass hit and a high hit at the same moment are one hit: keep the stronger one
 onsets.sort((a, b) => a.t - b.t);
+for (let i = onsets.length - 1; i > 0; i--) if (onsets[i].t - onsets[i - 1].t < 0.03) onsets.splice(onsets[i].s > onsets[i - 1].s ? i - 1 : i, 1);
+const out = { sr, hop, frames, low, high, onsets };
+heard.set(buffer, out); return out;
+}
+async function chartFromAudio(buffer, diff) {
+const { sr, hop, frames, low, high, onsets } = await hearSong(buffer);
 // smoothed loudness of each band, used to see how long a sound keeps ringing (for long notes)
 const smooth = (a) => { const o = new Float32Array(frames); let s = 0; for (let f = 0; f < frames; f++) { s += (a[f] - s) * 0.35; o[f] = s; } return o; };
 const env = { low: smooth(low), high: smooth(high) };
@@ -10127,31 +10269,100 @@ return notes;
 }
 
 // your own song: listen for the beats and make notes from them
-async function chartFromAudio(buffer, diff) {
+// How it hears the song: it splits the sound into its pitches many times a second (an FFT), and a note is made
+// only where some pitches suddenly get louder (a drum hit, a new note, a word). Quiet or silent parts never get notes.
+let fftCache = null;
+function fftSetup(N) {
+if (fftCache && fftCache.N === N) return fftCache;
+const rev = new Uint32Array(N), bits = Math.log2(N);
+for (let i = 0; i < N; i++) { let r = 0; for (let b = 0; b < bits; b++) r |= ((i >> b) & 1) << (bits - 1 - b); rev[i] = r; }
+const cos = new Float32Array(N / 2), sin = new Float32Array(N / 2);
+for (let i = 0; i < N / 2; i++) { cos[i] = Math.cos((2 * Math.PI * i) / N); sin[i] = -Math.sin((2 * Math.PI * i) / N); }
+const win = new Float32Array(N); for (let i = 0; i < N; i++) win[i] = 0.5 - 0.5 * Math.cos((2 * Math.PI * i) / N);
+return (fftCache = { N, rev, cos, sin, win, re: new Float32Array(N), im: new Float32Array(N) });
+}
+function fftMag(F, x, start, out) { // magnitudes of one window of the song
+const { N, rev, cos, sin, win, re, im } = F;
+for (let i = 0; i < N; i++) { const j = start + i; re[rev[i]] = j >= 0 && j < x.length ? x[j] * win[i] : 0; im[rev[i]] = 0; }
+for (let size = 2; size <= N; size <<= 1) {
+const half = size >> 1, step = N / size;
+for (let i = 0; i < N; i += size) for (let k = 0; k < half; k++) {
+const c = cos[k * step], sn = sin[k * step], a = i + k, b = a + half;
+const tr = re[b] * c - im[b] * sn, ti = re[b] * sn + im[b] * c;
+re[b] = re[a] - tr; im[b] = im[a] - ti; re[a] += tr; im[a] += ti;
+}
+}
+for (let k = 0; k < out.length; k++) out[k] = Math.hypot(re[k], im[k]);
+}
+const heard = new WeakMap(); // each song is only listened to once, then all 3 difficulties use it
+async function hearSong(buffer) {
+if (heard.has(buffer)) return heard.get(buffer);
 const sr = buffer.sampleRate, ch0 = buffer.getChannelData(0), ch1 = buffer.numberOfChannels > 1 ? buffer.getChannelData(1) : ch0;
 const hop = 512, frames = Math.floor(ch0.length / hop);
-const low = new Float32Array(frames), high = new Float32Array(frames);
+const x = new Float32Array(ch0.length); for (let i = 0; i < x.length; i++) x[i] = (ch0[i] + ch1[i]) * 0.5;
+// loudness of the bass and the rest (used for long notes)
+const low = new Float32Array(frames), high = new Float32Array(frames), rms = new Float32Array(frames);
 let lp = 0;
 for (let f = 0; f < frames; f++) {
-let el = 0, eh = 0;
-for (let i = f * hop, end = i + hop; i < end; i++) {
-const x = (ch0[i] + ch1[i]) * 0.5;
-lp += 0.04 * (x - lp); // simple low-pass filter: the "bass" part
-el += lp * lp; eh += (x - lp) * (x - lp);
+let el = 0, eh = 0, ea = 0;
+for (let i = f * hop, end = i + hop; i < end; i++) { const v = x[i]; lp += 0.04 * (v - lp); el += lp * lp; eh += (v - lp) * (v - lp); ea += v * v; }
+low[f] = Math.sqrt(el / hop); high[f] = Math.sqrt(eh / hop); rms[f] = Math.sqrt(ea / hop);
 }
-low[f] = Math.sqrt(el / hop); high[f] = Math.sqrt(eh / hop);
+// how loud the loud parts are: anything much quieter than that counts as silence
+const sorted = Array.from(rms).sort((a, b) => a - b), loud = sorted[Math.floor(sorted.length * 0.9)] || 0;
+const quietLine = Math.max(0.004, loud * 0.12); // about 18 dB below the loud parts
+const quiet = new Uint8Array(frames);
+for (let f = 0; f < frames; f++) { let m = 0; for (let k = Math.max(0, f - 2); k <= Math.min(frames - 1, f + 2); k++) m = Math.max(m, rms[k]); quiet[f] = m < quietLine ? 1 : 0; }
+// spectral flux: how much each pitch got louder since the last moment
+const N = 1024, F = fftSetup(N), bins = N / 2, kLow = Math.max(2, Math.round((180 * N) / sr)), kHigh = Math.min(bins, Math.round((9000 * N) / sr));
+const mag = new Float32Array(bins); let prev = new Float32Array(bins), cur = new Float32Array(bins);
+const fl = new Float32Array(frames), fh = new Float32Array(frames);
+for (let f = 0; f < frames; f++) {
+fftMag(F, x, f * hop + hop / 2 - N / 2, mag);
+for (let k = 0; k < bins; k++) cur[k] = Math.log1p(100 * mag[k]);
+if (f > 0 && !quiet[f]) {
+let a = 0, b = 0;
+for (let k = 1; k < kLow; k++) { const d = cur[k] - Math.max(prev[k], k > 1 ? prev[k - 1] : 0, prev[k + 1]); if (d > 0) a += d; }
+for (let k = kLow; k < kHigh; k++) { const d = cur[k] - Math.max(prev[k], prev[k - 1], prev[k + 1]); if (d > 0) b += d; }
+fl[f] = a / kLow; fh[f] = b / (kHigh - kLow);
+}
+const t = prev; prev = cur; cur = t;
+if (f % 2000 === 1999) await new Promise((r) => setTimeout(r, 0)); // let the page breathe on long songs
 }
 const onsets = [];
-const flux = (arr) => { const o = new Float32Array(frames); for (let f = 1; f < frames; f++) o[f] = Math.max(0, arr[f] - arr[f - 1]); return o; };
-const fl = flux(low), fh = flux(high);
 for (const [arr, band] of [[fl, 'low'], [fh, 'high']]) {
-for (let f = 8; f < frames - 8; f++) {
-let sum = 0; for (let k = f - 8; k <= f + 8; k++) sum += arr[k];
-const thr = (sum / 17) * 1.7 + 0.004;
-if (arr[f] > thr && arr[f] >= arr[f - 1] && arr[f] >= arr[f + 1]) onsets.push({ t: (f * hop) / sr, f, s: arr[f] / thr, band });
+// typical size of a real hit in this song (ignoring silence)
+const vals = []; for (let f = 0; f < frames; f++) if (!quiet[f] && arr[f] > 0) vals.push(arr[f]);
+vals.sort((a, b) => a - b);
+const typical = vals.length ? vals[Math.floor(vals.length * 0.5)] : 0, big = vals.length ? vals[Math.floor(vals.length * 0.97)] : 0;
+if (!big) continue;
+const W = 12, win = new Float32Array(2 * W + 1);
+for (let f = 3; f < frames - 3; f++) {
+const v = arr[f];
+if (quiet[f] || v <= 0) continue;
+let isPeak = true; for (let k = f - 3; k <= f + 3; k++) if (k !== f && arr[k] > v) { isPeak = false; break; } // the biggest jump nearby
+if (!isPeak) continue;
+let n = 0; for (let k = Math.max(0, f - W); k <= Math.min(frames - 1, f + W); k++) win[n++] = arr[k];
+const loc = Array.from(win.subarray(0, n)).sort((a, b) => a - b)[n >> 1]; // the local median
+const thr = loc * 1.15 + typical * 0.9 + big * 0.06;
+if (v < thr) continue;
+// a real hit makes that part of the sound louder; wobbles and echoes in a held sound don't
+const env0 = band === 'low' ? low : high; let before = Infinity, after = 0;
+for (let k = Math.max(0, f - 4); k < f; k++) before = Math.min(before, env0[k]);
+for (let k = f; k <= Math.min(frames - 1, f + 3); k++) after = Math.max(after, env0[k]);
+if (after < before * 1.12 && v < big * 0.8) continue;
+const a = arr[f - 1], c = arr[f + 1], den = a - 2 * v + c, off = den < 0 ? Math.max(-0.5, Math.min(0.5, (0.5 * (a - c)) / den)) : 0; // between two frames
+onsets.push({ t: ((f + off) * hop + N * 0.38) / sr, f, s: 1 + (v - thr) / (big * 0.35), band });
 }
 }
+// a bass hit and a high hit at the same moment are one hit: keep the stronger one
 onsets.sort((a, b) => a.t - b.t);
+for (let i = onsets.length - 1; i > 0; i--) if (onsets[i].t - onsets[i - 1].t < 0.03) onsets.splice(onsets[i].s > onsets[i - 1].s ? i - 1 : i, 1);
+const out = { sr, hop, frames, low, high, onsets };
+heard.set(buffer, out); return out;
+}
+async function chartFromAudio(buffer, diff) {
+const { sr, hop, frames, low, high, onsets } = await hearSong(buffer);
 // smoothed loudness of each band, used to see how long a sound keeps ringing (for long notes)
 const smooth = (a) => { const o = new Float32Array(frames); let s = 0; for (let f = 0; f < frames; f++) { s += (a[f] - s) * 0.35; o[f] = s; } return o; };
 const env = { low: smooth(low), high: smooth(high) };
@@ -11338,7 +11549,7 @@ console.log('Monochrome OTM loaded! Click or press any key to skip the intro. Pr
 
 };</script>
 <script>window.__otmLaunchSite = function () {
-// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder).
+// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder, online build breaks).
 // Paste this whole thing into the Chrome dev console (F12 → Console) on any page and press Enter.
 // Spawn fighters with the buttons, drag and throw them with the mouse. Esc (or the Quit button) closes it.
 (() => {
@@ -11388,7 +11599,7 @@ border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 20px 40px -10px rgba(0,
 });
 const head = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' });
 head.appendChild(el('div', { fontSize: '20px', fontWeight: '800', color: '#1e293b' }, 'OTM Stickmen'));
-head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.2 • online'));
+head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.4 • online'));
 const hideBtn = el('button', { marginLeft: '8px', width: '28px', height: '28px', border: 'none', borderRadius: '8px', background: '#e2e8f0', color: '#334155', fontWeight: '900', fontSize: '15px', cursor: 'pointer', lineHeight: '1' }, '–');
 hideBtn.title = 'Hide the spawn menu';
 head.appendChild(hideBtn);
@@ -11899,7 +12110,7 @@ if (!mode) mode = 'watch';
 showToast('Blank stage! Build some ground, then spawn fighters 🧱');
 }
 function setBuilder(open) {
-if (open && !noFloor) startCustomStage();
+if (open && !noFloor && !net) startCustomStage(); // online build breaks keep the fight as it is
 builder.open = open; builder.drag = null; builder.painting = null; builder.sel = null; builder.resize = null;
 builder.hidden = false; builderPanel.style.display = open ? 'block' : 'none'; bpShow.style.display = 'none';
 if (open) settings.style.display = 'none';
@@ -11908,7 +12119,7 @@ stageBtn.style.color = open ? 'white' : '#1e293b';
 refreshBuilder();
 }
 stageBtn.onclick = () => setBuilder(!builder.open);
-bpClose.onclick = () => setBuilder(false);
+bpClose.onclick = () => { if (net && net.paused) netResume(); else setBuilder(false); };
 bloodSlider.oninput = () => setGore(+bloodSlider.value);
 bgCheck.onchange = () => setOverlay(!bgCheck.checked);
 function setGore(v) {
@@ -12062,7 +12273,7 @@ const block = (e) => { e.preventDefault(); e.stopPropagation(); };
 const tgt = (e) => (e.target instanceof Node ? e.target : null); // safe event target
 const onMouseDown = (e) => {
 if (panel.contains(tgt(e)) || gearBtn.contains(tgt(e)) || settings.contains(tgt(e)) || menu.contains(tgt(e)) || controlsCard.contains(tgt(e)) || stageBtn.contains(tgt(e)) || builderPanel.contains(tgt(e)) || bpShow.contains(tgt(e))) return;
-if (net && net.started) return;
+if (net && net.started && !net.paused) return;
 if (builder.open && menu.style.display !== 'flex') { builderMouseDown(e); return; } // building, not fighting
 if (e.button !== 0) return;
 const hit = findHit(e.clientX, e.clientY);
@@ -12164,7 +12375,9 @@ if (e.key === 'Escape' && net) { e.preventDefault(); netLeave('You left the game
 if (e.key === 'Escape') { quit(); return; }
 if (net && net.started && !isTyping(e)) { // online: your keys go into the shared input stream
 const a = physToAction[keyName(e)];
+if (!a && keyName(e) === 'b') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) netToggleBreak(); return; } // B: build break
 if (!a) return;
+if (net.paused) return;
 e.preventDefault(); e.stopPropagation();
 if (a === 'h') { if (!e.repeat) controlsCard.style.display = controlsCard.style.display === 'none' ? 'block' : 'none'; return; }
 if (!e.repeat && !net.held.has(a)) net.pressed.add(a);
@@ -16056,6 +16269,9 @@ else if (m.t === 'start' && net.role === 'guest') netStart(m);
 else if (m.t === 'i') net.theirs[m.f] = m;
 else if (m.t === 'hash') { const mine = net.hashes[m.f]; if (mine != null && mine !== m.v && !net.warned) { net.warned = true; showToast('⚠️ The two computers got out of sync. Finish this round and play again.'); } }
 else if (m.t === 'again' && !net.started) netPickFighter();
+else if (m.t === 'stage' && net.paused) { if (builder.drag || builder.resize || builder.painting) net.pendingStage = m.d; else netApplyStage(m.d); }
+else if (m.t === 'resume' && net.role === 'host' && net.paused) netResume();
+else if (m.t === 'go' && net.role === 'guest' && net.paused) netGo(m.stage);
 }
 function netStart(cfg) {
 if (!net.saved) net.saved = { gore, diff: difficulty, stage: stageData(), noFloor };
@@ -16070,11 +16286,12 @@ for (const k in keys) keys[k] = false; for (const k in pressAt) pressAt[k] = nul
 net.mine = {}; net.theirs = {}; net.hashes = {}; net.frame = 0; net.acc = 0; net.last = performance.now(); net.held.clear(); net.pressed.clear(); net.warned = false;
 for (const ui of [panel, stageBtn, gearBtn, settings]) ui.style.display = 'none';
 if (cfg.kind === 'coop') startCoop(cfg.r1, cfg.r2); else startVersus(cfg.r1, cfg.r2);
-controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • Esc leaves`));
+controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • B build break 🧱 • Esc leaves`));
 controlsCard.style.display = 'block';
 net.started = true;
 }
 function netLoop(now) {
+if (net.paused) { netBuildTick(now); net.last = now; net.acc = 0; return; }
 net.acc += Math.min(100, now - net.last); net.last = now;
 const myPre = net.role === 'host' ? '1:' : '2:', theirPre = net.role === 'host' ? '2:' : '1:';
 let n = 0;
@@ -16082,11 +16299,13 @@ while (net.acc >= TICK && n < 4 && net.started) {
 const D = net.delay, F = net.frame, fi = F + D;
 if (!net.mine[fi]) { // record my keys for a frame a little in the future and send them
 const inp = { t: 'i', f: fi, h: toMask(net.held), p: toMask(net.pressed) }; net.pressed.clear();
+if (net.wantBreak) { inp.b = 1; net.wantBreak = false; }
 net.mine[fi] = inp; netSend(inp);
 }
 const mine = F < D ? { h: 0, p: 0 } : net.mine[F], theirs = F < D ? { h: 0, p: 0 } : net.theirs[F];
 if (!theirs) { net.stall++; break; } // wait for the other computer
 net.stall = 0;
+if (mine.b || theirs.b) { mine.b = 0; theirs.b = 0; netPause(); break; } // both computers stop on the same frame
 for (const [pre, inp] of [[myPre, mine], [theirPre, theirs]]) NET_ACTS.forEach((a, i) => {
 const k = pre + a, held = !!(inp.h & (1 << i)), press = !!(inp.p & (1 << i));
 if (press) registerPress(k);
@@ -16100,7 +16319,45 @@ net.frame++; net.acc -= TICK; n++;
 if (net && n === 4) net.acc = 0;
 if (net && net.stall > 90 && net.stall % 60 === 0) showToast('Waiting for the other computer...');
 }
+// ---------- online build breaks: either player presses B (or the button), the fight freezes on both computers, and you both build ----------
+function netToggleBreak() { if (!net || !net.started) return; if (net.paused) netResume(); else { net.wantBreak = true; showToast('🧱 Build break coming up...'); } }
+function netPause() {
+net.paused = true; net.lastStage = JSON.stringify(stageData()); net.stageCheck = 0;
+net.held.clear(); net.pressed.clear();
+stageBtn.style.display = ''; setBuilder(true);
+showToast('🧱 Build break! You can both build. Press B or ✕ to fight again');
+}
+function netApplyStage(d) { loadStageData(d); net.lastStage = JSON.stringify(stageData()); net.pendingStage = null; }
+function netBuildTick(now) { // while paused: send my changes, draw the frozen fight
+if (net.pendingStage && !builder.drag && !builder.resize && !builder.painting) netApplyStage(net.pendingStage);
+if (now - (net.stageCheck || 0) > 150 && !builder.drag && !builder.resize && !builder.painting) {
+net.stageCheck = now;
+const d = stageData(), j = JSON.stringify(d);
+if (j !== net.lastStage) { net.lastStage = j; netSend({ t: 'stage', d }); }
+}
+const keep = rngFn; rngFn = Math.random; // drawing must not touch the shared random numbers
+ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, width, height);
+drawWorld(); drawStage(); drawDecals(); for (let i = agents.length - 1; i >= 0; i--) agents[i].draw();
+rngFn = keep;
+ctx.setTransform(1, 0, 0, 1, 0, 0);
+const msg = '🧱 BUILD BREAK • you can both build • B or ✕ to fight';
+ctx.font = '800 18px sans-serif'; const tw = ctx.measureText(msg).width;
+ctx.fillStyle = 'rgba(15,23,42,0.8)'; ctx.beginPath(); ctx.roundRect(width / 2 - tw / 2 - 16, 18, tw + 32, 38, 12); ctx.fill();
+ctx.fillStyle = 'white'; ctx.fillText(msg, width / 2 - tw / 2, 43);
+}
+function netResume() { // the host has the final say on the stage, so both computers fight on exactly the same one
+if (!net || !net.paused) return;
+if (net.role === 'host') { const d = stageData(); netSend({ t: 'go', stage: d }); netGo(d); }
+else { netSend({ t: 'stage', d: stageData() }); netSend({ t: 'resume' }); showToast('Starting...'); }
+}
+function netGo(d) {
+loadStageData(d);
+setBuilder(false); stageBtn.style.display = 'none';
+net.paused = false; net.last = performance.now(); net.acc = 0;
+showToast('Fight! ⚔️');
+}
 function netMatchOver(title, sub) {
+if (net.paused) { setBuilder(false); net.paused = false; }
 net.started = false; net.myPick = null; net.theirPick = null;
 openMenu(title, sub, [
 bigButton('🔁 Play again', 'Pick fighters again', 'linear-gradient(135deg, #0891b2, #4f46e5)', () => { netSend({ t: 'again' }); netPickFighter(); }),
@@ -16110,6 +16367,7 @@ bigButton('🚪 Leave', '', '#64748b', () => netLeave('You left the game.')),
 function netLeave(msg, quiet) {
 if (!net) return;
 const n0 = net; net = null;
+if (builder.open) setBuilder(false);
 closeChannels();
 try { n0.dc && n0.dc.close(); } catch (e) {}
 try { n0.pc && n0.pc.close(); } catch (e) {}
@@ -16343,6 +16601,11 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 <script>
 (() => {
   const RELEASES = [
+    { g: 'speed', v: 'v1.0', t: 'Godspeed', n: ['New: a 3D movement game over a stormy void', 'Run to build speed, slide to keep it, slide-jump to carry it over gaps', '⚡ Lightning dash where you look, recharged by landing or by touching lightning orbs', '4 checkpoints, a timer and your best time', 'Thunder, wind and dash sounds all made in code'] },
+    { g: 'mono', v: 'v1.6', t: 'Way more accurate custom songs', n: ['Custom songs now listen to every pitch (an FFT) instead of just bass and treble, so notes land on real hits', 'No more notes in quiet or silent parts of a song', 'Echoes and wobbles in held sounds no longer make notes', 'Notes are timed more exactly to the music', 'Songs you already saved get the new notes automatically'] },
+    { g: 'stick', v: 'v12.4', t: 'Stage Builder in online games', n: ['Press B (or ✕ in the builder) during an online match for a 🧱 Build break', 'The fight freezes on both computers and you can both build at the same time', 'You see each other\'s blocks as you place them', 'Press B again to keep fighting on the new stage', 'The host\'s stage is still used when the match starts'] },
+    { g: 'lines', v: 'v1.0', t: '/open line engine', n: ['New: webcam hand tracking. Lines follow your fingers', 'Strings: rainbow strings between your fingertips', 'Window: a box between your hands that flips the video (invert, blue, pixel, thermal)', 'Laser: a red beam between your pointer fingers', 'Demo hands if you have no camera', 'Customize: colors, thickness, glow and more for every effect (press C)'] },
+    { g: 'mori', v: 'v0.1', t: 'Moribund (in development)', n: ['New: a dark horror game. You wake up in a field of flowers outside a wall that never ends', 'Scan the dark with lidar dots, with Mori, God\'s assistant, guiding you', 'Act 1: the chase. Run from Rot, solve the lightbulb doors and find the power', 'Three save files'] },
     { g: 'stick', v: 'v12.2', t: 'More reliable room codes', n: ['Uses two matchmaking services at once, so one failing no longer stops you', 'New backup: 📋 Connect with codes (swap two codes through any chat)', 'Shows which step failed if it can\'t connect'] },
     { g: 'stick', v: 'v12.1', t: 'Online with room codes, no accounts', n: ['New 🌐 Online version to paste or open as a file', 'Host gets a 4-letter code, your friend types it in', 'Works over the internet; no Claude account needed', 'Some websites and school WiFi block it'] },
     { g: 'stick', v: 'v12.0', t: 'Play on the site + internet play', n: ['New ▶ Play here button runs the game right on this site', 'Online over the internet with 4-letter room codes', 'Connection speed is measured so matches stay smooth', 'The copy-and-paste version stays the same (v11.1)'] },
@@ -16375,13 +16638,29 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 
   const $ = (id) => document.getElementById(id);
   const GAMES = {
-    stick: { title: 'OTM Stickman Fight', ver: 'v12.3', code: $('otm-online-code').textContent },
-    online: { title: 'OTM Stickman Fight', ver: 'v12.2 online', code: $('otm-online-code').textContent },
-    mono: { title: 'Monochrome OTM', ver: 'v1.5', code: $('otm-mono-code').textContent },
+    stick: { title: 'OTM Stickman Fight', ver: 'v12.4', code: $('otm-online-code').textContent },
+    online: { title: 'OTM Stickman Fight', ver: 'v12.4 online', code: $('otm-online-code').textContent },
+    mono: { title: 'Monochrome OTM', ver: 'v1.6', code: $('otm-mono-code').textContent },
     gba: { title: 'Overlay GBA', ver: 'v1.0', code: $('otm-gba-code').textContent.replace(/^\n/, '') },
     snes: { title: 'Overlay SNES', ver: 'v1.0', code: $('otm-snes-code').textContent.replace(/^\n/, '') },
+    mori: { title: 'Moribund', ver: 'v0.1', code: '' },
+    lines: { title: '/open line engine', ver: 'v1.0', code: '' },
+    speed: { title: 'Godspeed', ver: 'v1.0', code: '' },
   };
-  const LATEST = { stick: 'v12.3', mono: 'v1.5', gba: 'v1.0', snes: 'v1.0' };
+  const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html';
+  // creator code: unlocks the version of Moribund with the test buttons (checked by its SHA-256, the code isn't written here)
+  const CREATOR_HASH = '64cf866e039356cca8d083eb06af1578cfaf365ab2a9621c17a7731603bd605f';
+  let creator = null; try { creator = localStorage.getItem('moribund-creator'); } catch (e) {}
+  const sha = async (t) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map((b) => b.toString(16).padStart(2, '0')).join('');
+  const creatorMsg = () => { const m = $('creator-msg'); m.className = creator ? 'ok' : ''; m.textContent = creator ? '🔓 creator mode on. Play opens the creator version.' : ''; };
+  $('creator').onsubmit = async (e) => {
+    e.preventDefault(); const code = $('creator-code').value.trim().toLowerCase();
+    let ok = false; try { ok = (await sha(code)) === CREATOR_HASH; } catch (x) {}
+    if (ok) { creator = code; try { localStorage.setItem('moribund-creator', code); } catch (x) {} $('creator-code').value = ''; creatorMsg(); }
+    else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
+  };
+  creatorMsg();
+  const LATEST = { stick: 'v12.4', mono: 'v1.6', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.0', speed: 'v1.0' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
@@ -16391,6 +16670,9 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     $('g-mono').setAttribute('aria-pressed', String(which === 'mono'));
     $('g-gba').setAttribute('aria-pressed', String(which === 'gba'));
     $('g-snes').setAttribute('aria-pressed', String(which === 'snes'));
+    $('g-mori').setAttribute('aria-pressed', String(which === 'mori'));
+    $('g-lines').setAttribute('aria-pressed', String(which === 'lines'));
+    $('g-speed').setAttribute('aria-pressed', String(which === 'speed'));
     $('hint').hidden = true;
     $('panel').hidden = false;
     if (current !== which) {
@@ -16402,6 +16684,10 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       for (const vb of $('variant').children) vb.setAttribute('aria-pressed', String(vb.dataset.v === which));
       $('code').value = g.code; $('code').scrollTop = 0;
       $('p-meta').textContent = `${g.code.split('\n').length.toLocaleString()} lines • ${Math.max(1, Math.round(g.code.length / 1024))} KB`;
+      const page = which === 'mori' || which === 'lines' || which === 'speed'; // a full page: no code to paste
+      $('mori-note').hidden = which !== 'mori'; $('creator').hidden = which !== 'mori'; $('lines-note').hidden = which !== 'lines'; $('speed-note').hidden = which !== 'speed'; $('copy').hidden = page; $('code').hidden = page;
+      for (const e of document.querySelectorAll('#panel .steps, #panel .note')) e.hidden = page;
+      if (page) { $('play').textContent = '▶ Play'; $('p-meta').textContent = 'opens the game'; }
     }
     try { localStorage.setItem('otm-games-pick', which); } catch (e) {}
   };
@@ -16410,8 +16696,11 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-mono').onclick = () => choose('mono');
   $('g-gba').onclick = () => choose('gba');
   $('g-snes').onclick = () => choose('snes');
+  $('g-mori').onclick = () => choose('mori');
+  $('g-lines').onclick = () => choose('lines');
+  $('g-speed').onclick = () => choose('speed');
 
-  $('play').onclick = () => { try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
+  $('play').onclick = () => { if (current === 'speed') { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
   $('copy').onclick = () => {
     const box = $('code');
     const fallback = () => { box.focus(); box.select(); toast('Code selected — press Ctrl + C'); };
@@ -16429,7 +16718,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const head = document.createElement('div'); head.className = 'v';
       const num = document.createElement('span'); num.className = 'num'; num.textContent = r.v;
       const title = document.createElement('span'); title.className = 'title'; title.textContent = r.t;
-      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES' }[r.g];
+      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', mori: 'Moribund', lines: '/open line engine', speed: 'Godspeed' }[r.g];
       head.append(num, title, tag);
       const ul = document.createElement('ul');
       for (const n of r.n) { const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); }
@@ -16506,14 +16795,51 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     c.fillStyle = red(); c.beginPath(); c.arc(98, 78, 5, 0, Math.PI * 2); c.fill();
   };
   drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon();
-  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); });
+  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
+  // Moribund: the teeth, shaking a little, red when picked
+  const teeth = new Image(); teeth.src = 'data:image/png;base64,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';
+  function drawMoriIcon() {
+    const c = $('ico-mori').getContext('2d'), on = $('g-mori').getAttribute('aria-pressed') === 'true';
+    c.clearRect(0, 0, 128, 128); c.fillStyle = on ? '#3a0606' : '#0b0b0d'; c.beginPath(); c.roundRect(4, 4, 120, 120, 22); c.fill();
+    if (teeth.complete && teeth.naturalWidth) { const k = Math.min(96 / teeth.naturalWidth, 96 / teeth.naturalHeight), w = teeth.naturalWidth * k, h = teeth.naturalHeight * k; c.drawImage(teeth, 64 - w / 2 + (Math.random() - 0.5) * 2, 64 - h / 2 + (Math.random() - 0.5) * 2, w, h); }
+  }
+  teeth.onload = drawMoriIcon; setInterval(drawMoriIcon, 90);
+  // /open line engine: two little hands of dots with rainbow strings between them
+  function drawLinesIcon(now) {
+    const c = $('ico-lines').getContext('2d'), on = $('g-lines').getAttribute('aria-pressed') === 'true', t = (now || 0) / 1000;
+    c.clearRect(0, 0, 128, 128); c.fillStyle = on ? '#241a3d' : '#0b0b0d'; c.beginPath(); c.roundRect(4, 4, 120, 120, 22); c.fill();
+    const tips = (cx, s) => [0, 1, 2, 3, 4].map((i) => ({ x: cx + s * (i - 2) * 6 + s * Math.sin(t * 2 + i) * 1.5, y: 40 + Math.abs(i - 2) * 9 + Math.cos(t * 1.5 + i) * 2 }));
+    const A = tips(30, -1), B = tips(98, 1);
+    c.globalCompositeOperation = 'lighter'; c.lineWidth = 1.3;
+    A.forEach((a, i) => B.forEach((b, j) => { c.strokeStyle = `hsla(${(i * 50 + j * 25 + t * 80) % 360},100%,65%,0.7)`; c.beginPath(); c.moveTo(a.x, a.y); c.quadraticCurveTo(64, 70, b.x, b.y); c.stroke(); }));
+    c.globalCompositeOperation = 'source-over'; c.fillStyle = '#fff';
+    for (const p of [...A, ...B]) { c.beginPath(); c.arc(p.x, p.y, 2.6, 0, 7); c.fill(); }
+    c.strokeStyle = 'rgba(80,255,120,0.9)'; c.lineWidth = 2;
+    for (const [h, cx] of [[A, 30], [B, 98]]) { for (const p of h) { c.beginPath(); c.moveTo(cx, 96); c.lineTo(p.x, p.y); c.stroke(); } }
+    c.fillStyle = '#ff2b4a'; for (const cx of [30, 98]) { c.beginPath(); c.arc(cx, 96, 3.5, 0, 7); c.fill(); }
+    requestAnimationFrame(drawLinesIcon);
+  }
+  requestAnimationFrame(drawLinesIcon);
+  // Godspeed: a lightning bolt over a dark storm, flickering
+  function drawSpeedIcon(now) {
+    const c = $('ico-speed').getContext('2d'), on = $('g-speed').getAttribute('aria-pressed') === 'true', t = (now || 0) / 1000;
+    c.clearRect(0, 0, 128, 128);
+    const g = c.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, on ? '#2c1f5e' : '#120c2c'); g.addColorStop(1, on ? '#4a3590' : '#241a4a');
+    c.fillStyle = g; c.beginPath(); c.roundRect(4, 4, 120, 120, 22); c.fill();
+    c.fillStyle = 'rgba(255,255,255,0.06)'; for (let i = 0; i < 6; i++) c.fillRect(10 + ((i * 37 + t * 60) % 108), 20 + i * 15, 22, 2);
+    const fl = 0.75 + 0.25 * Math.sin(t * 23) * Math.sin(t * 7);
+    c.save(); c.shadowColor = '#8fc8ff'; c.shadowBlur = 18 * fl; c.fillStyle = `rgba(225,240,255,${fl})`;
+    c.beginPath(); c.moveTo(74, 14); c.lineTo(38, 70); c.lineTo(60, 70); c.lineTo(48, 114); c.lineTo(92, 52); c.lineTo(68, 52); c.lineTo(84, 14); c.closePath(); c.fill(); c.restore();
+    requestAnimationFrame(drawSpeedIcon);
+  }
+  requestAnimationFrame(drawSpeedIcon);
   const drawAll = () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); };
   try { matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawAll); } catch (e) {}
   new MutationObserver(drawAll).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
   if (document.fonts) document.fonts.ready.then(drawAll);
 
   // remember the last game you looked at
-  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
+  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
   drawAll();
 })();
 </script>

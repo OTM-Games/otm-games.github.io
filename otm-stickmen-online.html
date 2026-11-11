@@ -9,7 +9,7 @@
 <body>
 <div id="again"><button type="button" onclick="location.reload()">▶ Play OTM Stickmen Online again</button></div>
 <script>
-// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder).
+// OTM STICKMEN — by Teigen (liquid blood, play/watch modes, 1v1 duels, stage builder, online build breaks).
 // Paste this whole thing into the Chrome dev console (F12 → Console) on any page and press Enter.
 // Spawn fighters with the buttons, drag and throw them with the mouse. Esc (or the Quit button) closes it.
 (() => {
@@ -59,7 +59,7 @@ border: '1px solid rgba(255,255,255,0.6)', boxShadow: '0 20px 40px -10px rgba(0,
 });
 const head = el('div', { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' });
 head.appendChild(el('div', { fontSize: '20px', fontWeight: '800', color: '#1e293b' }, 'OTM Stickmen'));
-head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.2 • online'));
+head.appendChild(el('span', { padding: '2px 8px', background: '#dbeafe', color: '#1d4ed8', fontSize: '12px', fontWeight: '700', borderRadius: '999px' }, 'v12.4 • online'));
 const hideBtn = el('button', { marginLeft: '8px', width: '28px', height: '28px', border: 'none', borderRadius: '8px', background: '#e2e8f0', color: '#334155', fontWeight: '900', fontSize: '15px', cursor: 'pointer', lineHeight: '1' }, '–');
 hideBtn.title = 'Hide the spawn menu';
 head.appendChild(hideBtn);
@@ -570,7 +570,7 @@ if (!mode) mode = 'watch';
 showToast('Blank stage! Build some ground, then spawn fighters 🧱');
 }
 function setBuilder(open) {
-if (open && !noFloor) startCustomStage();
+if (open && !noFloor && !net) startCustomStage(); // online build breaks keep the fight as it is
 builder.open = open; builder.drag = null; builder.painting = null; builder.sel = null; builder.resize = null;
 builder.hidden = false; builderPanel.style.display = open ? 'block' : 'none'; bpShow.style.display = 'none';
 if (open) settings.style.display = 'none';
@@ -579,7 +579,7 @@ stageBtn.style.color = open ? 'white' : '#1e293b';
 refreshBuilder();
 }
 stageBtn.onclick = () => setBuilder(!builder.open);
-bpClose.onclick = () => setBuilder(false);
+bpClose.onclick = () => { if (net && net.paused) netResume(); else setBuilder(false); };
 bloodSlider.oninput = () => setGore(+bloodSlider.value);
 bgCheck.onchange = () => setOverlay(!bgCheck.checked);
 function setGore(v) {
@@ -733,7 +733,7 @@ const block = (e) => { e.preventDefault(); e.stopPropagation(); };
 const tgt = (e) => (e.target instanceof Node ? e.target : null); // safe event target
 const onMouseDown = (e) => {
 if (panel.contains(tgt(e)) || gearBtn.contains(tgt(e)) || settings.contains(tgt(e)) || menu.contains(tgt(e)) || controlsCard.contains(tgt(e)) || stageBtn.contains(tgt(e)) || builderPanel.contains(tgt(e)) || bpShow.contains(tgt(e))) return;
-if (net && net.started) return;
+if (net && net.started && !net.paused) return;
 if (builder.open && menu.style.display !== 'flex') { builderMouseDown(e); return; } // building, not fighting
 if (e.button !== 0) return;
 const hit = findHit(e.clientX, e.clientY);
@@ -835,7 +835,9 @@ if (e.key === 'Escape' && net) { e.preventDefault(); netLeave('You left the game
 if (e.key === 'Escape') { quit(); return; }
 if (net && net.started && !isTyping(e)) { // online: your keys go into the shared input stream
 const a = physToAction[keyName(e)];
+if (!a && keyName(e) === 'b') { e.preventDefault(); e.stopPropagation(); if (!e.repeat) netToggleBreak(); return; } // B: build break
 if (!a) return;
+if (net.paused) return;
 e.preventDefault(); e.stopPropagation();
 if (a === 'h') { if (!e.repeat) controlsCard.style.display = controlsCard.style.display === 'none' ? 'block' : 'none'; return; }
 if (!e.repeat && !net.held.has(a)) net.pressed.add(a);
@@ -4727,6 +4729,9 @@ else if (m.t === 'start' && net.role === 'guest') netStart(m);
 else if (m.t === 'i') net.theirs[m.f] = m;
 else if (m.t === 'hash') { const mine = net.hashes[m.f]; if (mine != null && mine !== m.v && !net.warned) { net.warned = true; showToast('⚠️ The two computers got out of sync. Finish this round and play again.'); } }
 else if (m.t === 'again' && !net.started) netPickFighter();
+else if (m.t === 'stage' && net.paused) { if (builder.drag || builder.resize || builder.painting) net.pendingStage = m.d; else netApplyStage(m.d); }
+else if (m.t === 'resume' && net.role === 'host' && net.paused) netResume();
+else if (m.t === 'go' && net.role === 'guest' && net.paused) netGo(m.stage);
 }
 function netStart(cfg) {
 if (!net.saved) net.saved = { gore, diff: difficulty, stage: stageData(), noFloor };
@@ -4741,11 +4746,12 @@ for (const k in keys) keys[k] = false; for (const k in pressAt) pressAt[k] = nul
 net.mine = {}; net.theirs = {}; net.hashes = {}; net.frame = 0; net.acc = 0; net.last = performance.now(); net.held.clear(); net.pressed.clear(); net.warned = false;
 for (const ui of [panel, stageBtn, gearBtn, settings]) ui.style.display = 'none';
 if (cfg.kind === 'coop') startCoop(cfg.r1, cfg.r2); else startVersus(cfg.r1, cfg.r2);
-controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • Esc leaves`));
+controlsCard.replaceChildren(el('div', { fontWeight: '800', fontSize: '14px', color: '#0f172a', marginBottom: '4px' }, `🌐 Online • you are ${net.role === 'host' ? '🔵 Player 1' : '🔴 Player 2'}`), el('div', {}, `Use your normal keys. ☠ Finisher: ${FIN_KEYS.map((k) => keyLabel(binds[k])).join(' + ')} • B build break 🧱 • Esc leaves`));
 controlsCard.style.display = 'block';
 net.started = true;
 }
 function netLoop(now) {
+if (net.paused) { netBuildTick(now); net.last = now; net.acc = 0; return; }
 net.acc += Math.min(100, now - net.last); net.last = now;
 const myPre = net.role === 'host' ? '1:' : '2:', theirPre = net.role === 'host' ? '2:' : '1:';
 let n = 0;
@@ -4753,11 +4759,13 @@ while (net.acc >= TICK && n < 4 && net.started) {
 const D = net.delay, F = net.frame, fi = F + D;
 if (!net.mine[fi]) { // record my keys for a frame a little in the future and send them
 const inp = { t: 'i', f: fi, h: toMask(net.held), p: toMask(net.pressed) }; net.pressed.clear();
+if (net.wantBreak) { inp.b = 1; net.wantBreak = false; }
 net.mine[fi] = inp; netSend(inp);
 }
 const mine = F < D ? { h: 0, p: 0 } : net.mine[F], theirs = F < D ? { h: 0, p: 0 } : net.theirs[F];
 if (!theirs) { net.stall++; break; } // wait for the other computer
 net.stall = 0;
+if (mine.b || theirs.b) { mine.b = 0; theirs.b = 0; netPause(); break; } // both computers stop on the same frame
 for (const [pre, inp] of [[myPre, mine], [theirPre, theirs]]) NET_ACTS.forEach((a, i) => {
 const k = pre + a, held = !!(inp.h & (1 << i)), press = !!(inp.p & (1 << i));
 if (press) registerPress(k);
@@ -4771,7 +4779,45 @@ net.frame++; net.acc -= TICK; n++;
 if (net && n === 4) net.acc = 0;
 if (net && net.stall > 90 && net.stall % 60 === 0) showToast('Waiting for the other computer...');
 }
+// ---------- online build breaks: either player presses B (or the button), the fight freezes on both computers, and you both build ----------
+function netToggleBreak() { if (!net || !net.started) return; if (net.paused) netResume(); else { net.wantBreak = true; showToast('🧱 Build break coming up...'); } }
+function netPause() {
+net.paused = true; net.lastStage = JSON.stringify(stageData()); net.stageCheck = 0;
+net.held.clear(); net.pressed.clear();
+stageBtn.style.display = ''; setBuilder(true);
+showToast('🧱 Build break! You can both build. Press B or ✕ to fight again');
+}
+function netApplyStage(d) { loadStageData(d); net.lastStage = JSON.stringify(stageData()); net.pendingStage = null; }
+function netBuildTick(now) { // while paused: send my changes, draw the frozen fight
+if (net.pendingStage && !builder.drag && !builder.resize && !builder.painting) netApplyStage(net.pendingStage);
+if (now - (net.stageCheck || 0) > 150 && !builder.drag && !builder.resize && !builder.painting) {
+net.stageCheck = now;
+const d = stageData(), j = JSON.stringify(d);
+if (j !== net.lastStage) { net.lastStage = j; netSend({ t: 'stage', d }); }
+}
+const keep = rngFn; rngFn = Math.random; // drawing must not touch the shared random numbers
+ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, width, height);
+drawWorld(); drawStage(); drawDecals(); for (let i = agents.length - 1; i >= 0; i--) agents[i].draw();
+rngFn = keep;
+ctx.setTransform(1, 0, 0, 1, 0, 0);
+const msg = '🧱 BUILD BREAK • you can both build • B or ✕ to fight';
+ctx.font = '800 18px sans-serif'; const tw = ctx.measureText(msg).width;
+ctx.fillStyle = 'rgba(15,23,42,0.8)'; ctx.beginPath(); ctx.roundRect(width / 2 - tw / 2 - 16, 18, tw + 32, 38, 12); ctx.fill();
+ctx.fillStyle = 'white'; ctx.fillText(msg, width / 2 - tw / 2, 43);
+}
+function netResume() { // the host has the final say on the stage, so both computers fight on exactly the same one
+if (!net || !net.paused) return;
+if (net.role === 'host') { const d = stageData(); netSend({ t: 'go', stage: d }); netGo(d); }
+else { netSend({ t: 'stage', d: stageData() }); netSend({ t: 'resume' }); showToast('Starting...'); }
+}
+function netGo(d) {
+loadStageData(d);
+setBuilder(false); stageBtn.style.display = 'none';
+net.paused = false; net.last = performance.now(); net.acc = 0;
+showToast('Fight! ⚔️');
+}
 function netMatchOver(title, sub) {
+if (net.paused) { setBuilder(false); net.paused = false; }
 net.started = false; net.myPick = null; net.theirPick = null;
 openMenu(title, sub, [
 bigButton('🔁 Play again', 'Pick fighters again', 'linear-gradient(135deg, #0891b2, #4f46e5)', () => { netSend({ t: 'again' }); netPickFighter(); }),
@@ -4781,6 +4827,7 @@ bigButton('🚪 Leave', '', '#64748b', () => netLeave('You left the game.')),
 function netLeave(msg, quiet) {
 if (!net) return;
 const n0 = net; net = null;
+if (builder.open) setBuilder(false);
 closeChannels();
 try { n0.dc && n0.dc.close(); } catch (e) {}
 try { n0.pc && n0.pc.close(); } catch (e) {}

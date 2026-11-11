@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>/open line engine</title>
+<style>
+:root { --fg: #f4f0ff; --dim: #a9a3b8; --line: #3a3550; --accent: #c9a6ff; }
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; height: 100%; background: #07060b; color: var(--fg); font: 14px system-ui, sans-serif; overflow: hidden; }
+canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+video { display: none; }
+.bar { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; padding: 6px; background: rgba(10, 8, 18, 0.72); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(8px); z-index: 2; max-width: calc(100% - 24px); }
+.bar button { font: 600 13px system-ui, sans-serif; color: var(--fg); background: transparent; border: 1.5px solid transparent; border-radius: 9px; padding: 7px 12px; cursor: pointer; }
+.bar button:hover { border-color: var(--line); }
+.bar button[aria-pressed="true"] { background: var(--fg); color: #07060b; }
+.bar .sep { width: 1px; background: var(--line); margin: 4px 2px; }
+.title { position: fixed; left: 16px; bottom: 14px; font: 700 15px ui-monospace, Menlo, monospace; color: var(--accent); z-index: 2; letter-spacing: 0.02em; }
+.title span { color: var(--dim); font-weight: 400; }
+.panel { position: fixed; top: 70px; right: 12px; width: 270px; max-height: calc(100% - 90px); overflow-y: auto; padding: 12px 14px; background: rgba(10, 8, 18, 0.88); border: 1px solid var(--line); border-radius: 14px; backdrop-filter: blur(8px); z-index: 2; font-size: 13px; }
+.panel h3 { margin: 12px 0 6px; font: 700 12px ui-monospace, Menlo, monospace; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; }
+.panel h3:first-child { margin-top: 0; }
+.panel label { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 5px 0; color: var(--dim); }
+.panel input[type=range] { width: 120px; accent-color: var(--accent); }
+.panel input[type=color] { width: 42px; height: 24px; border: 1px solid var(--line); border-radius: 6px; background: none; padding: 0; cursor: pointer; }
+.panel select { background: #15111f; color: var(--fg); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; font: inherit; }
+.panel input[type=checkbox] { accent-color: var(--accent); width: 16px; height: 16px; }
+.panel .row { display: flex; gap: 6px; margin-top: 12px; }
+.panel .row button { flex: 1; font: 600 12px system-ui, sans-serif; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 6px; cursor: pointer; }
+@media (max-width: 600px) { .panel { left: 12px; right: 12px; width: auto; top: auto; bottom: 44px; max-height: 50%; } }
+.start { position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 24px; z-index: 3; background: radial-gradient(circle at 50% 40%, #1b1430, #07060b 70%); }
+.start h1 { margin: 0; font: 700 clamp(28px, 6vw, 56px) ui-monospace, Menlo, monospace; letter-spacing: -0.02em; }
+.start p { margin: 0; color: var(--dim); max-width: 440px; line-height: 1.5; }
+.start button { font: 700 16px system-ui, sans-serif; padding: 12px 22px; border-radius: 12px; border: 0; background: var(--fg); color: #07060b; cursor: pointer; }
+.start .small { font-size: 12px; }
+.start .err { color: #ff7a8a; }
+</style>
+</head>
+<body>
+<video id="v" playsinline muted></video>
+<canvas id="c"></canvas>
+<div class="bar" id="bar" hidden>
+  <button data-m="strings" aria-pressed="true">1 Strings</button>
+  <button data-m="window" aria-pressed="false">2 Window</button>
+  <button data-m="laser" aria-pressed="false">3 Laser</button>
+  <button data-m="all" aria-pressed="false">4 All</button>
+  <span class="sep"></span>
+  <button id="filter" aria-pressed="false">F filter: invert</button>
+  <button id="skel" aria-pressed="true">S skeleton</button>
+  <button id="cust" aria-pressed="false">C customize</button>
+</div>
+<div class="panel" id="panel" hidden></div>
+<div class="title" id="ttl" hidden>/open line engine <span id="status"></span></div>
+<div class="start" id="start">
+  <h1>/open line engine</h1>
+  <p>Hold your hands up to the camera. Lines follow your fingers. Strings connect your fingertips, a window stretches between your hands, and a laser fires between your pointer fingers.</p>
+  <button id="go">▶ Turn on camera</button>
+  <p class="small">Everything runs in your browser. The video never leaves your computer.</p>
+  <button id="demo" class="small" style="background:transparent;color:var(--dim);border:1px solid var(--line)">no camera? watch the demo hands</button>
+  <p class="err" id="err"></p>
+</div>
+<script type="module">
+const $ = (id) => document.getElementById(id);
+const cv = $('c'), ctx = cv.getContext('2d'), video = $('v');
+let W = 0, H = 0, DPR = 1;
+function size() { DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; cv.width = W * DPR; cv.height = H * DPR; ctx.setTransform(DPR, 0, 0, DPR, 0, 0); }
+addEventListener('resize', size); size();
+
+// ---------- settings ----------
+let mode = 'strings', skeleton = true;
+// how everything looks: change it in the C customize panel (it's remembered on this computer)
+const DEFAULTS = {
+  strColor: 'rainbow', strPick: '#ff4fd8', strWidth: 1.6, strGlow: 10, strSag: 10, strWiggle: 6, strOwn: true, strBetween: true, strDot: 4, strSpeed: 60,
+  winFilter: 'invert', winBorder: '#ffffff', winBorderW: 1.5, winGlow: 12, winScan: true, winPixel: 14, winFrame: true,
+  lasColor: '#ff1e3c', lasWidth: 1, lasGlow: 40, lasPulse: 12, lasSparks: true, lasCore: true,
+  skBone: '#50ff78', skJoint: '#ff2b4a', skWidth: 2, skDot: 3.2,
+};
+const S = { ...DEFAULTS };
+try { Object.assign(S, JSON.parse(localStorage.getItem('ole-look') || '{}')); } catch (e) {}
+const saveLook = () => { try { localStorage.setItem('ole-look', JSON.stringify(S)); } catch (e) {} };
+const rgba = (hex, a) => { const n = parseInt(hex.slice(1), 16); return `rgba(${n >> 16},${(n >> 8) & 255},${n & 255},${a})`; };
+const lighten = (hex, k) => { const n = parseInt(hex.slice(1), 16), f = (c) => Math.round(c + (255 - c) * k); return '#' + [n >> 16, (n >> 8) & 255, n & 255].map((c) => f(c).toString(16).padStart(2, '0')).join(''); };
+const PANEL = [
+  ['Strings', [['strColor', 'colors', ['rainbow', 'one color', 'fire', 'ice', 'neon green']], ['strPick', 'the one color', 'color'], ['strWidth', 'thickness', 0.5, 6, 0.1], ['strGlow', 'glow', 0, 40, 1], ['strSag', 'droop', -40, 60, 1], ['strWiggle', 'wiggle', 0, 30, 1], ['strSpeed', 'color speed', 0, 300, 5], ['strDot', 'fingertip dots', 0, 12, 0.5], ['strBetween', 'between hands', 'check'], ['strOwn', 'on each hand', 'check']]],
+  ['Window', [['winFilter', 'filter', ['invert', 'blue', 'pixel', 'thermal', 'none']], ['winBorder', 'border color', 'color'], ['winBorderW', 'border thickness', 0, 8, 0.5], ['winGlow', 'border glow', 0, 40, 1], ['winPixel', 'pixel size', 4, 40, 1], ['winScan', 'scan lines', 'check'], ['winFrame', 'finger lines', 'check']]],
+  ['Laser', [['lasColor', 'color', 'color'], ['lasWidth', 'thickness', 0.2, 3, 0.1], ['lasGlow', 'glow', 0, 80, 1], ['lasPulse', 'pulse speed', 0, 40, 1], ['lasCore', 'white core', 'check'], ['lasSparks', 'sparks', 'check']]],
+  ['Skeleton', [['skBone', 'bone color', 'color'], ['skJoint', 'joint color', 'color'], ['skWidth', 'bone thickness', 0.5, 6, 0.5], ['skDot', 'joint size', 0, 8, 0.2]]],
+];
+function buildPanel() {
+  const P = $('panel'); P.replaceChildren();
+  for (const [title, rows] of PANEL) {
+    const h = document.createElement('h3'); h.textContent = title; P.appendChild(h);
+    for (const [key, name, a, b, step] of rows) {
+      const l = document.createElement('label'); l.append(name); let inp;
+      if (Array.isArray(a)) { inp = document.createElement('select'); for (const o of a) { const op = document.createElement('option'); op.value = op.textContent = o; inp.appendChild(op); } inp.value = S[key]; inp.oninput = () => { S[key] = inp.value; saveLook(); if (key === 'winFilter') showFilter(); }; }
+      else if (a === 'color') { inp = document.createElement('input'); inp.type = 'color'; inp.value = S[key]; inp.oninput = () => { S[key] = inp.value; saveLook(); }; }
+      else if (a === 'check') { inp = document.createElement('input'); inp.type = 'checkbox'; inp.checked = S[key]; inp.oninput = () => { S[key] = inp.checked; saveLook(); }; }
+      else { inp = document.createElement('input'); inp.type = 'range'; inp.min = a; inp.max = b; inp.step = step; inp.value = S[key]; inp.oninput = () => { S[key] = +inp.value; saveLook(); }; }
+      inp.dataset.k = key; l.appendChild(inp); P.appendChild(l);
+    }
+  }
+  const row = document.createElement('div'); row.className = 'row';
+  const reset = document.createElement('button'); reset.textContent = '↺ reset look'; reset.onclick = () => { Object.assign(S, DEFAULTS); saveLook(); buildPanel(); showFilter(); };
+  const close = document.createElement('button'); close.textContent = 'close'; close.onclick = () => $('cust').click();
+  row.append(reset, close); P.appendChild(row);
+}
+$('cust').onclick = () => { const P = $('panel'), open = P.hidden; P.hidden = !open; $('cust').setAttribute('aria-pressed', String(open)); if (open) buildPanel(); };
+function strColor(n, t, a) { // the color of string number n
+  const c = S.strColor;
+  if (c === 'one color') return rgba(S.strPick, a);
+  const sp = t * S.strSpeed;
+  if (c === 'fire') return `hsla(${(n * 9 + sp) % 50},100%,${55 + (n % 3) * 8}%,${a})`;
+  if (c === 'ice') return `hsla(${185 + (n * 11 + sp) % 50},100%,${65 + (n % 3) * 8}%,${a})`;
+  if (c === 'neon green') return `hsla(${100 + (n * 7 + sp) % 40},100%,60%,${a})`;
+  return `hsla(${(n * 37 + sp) % 360},100%,65%,${a})`;
+}
+const FILTERS = ['invert', 'blue', 'pixel', 'thermal', 'none'];
+function setMode(m) { mode = m; for (const b of document.querySelectorAll('[data-m]')) b.setAttribute('aria-pressed', String(b.dataset.m === m)); }
+for (const b of document.querySelectorAll('[data-m]')) b.onclick = () => setMode(b.dataset.m);
+function showFilter() { $('filter').textContent = 'F filter: ' + S.winFilter; }
+$('filter').onclick = () => { S.winFilter = FILTERS[(FILTERS.indexOf(S.winFilter) + 1) % FILTERS.length]; saveLook(); showFilter(); if (!$('panel').hidden) buildPanel(); };
+showFilter();
+$('skel').onclick = () => { skeleton = !skeleton; $('skel').setAttribute('aria-pressed', String(skeleton)); };
+addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  if (k === '1') setMode('strings'); if (k === '2') setMode('window'); if (k === '3') setMode('laser'); if (k === '4') setMode('all');
+  if (e.target.closest && e.target.closest('.panel')) return;
+  if (k === 'f') $('filter').click(); if (k === 's') $('skel').click(); if (k === 'c') $('cust').click();
+});
+
+// ---------- hands ----------
+// each hand: 21 points {x, y} in 0..1 of the video (already mirrored like a selfie)
+let hands = [], source = null; // source: the video element, or null for the demo
+const TIPS = [4, 8, 12, 16, 20];
+const BONES = [[0,1],[1,2],[2,3],[3,4],[0,5],[5,6],[6,7],[7,8],[5,9],[9,10],[10,11],[11,12],[9,13],[13,14],[14,15],[15,16],[13,17],[0,17],[17,18],[18,19],[19,20]];
+const smooth = []; // smoothed points per hand so the lines don't jitter
+
+// where the video sits on screen (cover)
+function view() {
+  const vw = source ? video.videoWidth || 16 : 16, vh = source ? video.videoHeight || 9 : 9;
+  const s = Math.max(W / vw, H / vh), dw = vw * s, dh = vh * s;
+  return { x: (W - dw) / 2, y: (H - dh) / 2, w: dw, h: dh };
+}
+const toScreen = (p, v) => ({ x: v.x + p.x * v.w, y: v.y + p.y * v.h });
+
+// ---------- drawing ----------
+const off = document.createElement('canvas'), offc = off.getContext('2d');
+function drawVideo(v) {
+  if (!source) { // demo background
+    const g = ctx.createRadialGradient(W / 2, H * 0.4, 0, W / 2, H * 0.4, Math.max(W, H) * 0.7);
+    g.addColorStop(0, '#2a2140'); g.addColorStop(1, '#09070f'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 40) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+    return;
+  }
+  ctx.save(); ctx.translate(v.x + v.w, v.y); ctx.scale(-1, 1); ctx.drawImage(video, 0, 0, v.w, v.h); ctx.restore(); // mirrored, like a mirror
+}
+
+function glowLine(a, b, color, width, blur) {
+  ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = width; ctx.lineCap = 'round'; ctx.shadowColor = color; ctx.shadowBlur = blur;
+  ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); ctx.restore();
+}
+
+function drawSkeleton(pts) {
+  ctx.save(); ctx.strokeStyle = rgba(S.skBone, 0.9); ctx.lineWidth = S.skWidth;
+  for (const [a, b] of BONES) { ctx.beginPath(); ctx.moveTo(pts[a].x, pts[a].y); ctx.lineTo(pts[b].x, pts[b].y); ctx.stroke(); }
+  if (S.skDot > 0) { ctx.fillStyle = S.skJoint; for (const p of pts) { ctx.beginPath(); ctx.arc(p.x, p.y, S.skDot, 0, Math.PI * 2); ctx.fill(); } }
+  ctx.restore();
+}
+
+// 1: colorful strings between every fingertip of one hand and every fingertip of the other
+function drawStrings(hs, t) {
+  ctx.globalCompositeOperation = 'lighter';
+  if (hs.length >= 2 && S.strBetween) {
+    const [A, B] = hs; let n = 0;
+    for (const i of TIPS) for (const j of TIPS) {
+      n++;
+      const a = A[i], b = B[j];
+      // a little sag, like a real string
+      const mx = (a.x + b.x) / 2; const my = (a.y + b.y) / 2 + Math.sin(t * 2 + n) * S.strWiggle + S.strSag;
+      ctx.save(); ctx.strokeStyle = strColor(n, t, 0.8); ctx.lineWidth = S.strWidth; ctx.shadowColor = strColor(n, t, 1); ctx.shadowBlur = S.strGlow;
+      ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(mx, my, b.x, b.y); ctx.stroke(); ctx.restore();
+    }
+  }
+  for (const h of hs) { // strings between your own fingertips too
+    if (S.strOwn) for (let k = 0; k < TIPS.length; k++) for (let m = k + 1; m < TIPS.length; m++) glowLine(h[TIPS[k]], h[TIPS[m]], strColor(k * 2 + m * 3, t, 0.55), S.strWidth * 0.75, S.strGlow * 0.8);
+    if (S.strDot > 0) for (const i of TIPS) { ctx.save(); ctx.fillStyle = '#fff'; ctx.shadowColor = '#fff'; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(h[i].x, h[i].y, S.strDot, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+  }
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// 2: a window stretched between your thumbs and pointer fingers, showing the camera through a filter
+function drawWindow(hs, v, t) {
+  if (hs.length < 2) { for (const h of hs) glowLine(h[4], h[8], rgba(S.winBorder, 0.8), Math.max(1, S.winBorderW), S.winGlow); return; }
+  let [A, B] = hs; if (A[0].x > B[0].x) [A, B] = [B, A];
+  const quad = [A[8], B[8], B[4], A[4]]; // pointer → pointer → thumb → thumb
+  ctx.save(); ctx.beginPath(); quad.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath(); ctx.clip();
+  const f = S.winFilter;
+  if (f === 'none') { ctx.fillStyle = 'rgba(255,255,255,0.08)'; ctx.fillRect(0, 0, W, H); }
+  else if (f === 'pixel') {
+    const px = S.winPixel; off.width = Math.ceil(W / px); off.height = Math.ceil(H / px);
+    offc.imageSmoothingEnabled = false; offc.drawImage(cv, 0, 0, W * DPR, H * DPR, 0, 0, off.width, off.height);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(off, 0, 0, off.width, off.height, 0, 0, W, H); ctx.imageSmoothingEnabled = true;
+  } else {
+    ctx.filter = f === 'invert' ? 'invert(1) hue-rotate(180deg) saturate(1.4)' : f === 'blue' ? 'grayscale(1) sepia(1) hue-rotate(180deg) saturate(4) brightness(0.9) contrast(1.3)' : 'invert(1) saturate(6) hue-rotate(90deg) contrast(1.6)';
+    if (source) drawVideo(v); else { ctx.fillStyle = '#7fd4ff'; ctx.fillRect(0, 0, W, H); }
+    ctx.filter = 'none';
+  }
+  // scan lines
+  ctx.fillStyle = 'rgba(255,255,255,0.06)'; if (S.winScan) for (let y = (t * 40) % 6; y < H; y += 6) ctx.fillRect(0, y, W, 1);
+  ctx.restore();
+  ctx.save(); ctx.strokeStyle = rgba(S.winBorder, 0.95); ctx.lineWidth = S.winBorderW; ctx.shadowColor = S.winBorder; ctx.shadowBlur = S.winGlow;
+  if (S.winBorderW > 0) { ctx.beginPath(); quad.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y))); ctx.closePath(); ctx.stroke(); }
+  // extra frame lines from every fingertip to the window's corners, like the clips
+  ctx.lineWidth = 0.8; ctx.globalAlpha = 0.5;
+  if (S.winFrame) for (const [h, c] of [[A, [quad[0], quad[3]]], [B, [quad[1], quad[2]]]]) for (const i of [12, 16, 20]) for (const q of c) { ctx.beginPath(); ctx.moveTo(h[i].x, h[i].y); ctx.lineTo(q.x, q.y); ctx.stroke(); }
+  ctx.restore();
+}
+
+// 3: a red laser between your pointer fingers
+function drawLaser(hs, t) {
+  ctx.globalCompositeOperation = 'lighter';
+  if (hs.length >= 2) {
+    const a = hs[0][8], b = hs[1][8], d = Math.hypot(a.x - b.x, a.y - b.y), pulse = 0.75 + 0.25 * Math.sin(t * S.lasPulse);
+    const w = Math.max(6, 34 - d / 30) * pulse * S.lasWidth, C = S.lasColor;
+    glowLine(a, b, rgba(C, 0.55), w * 1.8, S.lasGlow);
+    glowLine(a, b, rgba(lighten(C, 0.1), 0.9), w, S.lasGlow * 0.6);
+    if (S.lasCore) glowLine(a, b, rgba(lighten(C, 0.8), 0.95), w * 0.25, 8);
+    // sparks
+    if (S.lasSparks) for (let k = 0; k < 10; k++) { const s = Math.random(), p = { x: a.x + (b.x - a.x) * s, y: a.y + (b.y - a.y) * s }; ctx.fillStyle = rgba(lighten(C, 0.45), 0.8); ctx.fillRect(p.x + (Math.random() - 0.5) * w * 2, p.y + (Math.random() - 0.5) * w * 2, 2, 2); }
+    for (const p of [a, b]) { ctx.save(); const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, w * 2.2); g.addColorStop(0, rgba(lighten(C, 0.85), 1)); g.addColorStop(0.3, rgba(C, 0.8)); g.addColorStop(1, rgba(C, 0)); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(p.x, p.y, w * 2.2, 0, Math.PI * 2); ctx.fill(); ctx.restore(); }
+  } else for (const h of hs) glowLine(h[8], h[4], rgba(S.lasColor, 0.9), 5 * S.lasWidth, S.lasGlow * 0.5); // one hand: a mini beam between thumb and pointer
+  ctx.globalCompositeOperation = 'source-over';
+}
+
+// ---------- demo hands (no camera) ----------
+function demoHands(t) {
+  const hand = (cx, cy, side, spread, rot) => {
+    // a simple open hand: wrist, then 4 joints per finger fanning out
+    const pts = [{ x: cx, y: cy }];
+    const fingers = [[-1.0, 0.55], [-0.45, 0.95], [-0.1, 1.05], [0.25, 0.95], [0.6, 0.75]];
+    fingers.forEach(([ang, len], f) => {
+      const a = (ang * spread - Math.PI / 2) + rot, base = f === 0 ? 0.04 : 0.06;
+      for (let k = 1; k <= 4; k++) { const r = base + k * 0.045 * len; pts.push({ x: cx + Math.cos(a) * r * side * 0.62, y: cy + Math.sin(a) * r }); }
+    });
+    return pts;
+  };
+  const sway = Math.sin(t * 0.9) * 0.08, lift = Math.cos(t * 1.3) * 0.05;
+  return [hand(0.32 - sway, 0.62 + lift, -1, 0.9 + Math.sin(t * 2) * 0.15, 0.25 + Math.sin(t) * 0.1), hand(0.68 + sway, 0.62 - lift, 1, 0.9 + Math.cos(t * 2) * 0.15, -0.25 - Math.sin(t) * 0.1)];
+}
+
+// ---------- loop ----------
+let landmarker = null, lastVideoT = -1, loadFailed = false;
+function frame(now) {
+  const t = now / 1000, v = view();
+  if (source && landmarker && video.readyState >= 2 && video.currentTime !== lastVideoT) {
+    lastVideoT = video.currentTime;
+    try { const r = landmarker.detectForVideo(video, now); hands = (r.landmarks || []).map((h) => h.map((p) => ({ x: 1 - p.x, y: p.y }))); } catch (e) {}
+  }
+  const raw = source ? hands : demoHands(t);
+  // smooth + to screen
+  const hs = raw.slice(0, 2).map((h, i) => {
+    const s = h.map((p) => toScreen(p, v));
+    const prev = smooth[i]; if (prev && prev.length === s.length) for (let k = 0; k < s.length; k++) { s[k].x = prev[k].x + (s[k].x - prev[k].x) * 0.6; s[k].y = prev[k].y + (s[k].y - prev[k].y) * 0.6; }
+    smooth[i] = s; return s;
+  });
+  smooth.length = hs.length;
+  hs.sort((a, b) => a[0].x - b[0].x); // left hand first
+  ctx.clearRect(0, 0, W, H); drawVideo(v);
+  if (mode === 'window' || mode === 'all') drawWindow(hs, v, t);
+  if (skeleton) hs.forEach(drawSkeleton);
+  if (mode === 'strings' || mode === 'all') drawStrings(hs, t);
+  if (mode === 'laser' || mode === 'all') drawLaser(hs, t);
+  $('status').textContent = source ? (loadFailed ? "· couldn't load hand tracking (this site or network might block it)" : landmarker ? (hs.length ? `· ${hs.length} hand${hs.length > 1 ? 's' : ''}` : '· show your hands') : '· loading hand tracking…') : '· demo hands';
+  requestAnimationFrame(frame);
+}
+
+function begin() { $('start').hidden = true; $('bar').hidden = false; $('ttl').hidden = false; requestAnimationFrame(frame); }
+window.__ole = { setMode, get hands() { return hands; } };
+
+$('demo').onclick = () => { source = null; begin(); };
+$('go').onclick = async () => {
+  $('err').textContent = '';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }, audio: false });
+    video.srcObject = stream; await video.play(); source = video; begin();
+  } catch (e) { $('err').textContent = "Couldn't turn on the camera (" + (e.name || 'blocked') + '). Allow camera access for this page, or watch the demo.'; return; }
+  try {
+    const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
+    const files = await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
+    const opts = (delegate) => ({ baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate }, runningMode: 'VIDEO', numHands: 2 });
+    try { landmarker = await vision.HandLandmarker.createFromOptions(files, opts('GPU')); } catch (e) { landmarker = await vision.HandLandmarker.createFromOptions(files, opts('CPU')); }
+  } catch (e) { loadFailed = true; console.warn(e); }
+};
+</script>
+</body>
+</html>
