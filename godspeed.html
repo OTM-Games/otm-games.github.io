@@ -23,6 +23,12 @@ canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
 .row input { accent-color: var(--bolt); width: 180px; }
 .big { font: 900 clamp(40px, 8vw, 80px) ui-monospace, Menlo, monospace; color: #fff; }
 .err { color: #ff8a9a; max-width: 420px; }
+.binds { display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px 10px; align-items: center; text-align: left; width: min(520px, 100%); }
+.binds span { color: var(--dim); font-size: 14px; }
+.binds button { min-width: 0; padding: 8px 10px; font: 700 13px ui-monospace, Menlo, monospace; background: rgba(255, 255, 255, 0.08); color: var(--fg); border: 1.5px solid var(--line); border-radius: 8px; }
+.binds button.wait { background: var(--bolt); color: #0b0820; border-color: var(--bolt); }
+.binds button.clash { border-color: #ff8a9a; }
+.screen .small { font-size: 12px; color: var(--dim); }
 </style>
 </head>
 <body>
@@ -34,14 +40,8 @@ canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
   <div class="sub">full note</div>
   <div class="best" id="bestT"></div>
   <button id="play">▶ Play</button>
-  <div class="keys">
-    <b>WASD</b><span>move (you speed up the longer you run)</span>
-    <b>Space</b><span>jump</span>
-    <b>C / Ctrl</b><span>slide: keeps your speed, faster downhill</span>
-    <b>E / RMB</b><span>⚡ lightning dash where you look (1 per jump)</span>
-    <b>R</b><span>back to the last checkpoint</span>
-    <b>Esc</b><span>pause</span>
-  </div>
+  <button class="ghost" id="bindsBtn">⌨ Keybinds</button>
+  <div class="keys" id="keyList"></div>
   <div class="sub" style="letter-spacing:.15em;font-size:12px">slide → jump keeps your momentum</div>
   <div class="err" id="err"></div>
 </div>
@@ -53,6 +53,14 @@ canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
   <label class="row">mouse speed <input type="range" id="sens" min="0.3" max="3" step="0.05"></label>
   <label class="row">volume <input type="range" id="vol" min="0" max="1" step="0.05"></label>
   <label class="row">field of view <input type="range" id="fov" min="70" max="110" step="1"></label>
+  <button class="ghost" id="bindsBtn2">⌨ Keybinds</button>
+</div>
+
+<div class="screen" id="bindsScreen" hidden>
+  <h1 style="font-size:56px">KEYBINDS</h1>
+  <div class="small">click a box, then press a key or mouse button · Esc cancels · Backspace clears</div>
+  <div class="binds" id="bindList"></div>
+  <div class="row"><button class="ghost" id="bindsReset" style="min-width:0">↺ Defaults</button><button id="bindsDone" style="min-width:0">✓ Done</button></div>
 </div>
 
 <div class="screen" id="done" hidden>
@@ -73,6 +81,16 @@ const gl = glc.getContext('webgl2', { antialias: true });
 if (!gl) { $('err').textContent = "Your browser can't run 3D games (WebGL2 is off). Try Chrome or Edge."; $('play').hidden = true; return; }
 const store = { get(k, d) { try { const v = localStorage.getItem('godspeed-' + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }, set(k, v) { try { localStorage.setItem('godspeed-' + k, JSON.stringify(v)); } catch (e) {} } };
 const settings = Object.assign({ sens: 1, vol: 0.7, fov: 90 }, store.get('settings', {}));
+// keybinds: each action has two slots. Mouse buttons are 'Mouse0' (left), 'Mouse1' (middle), 'Mouse2' (right)
+const ACTIONS = [
+  ['forward', 'run forward (you speed up the longer you run)'], ['back', 'back'], ['left', 'left'], ['right', 'right'],
+  ['jump', 'jump'], ['slide', 'slide: keeps your speed, faster downhill'], ['dash', '⚡ lightning dash where you look (1 per jump)'], ['reset', 'back to the last checkpoint'],
+];
+const DEFAULT_BINDS = { forward: ['KeyW', 'ArrowUp'], back: ['KeyS', 'ArrowDown'], left: ['KeyA', 'ArrowLeft'], right: ['KeyD', 'ArrowRight'], jump: ['Space', ''], slide: ['KeyC', 'ControlLeft'], dash: ['KeyE', 'Mouse2'], reset: ['KeyR', ''] };
+const binds = JSON.parse(JSON.stringify(DEFAULT_BINDS));
+{ const saved = store.get('binds', null); if (saved) for (const [a] of ACTIONS) if (Array.isArray(saved[a])) binds[a] = [saved[a][0] || '', saved[a][1] || '']; }
+const keyName = (c) => !c ? '—' : c === 'Mouse0' ? 'LMB' : c === 'Mouse1' ? 'MMB' : c === 'Mouse2' ? 'RMB' : c === 'Space' ? 'Space' : c.startsWith('Key') ? c.slice(3) : c.startsWith('Digit') ? c.slice(5) : c.startsWith('Arrow') ? { ArrowUp: '↑', ArrowDown: '↓', ArrowLeft: '←', ArrowRight: '→' }[c] : c.replace('Left', ' L').replace('Right', ' R').replace('Control', 'Ctrl');
+const actionOf = (code) => { for (const [a] of ACTIONS) if (binds[a].includes(code)) return a; return null; };
 let W = 0, H = 0, DPR = 1;
 function size() { DPR = Math.min(2, devicePixelRatio || 1); W = innerWidth; H = innerHeight; glc.width = W * DPR; glc.height = H * DPR; hud.width = W * DPR; hud.height = H * DPR; hx.setTransform(DPR, 0, 0, DPR, 0, 0); }
 addEventListener('resize', size); size();
@@ -165,17 +183,18 @@ function ramp(x0, x1, z0, z1, ya, yb, col) { // a slope along z: height ya at z0
 }
 const STONE = [0.80, 0.78, 0.88], STONE2 = [0.66, 0.63, 0.78], GOLD = [0.98, 0.78, 0.36], DARK = [0.38, 0.33, 0.52], RED = [0.85, 0.32, 0.38];
 const checkpoints = [], orbs = [], hints = [];
+const K = (a) => binds[a].filter(Boolean).map(keyName).join(' or ') || '(no key set)';
 let finishZ = 0, finishY = 0;
 function buildCourse() {
   // 1. the runway
   box(-4, -1, -6, 4, 0, 20, STONE);
-  hints.push({ z: -6, text: 'WASD to run. The longer you run, the faster you go' });
-  hints.push({ z: 14, text: 'SPACE: jump the gap' });
+  hints.push({ z: -6, get text() { return `${[binds.forward[0], binds.left[0], binds.back[0], binds.right[0]].map(keyName).join('')} to run. The longer you run, the faster you go`; } });
+  hints.push({ z: 14, get text() { return `${K('jump').toUpperCase()}: jump the gap`; } });
   // 2. jump a gap, then slide under the bar
   box(-4, -1, 25, 4, 0, 46, STONE);
   box(-4.5, 1.15, 37, 4.5, 2.6, 39, RED); // low bar: you have to slide under it
   box(-4.6, -1, 25, -4, 3, 46, DARK); box(4, -1, 25, 4.6, 3, 46, DARK); // side walls
-  hints.push({ z: 30, text: 'C or CTRL: slide under the bar' });
+  hints.push({ z: 30, get text() { return `${K('slide').toUpperCase()}: slide under the bar`; } });
   checkpoints.push({ x: 0, y: 0, z: 43 });
   // 3. slide down the big ramp to pick up speed
   ramp(-4, 4, 46, 72, 0, -11, STONE2);
@@ -188,7 +207,7 @@ function buildCourse() {
   ramp(-4, 4, 112, 128, -11, -5, STONE2);
   box(-4, -6, 128, 4, -5, 138, STONE);
   checkpoints.push({ x: 0, y: -5, z: 131 });
-  hints.push({ z: 129, text: 'E or RIGHT CLICK: ⚡ lightning dash where you look' });
+  hints.push({ z: 129, get text() { return `${K('dash').toUpperCase()}: ⚡ lightning dash where you look`; } });
   // 6. huge gap with a lightning orb: jump, dash, grab the orb, dash again
   orbs.push({ x: 0, y: -3, z: 152 });
   box(-4, -6, 166, 4, -5, 180, STONE);
@@ -203,7 +222,7 @@ function buildCourse() {
   box(-5, -6, 220, 5, -5, 230, STONE);
   box(-11, -6, 235, -1, -5, 245, STONE);
   checkpoints.push({ x: -6, y: -5, z: 240 });
-  hints.push({ z: 201, text: 'Zig-zag! Steer in the air with A and D' });
+  hints.push({ z: 201, get text() { return `Zig-zag! Steer in the air with ${keyName(binds.left[0])} and ${keyName(binds.right[0])}`; } });
   // 9. the long fall slide to the finish
   ramp(-11, -1, 245, 274, -5, -20, STONE2);
   box(-11, -21, 274, -1, -20, 288, STONE);
@@ -301,7 +320,7 @@ function doDash() {
   let d = [Math.sin(P.yaw) * cp, Math.sin(P.pitch), Math.cos(P.yaw) * cp];
   // no input? dash where you look. holding keys? dash that way (still using your look up/down)
   const mv = wishDir();
-  if (mv && (keys.has('KeyA') || keys.has('KeyD') || keys.has('KeyS'))) d = V.norm([mv[0] * cp, Math.sin(P.pitch), mv[2] * cp]);
+  if (mv && (down('left') || down('right') || down('back'))) d = V.norm([mv[0] * cp, Math.sin(P.pitch), mv[2] * cp]);
   P.dashDir = d; P.dashT = 0.16; P.dashFrom = V.add(P.pos, [0, P.h * 0.6, 0]);
   const hs = Math.hypot(P.vel[0], P.vel[2]);
   P.dashSpeed = Math.max(30, hs + 10);
@@ -314,7 +333,7 @@ function doDash() {
 }
 function wishDir() {
   let f = 0, s = 0;
-  if (keys.has('KeyW')) f++; if (keys.has('KeyS')) f--; if (keys.has('KeyD')) s++; if (keys.has('KeyA')) s--;
+  if (down('forward')) f++; if (down('back')) f--; if (down('right')) s++; if (down('left')) s--;
   if (!f && !s) return null;
   const fw = [Math.sin(P.yaw), 0, Math.cos(P.yaw)], rt = [-Math.cos(P.yaw), 0, Math.sin(P.yaw)];
   return V.norm([fw[0] * f + rt[0] * s, 0, fw[2] * f + rt[2] * s]);
@@ -323,7 +342,7 @@ function accelerate(dir, wish, acc, dt) { const cur = P.vel[0] * dir[0] + P.vel[
 function step(dt) {
   const wd = wishDir(), hs = Math.hypot(P.vel[0], P.vel[2]);
   P.slideCD = Math.max(0, P.slideCD - dt); P.coyote = P.ground ? 0.1 : Math.max(0, P.coyote - dt); P.jumpBuf = Math.max(0, P.jumpBuf - dt);
-  const crouchKey = keys.has('KeyC') || keys.has('ControlLeft') || keys.has('ControlRight');
+  const crouchKey = down('slide');
   if (P.dashT > 0) { // flying on lightning
     P.dashT -= dt;
     P.vel = V.mul(P.dashDir, P.dashSpeed);
@@ -343,7 +362,7 @@ function step(dt) {
     } else if (crouchKey) {
       const fr = Math.max(0, 1 - 8 * dt); P.vel[0] *= fr; P.vel[2] *= fr; if (wd) accelerate(wd, 4, 10, dt);
     } else {
-      P.runT = wd && keys.has('KeyW') ? P.runT + dt : Math.max(0, P.runT - dt * 3);
+      P.runT = wd && down('forward') ? P.runT + dt : Math.max(0, P.runT - dt * 3);
       const top = 9 + Math.min(1, P.runT / 2.2) * 5; // 9 → 14 m/s the longer you run
       if (hs > top + 0.5) { const fr = Math.max(0, 1 - 2.2 * dt); P.vel[0] *= fr; P.vel[2] *= fr; } // above top speed: ease off slowly (keeps momentum)
       if (wd) accelerate(wd, top, 10, dt);
@@ -429,21 +448,28 @@ function cubeGlow(c, s, rot, col) { // a spinning diamond for orbs
 }
 
 // ---------- input ----------
+const down = (a) => binds[a].some((c) => c && keys.has(c));
+function pressed(code) { // a key or mouse button went down during play
+  keys.add(code);
+  const a = actionOf(code);
+  if (a === 'jump') P.jumpBuf = 0.12;
+  if (a === 'dash') doDash();
+  if (a === 'reset') respawn(false);
+  return a;
+}
 addEventListener('keydown', (e) => {
   if (state !== 'play') return;
-  if (['Space', 'ControlLeft', 'ControlRight', 'Tab'].includes(e.code)) e.preventDefault();
+  if (actionOf(e.code) || ['Space', 'Tab'].includes(e.code)) e.preventDefault();
   if (e.repeat) return;
-  keys.add(e.code);
-  if (e.code === 'Space') P.jumpBuf = 0.12;
-  if (e.code === 'KeyE') doDash();
-  if (e.code === 'KeyR') { respawn(false); }
+  pressed(e.code);
 });
 addEventListener('keyup', (e) => keys.delete(e.code));
+addEventListener('mouseup', (e) => keys.delete('Mouse' + e.button));
 addEventListener('blur', () => keys.clear());
 glc.addEventListener('mousedown', (e) => {
   if (state !== 'play') return;
   if (document.pointerLockElement !== glc) { glc.requestPointerLock && glc.requestPointerLock(); return; }
-  if (e.button === 2) doDash();
+  pressed('Mouse' + e.button);
 });
 addEventListener('contextmenu', (e) => { if (state === 'play') e.preventDefault(); });
 addEventListener('mousemove', (e) => {
@@ -456,6 +482,52 @@ document.addEventListener('pointerlockchange', () => { if (state === 'play' && d
 function startGame() { audio(); $('title').hidden = true; $('done').hidden = true; $('pause').hidden = true; state = 'play'; respawn(true); try { glc.requestPointerLock(); } catch (e) {} }
 function pauseGame() { state = 'pause'; keys.clear(); $('pause').hidden = false; }
 $('play').onclick = startGame; $('again').onclick = startGame;
+// ---------- keybinds screen ----------
+let bindFrom = 'title', waiting = null;
+function keyList() { // the controls shown on the title screen
+  const L = $('keyList'); L.replaceChildren();
+  const add = (k, t) => { const b = document.createElement('b'); b.textContent = k; const s = document.createElement('span'); s.textContent = t; L.append(b, s); };
+  add([binds.forward[0], binds.left[0], binds.back[0], binds.right[0]].map(keyName).join(' '), 'move (you speed up the longer you run)');
+  for (const a of ['jump', 'slide', 'dash', 'reset']) add(binds[a].filter(Boolean).map(keyName).join(' / ') || '—', ACTIONS.find((x) => x[0] === a)[1]);
+  add('Esc', 'pause');
+}
+function drawBinds() {
+  const L = $('bindList'); L.replaceChildren();
+  const used = {}; for (const [a] of ACTIONS) for (const c of binds[a]) if (c) used[c] = (used[c] || 0) + 1;
+  for (const [a, label] of ACTIONS) {
+    const s = document.createElement('span'); s.textContent = label.split(':')[0].split('(')[0].trim(); L.appendChild(s);
+    for (let i = 0; i < 2; i++) {
+      const b = document.createElement('button'), c = binds[a][i];
+      const isWait = waiting && waiting.a === a && waiting.i === i;
+      b.textContent = isWait ? 'press a key...' : keyName(c);
+      if (isWait) b.className = 'wait'; else if (c && used[c] > 1) { b.className = 'clash'; b.title = 'this key is used twice'; }
+      b.onclick = (e) => { e.stopPropagation(); waiting = { a, i }; drawBinds(); };
+      L.appendChild(b);
+    }
+  }
+}
+function setBind(code) {
+  if (!waiting) return;
+  const { a, i } = waiting; waiting = null;
+  if (code === null) { drawBinds(); return; }
+  for (const [o] of ACTIONS) binds[o] = binds[o].map((c) => (c === code ? '' : c)); // a key does one thing
+  binds[a][i] = code; store.set('binds', binds); drawBinds(); keyList();
+}
+addEventListener('keydown', (e) => {
+  if (!waiting) return;
+  e.preventDefault(); e.stopPropagation();
+  if (e.code === 'Escape') setBind(null);
+  else if (e.code === 'Backspace' || e.code === 'Delete') { const { a, i } = waiting; waiting = null; binds[a][i] = ''; store.set('binds', binds); drawBinds(); keyList(); }
+  else setBind(e.code);
+}, true);
+addEventListener('mousedown', (e) => { if (!waiting || e.target.closest('#bindList')) return; e.preventDefault(); setBind('Mouse' + e.button); }, true);
+$('bindList').addEventListener('mousedown', (e) => { if (waiting && e.target.className === 'wait') { e.preventDefault(); e.stopPropagation(); setBind('Mouse' + e.button); } });
+$('bindList').addEventListener('contextmenu', (e) => e.preventDefault());
+const openBinds = (from) => { bindFrom = from; waiting = null; $(from).hidden = true; $('bindsScreen').hidden = false; drawBinds(); };
+$('bindsBtn').onclick = () => openBinds('title'); $('bindsBtn2').onclick = () => openBinds('pause');
+$('bindsDone').onclick = () => { waiting = null; $('bindsScreen').hidden = true; $(bindFrom).hidden = false; };
+$('bindsReset').onclick = () => { for (const [a] of ACTIONS) binds[a] = DEFAULT_BINDS[a].slice(); store.set('binds', binds); waiting = null; drawBinds(); keyList(); };
+keyList();
 $('resume').onclick = () => { $('pause').hidden = true; state = 'play'; try { glc.requestPointerLock(); } catch (e) {} };
 $('restart').onclick = () => { $('pause').hidden = true; state = 'play'; respawn(true); try { glc.requestPointerLock(); } catch (e) {} };
 for (const k of ['sens', 'vol', 'fov']) { const el = $(k); el.value = settings[k]; el.oninput = () => { settings[k] = +el.value; store.set('settings', settings); if (k === 'vol' && master) master.gain.value = settings.vol; }; }
@@ -473,7 +545,7 @@ function frame(now) {
   flash *= Math.pow(0.02, dt); boltT *= Math.pow(0.08, dt); fovKick *= Math.pow(0.05, dt); shake *= Math.pow(0.02, dt); landDip *= Math.pow(0.004, dt); toastT -= dt;
   skyNext -= dt; if (skyNext <= 0) { skyNext = 5 + Math.random() * 9; sky = 1; skyBolt(); if (AC) setTimeout(() => sfxThunder(), 300 + Math.random() * 900); }
   sky *= Math.pow(0.03, dt);
-  const strafe = (keys.has('KeyD') ? 1 : 0) - (keys.has('KeyA') ? 1 : 0);
+  const strafe = (down('right') ? 1 : 0) - (down('left') ? 1 : 0);
   tilt += ((state === 'play' ? strafe * 0.035 + (P.slide ? 0.05 : 0) : 0) - tilt) * Math.min(1, dt * 8);
   if (AC) { const t = AC.currentTime; wind.g.gain.setTargetAtTime(Math.min(0.5, Math.max(0, hs - 6) * 0.025) * (state === 'play' ? 1 : 0), t, 0.1); wind.f.frequency.setTargetAtTime(300 + hs * 40, t, 0.1); slideN.g.gain.setTargetAtTime(P.slide && P.ground && state === 'play' ? 0.12 : 0, t, 0.05); }
   // camera

@@ -214,7 +214,7 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <p class="site-note" id="snes-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .sfc or .smc file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them. Games with extra chips inside the cartridge (Star Fox, Super Mario Kart, Yoshi's Island) don't work yet.</p>
       <p class="site-note" id="mori-note" hidden><b>Moribund is a full game page</b>, so there's no console code to copy. Press <b>▶ Play</b> to open it. Use headphones, and click the game so the mouse can look around. Your save files stay in your browser.</p>
       <p class="site-note" id="lines-note" hidden><b>/open line engine</b> uses your webcam to track your hands. Press <b>▶ Play</b>, then <b>Turn on camera</b> and allow it. Keys: 1 strings · 2 window · 3 laser · 4 all · F filter · S skeleton · C customize how everything looks. The video stays on your computer. School computers might block the camera.</p>
-      <p class="site-note" id="speed-note" hidden><b>Godspeed</b> is a 3D movement game. Press <b>▶ Play</b>, click the game so the mouse can look around, and run the course as fast as you can. WASD move · Space jump · C/Ctrl slide · E or right click ⚡ lightning dash · R checkpoint. Slide, then jump, to keep your speed.</p>
+      <p class="site-note" id="speed-note" hidden><b>Godspeed</b> is a 3D movement game. Press <b>▶ Play</b>, click the game so the mouse can look around, and run the course as fast as you can. WASD move · Space jump · C/Ctrl slide · E or right click ⚡ lightning dash · R checkpoint (change them in ⌨ Keybinds). Slide, then jump, to keep your speed.</p>
       <form class="creator" id="creator" hidden autocomplete="off"><label for="creator-code">Creator code</label><input id="creator-code" type="password" placeholder="enter code" spellcheck="false"><button type="submit">Enter</button><span id="creator-msg" aria-live="polite"></span></form>
       <p class="site-note" id="online-note" hidden><b>Pasting it:</b> this version has everything, including online play. Paste it on a website (example.com works best), then click Play → 🌐 Online. One person hosts and gets a 4-letter code, the other types it in. No accounts needed. Some websites and school WiFi block online play.</p>
       <ol class="steps">
@@ -16601,6 +16601,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 <script>
 (() => {
   const RELEASES = [
+    { g: 'speed', v: 'v1.1', t: 'Godspeed keybinds', n: ['New ⌨ Keybinds screen on the title and pause menus', 'Two keys for every action, and mouse buttons work too', 'Arrow keys move by default', 'The hints and controls list show your keys'] },
     { g: 'speed', v: 'v1.0', t: 'Godspeed', n: ['New: a 3D movement game over a stormy void', 'Run to build speed, slide to keep it, slide-jump to carry it over gaps', '⚡ Lightning dash where you look, recharged by landing or by touching lightning orbs', '4 checkpoints, a timer and your best time', 'Thunder, wind and dash sounds all made in code'] },
     { g: 'mono', v: 'v1.6', t: 'Way more accurate custom songs', n: ['Custom songs now listen to every pitch (an FFT) instead of just bass and treble, so notes land on real hits', 'No more notes in quiet or silent parts of a song', 'Echoes and wobbles in held sounds no longer make notes', 'Notes are timed more exactly to the music', 'Songs you already saved get the new notes automatically'] },
     { g: 'stick', v: 'v12.4', t: 'Stage Builder in online games', n: ['Press B (or ✕ in the builder) during an online match for a 🧱 Build break', 'The fight freezes on both computers and you can both build at the same time', 'You see each other\'s blocks as you place them', 'Press B again to keep fighting on the new stage', 'The host\'s stage is still used when the match starts'] },
@@ -16645,7 +16646,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     snes: { title: 'Overlay SNES', ver: 'v1.0', code: $('otm-snes-code').textContent.replace(/^\n/, '') },
     mori: { title: 'Moribund', ver: 'v0.1', code: '' },
     lines: { title: '/open line engine', ver: 'v1.0', code: '' },
-    speed: { title: 'Godspeed', ver: 'v1.0', code: '' },
+    speed: { title: 'Godspeed', ver: 'v1.1', code: '' },
   };
   const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html';
   // creator code: unlocks the version of Moribund with the test buttons (checked by its SHA-256, the code isn't written here)
@@ -16660,7 +16661,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
   };
   creatorMsg();
-  const LATEST = { stick: 'v12.4', mono: 'v1.6', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.0', speed: 'v1.0' };
+  const LATEST = { stick: 'v12.4', mono: 'v1.6', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.0', speed: 'v1.1' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
