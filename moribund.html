@@ -27,8 +27,8 @@ p{color:#6b6b6b;margin:0;text-align:center}
   const HASH = '64cf866e039356cca8d083eb06af1578cfaf365ab2a9621c17a7731603bd605f';
   const sha = async (t) => [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(t)))].map((b) => b.toString(16).padStart(2, '0')).join('');
   const unlock = () => document.documentElement.classList.add('creator');
-  const check = async (code, save) => { try { if (code && (await sha(code.trim().toLowerCase())) === HASH) { unlock(); if (save) try { localStorage.setItem('moribund-creator', code.trim().toLowerCase()); } catch (e) {} return true; } } catch (e) {} return false; };
-  let saved = null; try { saved = localStorage.getItem('moribund-creator'); } catch (e) {}
+  const check = async (code, save) => { try { if (code && (await sha(code.trim().toLowerCase())) === HASH) { unlock(); if (save) try { sessionStorage.setItem('moribund-creator', code.trim().toLowerCase()); } catch (e) {} return true; } } catch (e) {} return false; };
+  let saved = null; try { localStorage.removeItem('moribund-creator'); saved = sessionStorage.getItem('moribund-creator'); } catch (e) {} // creator mode only lasts until you leave
   check(saved);
   const m = location.hash.match(/[#&]c=([^&]+)/); // the games site sends the code here
   if (m) { check(decodeURIComponent(m[1]), true); try { history.replaceState(null, '', location.pathname + location.search); } catch (e) {} }
