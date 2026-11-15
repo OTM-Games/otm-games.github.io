@@ -1,0 +1,307 @@
+<title>OTM Stomp</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=VT323&display=swap">
+<style>
+/* One committed look: a dusk-purple pixel city seen from the street, a giant sneaker above it. */
+:root { --bg: #140d1f; --fg: #f3ecff; --dim: #a99bc4; --accent: #5ee0ff; color-scheme: dark; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); overflow: hidden; font-family: 'VT323', ui-monospace, monospace; }
+#game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: none; image-rendering: pixelated; }
+</style>
+<canvas id="game"></canvas>
+<script>
+// ---------- setup: everything is drawn on a small pixel canvas, then blown up ----------
+const cv = document.getElementById('game'), out = cv.getContext('2d');
+const BW = 400, BH = 225, GROUND = 196;
+const buf = document.createElement('canvas'); buf.width = BW; buf.height = BH; const g = buf.getContext('2d');
+let S = 1, OX = 0, OY = 0, dpr = 1;
+function resize() {
+  dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  S = Math.min(cv.width / BW, cv.height / BH); OX = (cv.width - BW * S) / 2; OY = (cv.height - BH * S) / 2;
+}
+addEventListener('resize', resize); resize();
+const rnd = (a, b) => a + Math.random() * (b - a), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+let best = {}; try { best = JSON.parse(localStorage.getItem('otm-stomp-best')) || {}; } catch (e) {}
+const saveBest = () => { try { localStorage.setItem('otm-stomp-best', JSON.stringify(best)); } catch (e) {} };
+
+// ---------- the city (drawn once) ----------
+const city = document.createElement('canvas'); city.width = BW; city.height = BH;
+(function drawCity() {
+  const c = city.getContext('2d'), sky = c.createLinearGradient(0, 0, 0, GROUND);
+  sky.addColorStop(0, '#3b2350'); sky.addColorStop(0.6, '#6e3d6b'); sky.addColorStop(1, '#9b5a72'); c.fillStyle = sky; c.fillRect(0, 0, BW, GROUND);
+  let seed = 7; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const layer = (col, win, minH, maxH, wmin, wmax, lit) => { let x = -10; while (x < BW) { const w = Math.floor(wmin + r() * (wmax - wmin)), h = Math.floor(minH + r() * (maxH - minH)); c.fillStyle = col; c.fillRect(x, GROUND - h, w, h); for (let wy = GROUND - h + 5; wy < GROUND - 14; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 5) { c.fillStyle = r() < lit ? win : 'rgba(0,0,0,0.18)'; c.fillRect(wx, wy, 2, 3); } x += w + Math.floor(r() * 4); } };
+  layer('#5a3560', '#c98bb0', 70, 150, 22, 44, 0.25);
+  layer('#43274d', '#ffcf8a', 40, 110, 26, 52, 0.35);
+  // a highway sign and a billboard
+  c.fillStyle = '#2b1a33'; c.fillRect(70, 150, 2, 40); c.fillRect(132, 150, 2, 40);
+  c.fillStyle = '#1f6b4f'; c.fillRect(64, 128, 76, 28); c.strokeStyle = '#d8f3e6'; c.strokeRect(65.5, 129.5, 73, 25);
+  c.fillStyle = '#d8f3e6'; c.fillRect(100, 134, 2, 16); c.beginPath(); c.moveTo(97, 137); c.lineTo(101, 132); c.lineTo(105, 137); c.fill(); c.fillRect(70, 135, 18, 2); c.fillRect(70, 141, 22, 2); c.fillRect(110, 135, 22, 2); c.fillRect(110, 141, 16, 2);
+  c.fillStyle = '#2b1a33'; c.fillRect(262, 152, 2, 40); c.fillStyle = '#e9dccf'; c.fillRect(244, 118, 40, 34); c.fillStyle = '#5ee0ff'; c.fillRect(248, 122, 32, 18); c.fillStyle = '#140d1f'; c.font = '10px VT323, monospace'; c.fillText('OTM', 254, 149);
+  // the street with hazard stripes
+  c.fillStyle = '#2a2233'; c.fillRect(0, GROUND, BW, BH - GROUND); c.fillStyle = '#4b4058'; c.fillRect(0, GROUND, BW, 2);
+  for (let x = -6; x < BW; x += 8) { c.fillStyle = '#d9d2e3'; c.beginPath(); c.moveTo(x, GROUND + 4); c.lineTo(x + 4, GROUND + 4); c.lineTo(x + 8, GROUND + 9); c.lineTo(x + 4, GROUND + 9); c.fill(); }
+  c.fillStyle = '#1b1522'; c.fillRect(0, GROUND + 10, BW, BH);
+})();
+
+// ---------- sound (made in code) ----------
+let AC = null;
+function sfx(type, k = 1) {
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); const t = AC.currentTime, o = AC.createOscillator(), v = AC.createGain(); o.connect(v); v.connect(AC.destination);
+    if (type === 'thud') { o.type = 'sine'; o.frequency.setValueAtTime(110 * (1.2 - 0.4 * k), t); o.frequency.exponentialRampToValueAtTime(30, t + 0.35); v.gain.setValueAtTime(0.6 * (0.6 + k * 0.5), t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.4); o.start(t); o.stop(t + 0.42);
+      const n = AC.createBufferSource(), b = AC.createBuffer(1, AC.sampleRate * 0.25, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 3; n.buffer = b; const ng = AC.createGain(); ng.gain.value = 0.25 * k + 0.1; n.connect(ng); ng.connect(AC.destination); n.start(t); }
+    else if (type === 'pop') { o.type = 'square'; o.frequency.setValueAtTime(rnd(600, 900), t); o.frequency.exponentialRampToValueAtTime(200, t + 0.06); v.gain.setValueAtTime(0.05, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.07); o.start(t); o.stop(t + 0.08); }
+    else if (type === 'charge') { o.type = 'triangle'; o.frequency.setValueAtTime(200 + k * 500, t); v.gain.setValueAtTime(0.04, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.08); o.start(t); o.stop(t + 0.09); }
+    else if (type === 'scrape') { const n = AC.createBufferSource(), b = AC.createBuffer(1, AC.sampleRate * 0.09, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); n.buffer = b; const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500 + k * 900; const ng = AC.createGain(); ng.gain.value = 0.12; n.connect(f); f.connect(ng); ng.connect(AC.destination); n.start(t); return; }
+    else if (type === 'escape') { o.type = 'square'; o.frequency.setValueAtTime(330, t); o.frequency.setValueAtTime(247, t + 0.08); v.gain.setValueAtTime(0.04, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.start(t); o.stop(t + 0.2); }
+  } catch (e) {}
+}
+
+// ---------- game state ----------
+const MAX_ESCAPED = 1500, MAX_ANTS = 3000;
+let state = 'title', time = 0, ants = [], splats = [], fx = [], lines = [], stains = [], strings = [], shake = 0;
+let foot, run;
+function newRun() {
+  foot = { x: BW / 2, tx: BW / 2, y: GROUND - 70, vy: 0, mode: 'hover', charge: 0, planted: 0, pips: 0 };
+  run = { t: 0, kills: 0, escaped: 0, ego: 0, combo: 0, comboT: 0, bestCombo: 0, bestStomp: 0, bestEgo: 0, fullKills: 0, trash: 0, slideKills: 0, spawnT: 1 };
+  ants = []; splats = []; fx = []; lines = []; stains = []; strings = [];
+}
+newRun();
+// the people: tiny ink folk walking along the street
+const KINDS = {
+  walker: { sp: [12, 20], ego: 5 }, runner: { sp: [34, 46], ego: 10 }, trash: { sp: [10, 15], ego: 15 }, hard: { sp: [9, 13], ego: 12 },
+};
+function spawnGroup() {
+  if (ants.length > MAX_ANTS) return;
+  const left = Math.random() < 0.5, n = Math.floor(rnd(60, 140 + Math.min(260, run.t * 4)));
+  for (let i = 0; i < n; i++) {
+    const r = Math.random(), kind = run.t > 20 && r < 0.12 ? 'hard' : run.t > 10 && r < 0.27 ? 'runner' : r < 0.36 ? 'trash' : 'walker', K = KINDS[kind];
+    ants.push({ row: Math.floor(Math.random() * 4), x: left ? -4 - i * rnd(0.3, 1.3) : BW + 4 + i * rnd(0.3, 1.3), dir: left ? 1 : -1, sp: rnd(...K.sp) * (1 + run.t / 150), kind, y: 0, vy: 0, vx: 0, stun: 0, step: Math.random() * 6, helmet: kind === 'hard', panic: 0 });
+  }
+}
+// the giant sneaker (drawn 1.5x big): sole from x-39 (heel) to x+58 (toe)
+const SLIDE_TIME = 2.5, SLIDE_SPEED = 260, FS = 1.5, soleL = () => foot.x - 26 * FS, soleR = () => foot.x + 39 * FS;
+function stomp() { if (foot.mode !== 'hover' && foot.mode !== 'charge') return; foot.power = foot.charge; foot.mode = 'stomp'; foot.vy = 120 + foot.charge * 200; foot.charge = 0; }
+function slideCrush(dx) {
+  const L = soleL(), R = soleR(), front = dx > 0 ? R : L; let kills = 0, ego = 0;
+  for (const a of ants) {
+    if (a.dead || a.y < -10 || a.x < L - 1 || a.x > R + 1) continue;
+    if (a.helmet) { a.helmet = false; a.vy = -70; a.vx = Math.sign(dx) * 90; a.x = dx > 0 ? R + 3 : L - 3; a.stun = 1; fx.push({ t: 'helmet', x: a.x, y: GROUND - 6, vx: Math.sign(dx) * 60, vy: -90, life: 1 }); continue; }
+    a.dead = a.done = true; kills++; ego += KINDS[a.kind].ego; if (a.kind === 'trash') run.trash++;
+    if (fx.length < 5000) for (let i = 0; i < (kills > 30 ? 1 : 4); i++) fx.push({ t: 'ink', x: front + rnd(-2, 2), y: GROUND - 2, vx: Math.sign(dx) * rnd(40, 160), vy: -rnd(40, 160), life: 2, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
+    if (Math.random() < Math.min(1, 20 / Math.max(1, kills)) && stains.length < 400) stains.push({ dx: front - foot.x - Math.sign(dx) * rnd(0, 6), dy: -rnd(1, 10), life: rnd(4, 8), drip: 0, max: rnd(4, 14), s: 2 });
+    if (Math.random() < 0.3) fx.push({ t: 'halo', x: a.x, y: GROUND - 6, vy: -rnd(14, 24), life: 1.6, wob: Math.random() * 6 });
+  }
+  if (!kills) return;
+  if (Math.random() < 0.5) sfx('pop');
+  foot.inky = 1.5; foot.slideKills += kills; run.combo += kills; run.comboT = 1.6;
+  ego = Math.round(ego * (1 + Math.min(3, run.combo * 0.05))); run.kills += kills; run.ego += ego;
+  if (run.combo > run.bestCombo) run.bestCombo = run.combo;
+}
+function impact() {
+  const p = foot.power, full = p >= 0.999, L = soleL(), R = soleR();
+  shake = 3 + p * 6; sfx('thud', p);
+  let kills = 0, fullK = 0, trash = 0, egoGain = 0;
+  for (const a of ants) {
+    if (a.dead) continue;
+    const inside = a.x >= L - 1 && a.x <= R + 1 && a.y > -10, edge = a.x < L ? L - a.x : a.x - R;
+    if (inside && a.helmet && !full) { a.helmet = false; a.stun = 1.2; a.vy = -60; a.vx = (a.x < foot.x ? -1 : 1) * 50; fx.push({ t: 'helmet', x: a.x, y: GROUND - 6, vx: rnd(-30, 30), vy: -80, life: 1 }); continue; }
+    if (inside || (full && edge < 30 && a.y > -6)) { a.dead = true; kills++; if (!inside) fullK++; if (a.kind === 'trash') trash++; egoGain += KINDS[a.kind].ego; }
+    else if (edge < 45 + p * 25 && a.y > -4) { a.vy = -rnd(70, 110) * (0.5 + p); a.vx = (a.x < foot.x ? -1 : 1) * rnd(30, 70); a.stun = 1; }
+  }
+  for (let i = 0; i < 10 + p * 18; i++) fx.push({ t: 'dust', x: rnd(L - 6, R + 6), y: GROUND, vx: (Math.random() < 0.5 ? -1 : 1) * rnd(20, 90) * (1 + p), vy: -rnd(5, 40), life: rnd(0.4, 0.9) });
+  if (full) fx.push({ t: 'ring', x: foot.x + 6 * FS, y: GROUND, r: 30, life: 0.35 });
+  if (!kills) { run.combo = 0; return; }
+  run.combo += kills; run.comboT = 1.6;
+  const mult = 1 + Math.min(3, run.combo * 0.05) + (full ? 0.5 : 0); egoGain = Math.round(egoGain * mult);
+  run.kills += kills; run.ego += egoGain; run.fullKills += fullK; run.trash += trash;
+  for (const a of ants) if (a.dead && !a.done) { a.done = true; if (splats.length < 900) splats.push({ x: a.x, w: rnd(8, 15), life: 14, seed: Math.random() });
+    const under = a.x >= L && a.x <= R, ex = under ? (a.x - L < R - a.x ? L - 1 : R + 1) : a.x, out = under ? (ex < foot.x ? -1 : 1) : (a.x < foot.x ? -1 : 1), many = kills > 400 ? 0.06 : kills > 150 ? 0.12 : kills > 60 ? 0.25 : kills > 25 ? 0.5 : 1; // lots of people: fewer drops each, so it stays smooth
+    if (fx.length < 5000) for (let i = 0; i < Math.max(1, Math.round(20 * many)); i++) fx.push({ t: 'ink', x: ex + rnd(-2, 2), y: GROUND - 2, vx: (Math.random() < 0.75 ? out : -out) * rnd(10, 90) * (1 + p * 0.6), vy: -rnd(80, 300) * (0.7 + p * 0.5), life: 2.5, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
+    if (Math.random() < Math.min(1, 50 / kills)) fx.push({ t: 'spike', x: ex, h: rnd(30, 70) * (0.7 + p * 0.5), life: 0.45, seed: Math.random() * 99 });
+    if (under) for (let i = 0; i < 2; i++) if (strings.length < 140) { const gx = a.x + rnd(-4, 4); strings.push({ gx, dx: gx - foot.x + rnd(-3, 3), max: rnd(30, 120), w: Math.random() < 0.4 ? 2 : 1, sway: rnd(-8, 8), ph: Math.random() * 6 }); }
+    if (under) for (let i = 0; i < 4; i++) if (stains.length < 400) stains.push({ dx: a.x - foot.x + rnd(-4, 4), dy: -rnd(2, 18), life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: Math.random() < 0.5 ? 3 : 2 });
+    if (kills <= 8) fx.push({ t: 'num', x: a.x, y: GROUND - 14, txt: '+' + KINDS[a.kind].ego, life: 0.9, small: true }); if (Math.random() < Math.min(1, 80 / kills)) fx.push({ t: 'halo', x: a.x, y: GROUND - 6, vy: -rnd(14, 24), life: 1.6, wob: Math.random() * 6 }); if (Math.random() < 6 / kills) sfx('pop'); }
+  fx.push({ t: 'num', x: foot.x + 6 * FS, y: GROUND - 64, txt: '+' + kills, life: 1.1 });
+  // the stat lines in the corner, like the clip
+  const add = (txt) => lines.push({ txt, life: 2.6 });
+  if (run.combo > run.bestCombo) { run.bestCombo = run.combo; add(`+${run.combo} Highest Kill Combo`); }
+  if (kills > run.bestStomp) { run.bestStomp = kills; add(`+${kills} Most Ants Killed in One Stomp`); }
+  if (egoGain > run.bestEgo) { run.bestEgo = egoGain; add(`+${egoGain} Most Ego Gained in One Stomp`); }
+  if (full) add(`+${kills} Full Pressure Kills`);
+  if (trash) add(`+${trash} Trash Taken Out`);
+  while (lines.length > 5) lines.shift();
+}
+
+// ---------- input: move to aim, hold to load pressure, let go to stomp ----------
+let holding = false, keys = {};
+const toBuf = (e) => [((e.clientX * dpr) - OX) / S, ((e.clientY * dpr) - OY) / S];
+let mouseX = BW / 2;
+cv.addEventListener('pointermove', (e) => { mouseX = toBuf(e)[0]; foot.tx = clamp(mouseX - 6 * FS, 20, BW - 60); });
+cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); mouseX = toBuf(e)[0]; foot.tx = clamp(mouseX - 6 * FS, 20, BW - 60); if (state !== 'play') return startGame(); holding = true; press(); });
+function press() { if (foot.mode === 'hover') foot.mode = 'charge'; else if (foot.mode === 'stomp') foot.wantSlide = true; else if (foot.mode === 'planted') startSlide(); }
+function startSlide() { foot.mode = 'slide'; foot.slideT = SLIDE_TIME; foot.slideKills = 0; foot.wantSlide = false; }
+function endSlide() { foot.mode = 'hover'; if (foot.slideKills) { run.slideKills += foot.slideKills; lines.push({ txt: `+${foot.slideKills} Slide Kills`, life: 2.6 }); while (lines.length > 5) lines.shift(); } foot.slideKills = 0; }
+const release = () => { if (holding && state === 'play') { if (foot.mode === 'slide') endSlide(); else if (foot.mode === 'stomp') foot.wantSlide = false; else stomp(); } holding = false; };
+cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', () => holding = false);
+addEventListener('keydown', (e) => {
+  keys[e.code] = true;
+  if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') { e.preventDefault(); if (state !== 'play') { if (!e.repeat) startGame(); return; } if (!holding) { holding = true; press(); } }
+  if (e.code === 'KeyP' && state === 'play') state = 'pause'; else if (e.code === 'KeyP' && state === 'pause') state = 'play';
+});
+addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') release(); });
+function startGame() { if (state === 'play') return; if (state === 'pause') { state = 'play'; return; } newRun(); state = 'play'; sfx('pop'); for (let i = 0; i < 3; i++) spawnGroup(); for (const a of ants) a.x += a.dir * rnd(30, 110); }
+
+// ---------- update ----------
+function update(dt) {
+  time += dt; shake = Math.max(0, shake - dt * 20);
+  for (const s of splats) s.life -= dt; splats = splats.filter((s) => s.life > 0);
+  for (const f of fx) { f.life -= dt; if (f.t === 'dust') { f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.92; f.vy += 60 * dt; } else if (f.t === 'halo') { f.y += f.vy * dt; } else if (f.t === 'num') f.y -= 18 * dt; else if (f.t === 'helmet') { f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 300 * dt; } else if (f.t === 'ring') f.r += 260 * dt;
+    else if (f.t === 'ink') { f.vy += 420 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.age += dt;
+      if (f.age > 0.04 && f.x > soleL() && f.x < soleR() && f.y > foot.y - 34 * FS && f.y < foot.y - 2 && Math.random() < 0.6) { if (stains.length < 400) stains.push({ dx: f.x - foot.x, dy: f.y - foot.y, life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: f.s }); f.life = 0; }
+      else if (f.y >= GROUND) { if (splats.length < 500) splats.push({ x: f.x, w: f.s + 1, life: 8, seed: Math.random(), dot: true }); f.life = 0; } } }
+  fx = fx.filter((f) => f.life > 0); for (const st of stains) { st.life -= dt; st.drip = Math.min(st.max || 7, st.drip + dt * rnd(0, 6)); } stains = stains.filter((st) => st.life > 0);
+  for (const sr of strings) { const len = GROUND - foot.y; // a strand snaps when the shoe lifts too far: one end hangs off the sole, the rest falls
+    if (len > sr.max || Math.abs(foot.x + sr.dx - sr.gx) > sr.max) { sr.dead = true; if (stains.length < 400) stains.push({ dx: sr.dx, dy: -1, life: rnd(3, 6), drip: Math.min(len, sr.max) * 0.45, max: Math.min(len, sr.max) * 0.5, s: sr.w });
+      for (let k = 0; k < 4; k++) fx.push({ t: 'ink', x: sr.gx + (foot.x + sr.dx - sr.gx) * k / 6, y: GROUND - len * (0.25 + k * 0.1), vx: rnd(-10, 10), vy: rnd(-20, 10), life: 1.5, age: 1, s: 1 }); } }
+  strings = strings.filter((sr) => !sr.dead); for (const l of lines) l.life -= dt; lines = lines.filter((l) => l.life > 0);
+  if (state !== 'play') { if (state === 'title') { foot.tx = BW / 2 + Math.sin(time * 0.7) * 120; foot.x += (foot.tx - foot.x) * Math.min(1, dt * 3); foot.y = GROUND - 80 + Math.sin(time * 2) * 4; } return; }
+  run.t += dt;
+  if (keys.ArrowLeft || keys.KeyA) foot.tx = clamp(foot.tx - 180 * dt, 20, BW - 40);
+  if (keys.ArrowRight || keys.KeyD) foot.tx = clamp(foot.tx + 180 * dt, 20, BW - 40);
+  const air = foot.mode === 'hover' || foot.mode === 'charge';
+  if (air) foot.x += (foot.tx - foot.x) * Math.min(1, dt * (foot.mode === 'charge' ? 5 : 9));
+  if (foot.mode === 'hover') foot.y += (GROUND - 70 - foot.y) * Math.min(1, dt * 8);
+  else if (foot.mode === 'charge') { const before = Math.floor(foot.charge * 4); foot.charge = Math.min(1, foot.charge + dt / 0.75); const now = Math.floor(foot.charge * 4); if (now > before) sfx('charge', foot.charge); foot.y += (GROUND - 70 - foot.charge * 70 - foot.y) * Math.min(1, dt * 10); }
+  else if (foot.mode === 'stomp') { foot.vy += 2800 * dt; foot.y += foot.vy * dt; if (foot.y >= GROUND) { foot.y = GROUND; foot.mode = 'planted'; foot.planted = 0.35; impact(); if (foot.wantSlide && holding) startSlide(); } }
+  else if (foot.mode === 'planted') { foot.planted -= dt; if (foot.planted <= 0) foot.mode = holding ? 'charge' : 'hover'; }
+  else if (foot.mode === 'slide') { // drag the shoe along the street, squashing everyone under it
+    foot.slideT -= dt; foot.y = GROUND; const dx = clamp(foot.tx - foot.x, -SLIDE_SPEED * dt, SLIDE_SPEED * dt); foot.x += dx;
+    if (Math.abs(dx) > 0.2) { slideCrush(dx); if ((foot.scrT = (foot.scrT || 0) - dt) <= 0) { foot.scrT = 0.07; sfx('scrape', Math.abs(dx) / (SLIDE_SPEED * dt)); }
+      if (Math.random() < 0.5) fx.push({ t: 'dust', x: dx > 0 ? soleL() : soleR(), y: GROUND, vx: -Math.sign(dx) * rnd(10, 40), vy: -rnd(5, 25), life: rnd(0.3, 0.6) });
+      if (foot.inky > 0 && splats.length < 900) splats.push({ x: (dx > 0 ? soleL() : soleR()) - dx / 2, w: Math.abs(dx) + 2, life: 10, seed: Math.random(), dot: true }); }
+    foot.inky = Math.max(0, (foot.inky || 0) - dt);
+    if (foot.slideT <= 0) endSlide(); }
+  if ((run.comboT -= dt) <= 0) run.combo = 0;
+  // crowds
+  if ((run.spawnT -= dt) <= 0) { spawnGroup(); run.spawnT = Math.max(0.35, rnd(0.8, 1.4) - run.t / 80); }
+  for (const a of ants) {
+    if (a.dead) continue;
+    if (a.y < 0 || a.vy) { a.vy += 300 * dt; a.y += a.vy * dt; a.x += a.vx * dt; if (a.y >= 0) { a.y = 0; a.vy = 0; a.vx = 0; } continue; }
+    if (a.stun > 0) { a.stun -= dt; continue; }
+    // they panic when the shoe hangs low over them
+    const near = Math.abs(a.x - (foot.x + 6 * FS)) < 46 && foot.y > GROUND - 120 && (foot.mode === 'hover' || foot.mode === 'charge' || foot.mode === 'slide');
+    let v = a.sp * a.dir;
+    if (near) { a.panic = 0.6; } if (a.panic > 0) { a.panic -= dt; v = (a.x < foot.x + 6 * FS ? -1 : 1) * a.sp * 1.9; }
+    // they can't walk through a planted shoe
+    if (foot.mode === 'planted' && a.x + v * dt > soleL() - 2 && a.x + v * dt < soleR() + 2) { a.dir = -a.dir; v = -v; }
+    a.x += v * dt; a.step += Math.abs(v) * dt * 0.6;
+    if ((a.dir > 0 && a.x > BW + 6) || (a.dir < 0 && a.x < -6) || (a.panic > 0 && (a.x > BW + 6 || a.x < -6))) { a.gone = true; run.escaped++; if (time - (run.escT || 0) > 0.2) { run.escT = time; sfx('escape'); } }
+  }
+  ants = ants.filter((a) => !a.dead && !a.gone);
+  if (run.escaped >= MAX_ESCAPED) gameOver();
+}
+function gameOver() {
+  state = 'over'; holding = false;
+  const rec = (k, v) => { if (!(best[k] >= v)) { best[k] = v; return true; } return false; };
+  run.newBest = rec('ego', run.ego); rec('kills', run.kills); rec('combo', run.bestCombo); rec('time', Math.floor(run.t)); saveBest();
+}
+
+// ---------- drawing ----------
+function drawAnt(a) {
+  const x = Math.round(a.x), y = Math.round(GROUND - 1 + a.y + (a.row || 0)), s = Math.floor(a.step) % 2, flip = a.panic > 0 ? (a.x < foot.x ? -1 : 1) : a.dir;
+  g.fillStyle = '#0d0a12';
+  if (a.stun > 0 && !a.y) { g.fillRect(x - 3, y - 2, 6, 2); g.fillRect(x + (flip > 0 ? 2 : -4), y - 3, 2, 2); return; } // knocked flat
+  g.fillRect(x - 1, y - 6, 2, 4); g.fillRect(x - 1, y - 9, 3, 3); // body + head
+  g.fillRect(x - 1 + (s ? -1 : 1), y - 2, 1, 2); g.fillRect(x + (s ? 1 : -1), y - 2, 1, 2); // legs
+  if (a.panic > 0) { g.fillRect(x - 2, y - 8, 1, 2); g.fillRect(x + 2, y - 8, 1, 2); } // arms up
+  g.fillStyle = '#ffffff'; g.fillRect(x + (flip > 0 ? 1 : -1), y - 8, 1, 1); // eye
+  if (a.kind === 'runner') { g.fillStyle = '#ff4d6d'; g.fillRect(x - (flip > 0 ? 3 : -1), y - 6, 3, 1); }
+  if (a.kind === 'trash') { g.fillStyle = '#e8e4ee'; g.fillRect(x - flip * 3 - 1, y - 6, 3, 4); g.fillStyle = '#9a90aa'; g.fillRect(x - flip * 3, y - 7, 1, 1); }
+  if (a.helmet) { g.fillStyle = '#ffcf3a'; g.fillRect(x - 2, y - 10, 5, 2); }
+}
+function drawFoot() {
+  const x = Math.round(foot.x), y = Math.round(foot.y), tw = foot.mode === 'charge' ? Math.round(Math.sin(time * 60) * foot.charge * 1.2) : 0, X = x + tw;
+  // the shadow on the street
+  const close = clamp(1 - (GROUND - y) / 160, 0.1, 1); g.fillStyle = `rgba(10,6,16,${0.18 + close * 0.35})`; g.beginPath(); g.ellipse(X + 6 * FS, GROUND + 3, 34 * FS * (0.6 + close * 0.4), 3, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.translate(X, y); g.scale(FS, FS); const top = -y / FS - 4; const X0 = X, y0 = y; { const X = 0, y = 0;
+  // trouser leg (navy with a faint pinstripe)
+  g.fillStyle = '#1d1b3a'; g.fillRect(X - 24, top, 32, -30 - top); g.fillStyle = '#2a2852'; for (let i = X - 20; i < X + 6; i += 7) g.fillRect(i, top, 1, -30 - top);
+  g.fillStyle = '#14122a'; g.fillRect(X - 26, y - 38, 36, 6); // cuff
+  // the sneaker: cyan high-top, white sole, toe to the right
+  g.fillStyle = '#2bb8e6'; g.beginPath(); g.moveTo(X - 24, y - 34); g.lineTo(X + 8, y - 34); g.lineTo(X + 12, y - 20); g.quadraticCurveTo(X + 36, y - 16, X + 39, y - 6); g.lineTo(X + 39, y - 4); g.lineTo(X - 26, y - 4); g.closePath(); g.fill();
+  g.fillStyle = '#5ee0ff'; g.fillRect(X - 22, y - 32, 4, 24); g.fillRect(X + 14, y - 15, 18, 2); // shine
+  g.fillStyle = '#ffffff'; for (let i = 0; i < 4; i++) g.fillRect(X - 4 + i * 4, y - 30 + i * 3, 6, 1); // laces
+  g.fillStyle = '#140d1f'; g.beginPath(); g.moveTo(X - 12, y - 18); g.lineTo(X + 6, y - 12); g.lineTo(X - 10, y - 10); g.fill(); // swoosh-ish stripe
+  g.fillStyle = '#f3ecff'; g.fillRect(X - 26, y - 5, 66, 4); g.fillStyle = '#b9b0c9'; g.fillRect(X - 26, y - 1, 66, 1); // sole
+  } g.restore();
+}
+function px(txt, x, y, col, size = 14, align = 'left') { g.font = `${size}px VT323, monospace`; g.textAlign = align; g.fillStyle = '#0d0a12'; g.fillText(txt, x + 1, y + 1); g.fillStyle = col; g.fillText(txt, x, y); }
+function fmtT(t) { t = Math.floor(t); return `${String(Math.floor(t / 3600)).padStart(2, '0')}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; }
+function draw() {
+  g.setTransform(1, 0, 0, 1, Math.round(rnd(-shake, shake)), Math.round(rnd(-shake, shake)));
+  g.drawImage(city, 0, 0);
+  for (const s of splats) { g.globalAlpha = Math.min(1, s.life / 3); g.fillStyle = '#0d0a12'; const sx = Math.round(s.x - s.w / 2); if (s.dot) { g.fillRect(sx, GROUND, s.w, 1); } else { g.fillRect(sx, GROUND, Math.round(s.w), 3); g.fillRect(sx + 2, GROUND - 1, Math.round(s.w) - 4, 1); for (let k = 0; k < 4; k++) g.fillRect(sx + Math.floor(((s.seed * 97 + k * 31) % 1) * s.w * 1.6 - s.w * 0.3), GROUND + 3 + (k % 2), 1 + (k % 2), 1); g.fillStyle = '#24305e'; g.fillRect(Math.round(s.x - 1), GROUND + 1, 2, 1); } g.globalAlpha = 1; }
+  for (const a of ants) drawAnt(a);
+  drawFoot();
+  g.strokeStyle = '#0d0a12'; for (const sr of strings) { const tx = foot.x + sr.dx, ty = foot.y - 1, len = GROUND - ty; if (len < 2) continue; const k = len / sr.max, sw = sr.sway * Math.sin(time * 3 + sr.ph) * Math.min(1, len / 30);
+    g.lineWidth = k > 0.7 ? 1 : sr.w; g.beginPath(); g.moveTo(sr.gx, GROUND); g.quadraticCurveTo((sr.gx + tx) / 2 + sw, GROUND - len / 2 + len * 0.1, tx, ty); g.stroke();
+    if (k < 0.7) { g.fillStyle = '#0d0a12'; g.fillRect(Math.round((sr.gx + tx) / 2 + sw / 2) - 1, Math.round(GROUND - len / 2), 2, 2); } }
+  g.fillStyle = '#0d0a12'; for (const st of stains) { g.globalAlpha = Math.min(1, st.life / 2); const x = Math.round(foot.x + st.dx), y = Math.round(foot.y + st.dy); g.fillRect(x, y, st.s + 1, st.s + 1); if (st.drip > 1) { const d = Math.round(st.drip); g.fillRect(x, y, 1, d); g.fillRect(x - (d > 6 ? 1 : 0), y + d - 1, d > 6 ? 2 : 1, 2); } } g.globalAlpha = 1;
+  for (const f of fx) {
+    g.globalAlpha = clamp(f.life * 2, 0, 1);
+    if (f.t === 'dust') { g.fillStyle = '#c9bfd8'; g.fillRect(Math.round(f.x), Math.round(f.y), 2, 2); }
+    else if (f.t === 'halo') { const x = Math.round(f.x + Math.sin(time * 4 + f.wob) * 2), y = Math.round(f.y); g.fillStyle = '#e8e4ee'; g.fillRect(x - 1, y - 4, 3, 4); g.fillStyle = '#ffd84a'; g.fillRect(x - 2, y - 7, 5, 1); }
+    else if (f.t === 'num') px(f.txt, f.x, f.y, '#5ee0ff', f.small ? 11 : 18, 'center');
+    else if (f.t === 'ink') { const col = Math.random() < 0.15 ? '#24305e' : '#0d0a12'; g.strokeStyle = col; g.lineWidth = Math.max(1, f.s - 1); g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x - f.vx * 0.035, f.y - f.vy * 0.035); g.stroke(); g.fillStyle = col; g.fillRect(Math.round(f.x), Math.round(f.y), f.s, f.s); }
+    else if (f.t === 'spike') { g.fillStyle = '#0d0a12'; const k = clamp(f.life / 0.4, 0, 1), h = f.h * (0.6 + 0.4 * (1 - k)); for (let j = 0; j < 8; j++) { const off = Math.sin(f.seed + j * 2.1) * 7, hh = h * (0.5 + 0.5 * Math.abs(Math.sin(f.seed * 3 + j))); g.fillRect(Math.round(f.x + off), Math.round(GROUND - hh), 1 + (j % 3), Math.round(hh)); g.fillRect(Math.round(f.x + off - 2), Math.round(GROUND - hh * 0.5), 5, 1); g.fillRect(Math.round(f.x + off + Math.sin(j + f.seed) * 2), Math.round(GROUND - hh - 2), 2, 2); } }
+    else if (f.t === 'helmet') { g.fillStyle = '#ffcf3a'; g.fillRect(Math.round(f.x) - 2, Math.round(f.y), 5, 2); }
+    else if (f.t === 'ring') { g.strokeStyle = '#5ee0ff'; g.lineWidth = 2; g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * 0.12, 0, 0, Math.PI * 2); g.stroke(); }
+    g.globalAlpha = 1;
+  }
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  // aim marker and pressure pips (fills as you hold)
+  if (state === 'play') {
+    const mx = Math.round(clamp(mouseX, 6, BW - 30)); g.strokeStyle = '#f3ecff'; g.lineWidth = 1; g.beginPath(); g.arc(mx, GROUND - 40, 3, 0, Math.PI * 2); g.stroke(); g.fillStyle = '#f3ecff'; g.fillRect(mx, GROUND - 40, 1, 1);
+    if (foot.mode === 'slide') for (let i = 0; i < 4; i++) { g.fillStyle = foot.slideT / SLIDE_TIME * 4 > i ? '#ff6b8a' : 'rgba(243,236,255,0.25)'; g.fillRect(mx + 8 + i * 5, GROUND - 42, 3, 3); } else
+    for (let i = 0; i < 4; i++) { const on = foot.charge * 4 > i + 0.01 || (foot.mode === 'charge' && foot.charge >= 1); g.fillStyle = on ? (foot.charge >= 1 ? '#5ee0ff' : '#f3ecff') : 'rgba(243,236,255,0.25)'; g.fillRect(mx + 8 + i * 5, GROUND - 42, 3, 3); }
+  }
+  // HUD: time, kills (+ combo), escaped
+  if (state !== 'title') {
+    let hx = 8; const hud = (t, col) => { px(t, hx, 15, col); hx += g.measureText(t).width + 12; };
+    hud(fmtT(run.t), '#f3ecff');
+    hud('KILLS ' + run.kills + (run.combo > 1 ? ' +' + run.combo : ''), run.combo > 1 ? '#ff6b8a' : '#f3ecff');
+    hud('AWAY ' + run.escaped + '/' + MAX_ESCAPED, run.escaped >= MAX_ESCAPED * 0.85 ? '#ff6b8a' : '#f3ecff');
+    px('EGO ' + run.ego, BW - 8, 15, '#5ee0ff', 16, 'right');
+    lines.forEach((l, i) => { g.globalAlpha = clamp(l.life * 1.5, 0, 1); px(l.txt, 14, 30 + i * 11, '#f3ecff', 14); g.globalAlpha = 1; });
+  }
+  if (state === 'title') {
+    g.fillStyle = 'rgba(20,13,31,0.55)'; g.fillRect(0, 0, BW, BH);
+    px('OTM STOMP', BW / 2, 62, '#5ee0ff', 48, 'center');
+    px('stomp the tiny people before they get away', BW / 2, 84, '#f3ecff', 14, 'center');
+    px('mouse or A/D to aim · hold click/Space: pressure', BW / 2, 102, '#a99bc4', 12, 'center');
+    px('let go to STOMP · 4 dots = shockwave', BW / 2, 113, '#a99bc4', 12, 'center');
+    px('click + HOLD right after a stomp to SLIDE', BW / 2, 137, '#ff6b8a', 13, 'center');
+    px('yellow hats need 4 dots · 1500 escape = game over', BW / 2, 124, '#a99bc4', 12, 'center');
+    px(Math.floor(time * 2) % 2 ? '▶ CLICK TO START' : '', BW / 2, 158, '#ffcf3a', 20, 'center');
+    if (best.ego) px(`best ego ${best.ego} · most kills ${best.kills} · best combo ${best.combo}`, BW / 2, 174, '#a99bc4', 12, 'center');
+  } else if (state === 'over') {
+    g.fillStyle = 'rgba(20,13,31,0.7)'; g.fillRect(0, 0, BW, BH);
+    px('TOO MANY GOT AWAY', BW / 2, 58, '#ff6b8a', 32, 'center');
+    px(`ego ${run.ego}${run.newBest ? '  ★ NEW BEST' : ''}`, BW / 2, 84, '#5ee0ff', 22, 'center');
+    px(`kills ${run.kills} · best combo ${run.bestCombo} · most in one stomp ${run.bestStomp}`, BW / 2, 102, '#f3ecff', 14, 'center');
+    px(`full pressure kills ${run.fullKills} · trash taken out ${run.trash} · slide kills ${run.slideKills} · time ${fmtT(run.t)}`, BW / 2, 116, '#f3ecff', 14, 'center');
+    px(`best ego ever ${best.ego || 0}`, BW / 2, 134, '#a99bc4', 14, 'center');
+    px(Math.floor(time * 2) % 2 ? '▶ CLICK TO STOMP AGAIN' : '', BW / 2, 160, '#ffcf3a', 20, 'center');
+  } else if (state === 'pause') { g.fillStyle = 'rgba(20,13,31,0.6)'; g.fillRect(0, 0, BW, BH); px('PAUSED · P or click to keep stomping', BW / 2, 112, '#f3ecff', 20, 'center'); }
+  // blow it up to the screen
+  out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#140d1f'; out.fillRect(0, 0, cv.width, cv.height);
+  out.imageSmoothingEnabled = false; out.drawImage(buf, OX, OY, BW * S, BH * S);
+}
+let last = performance.now();
+function loop(now) { const dt = Math.min(0.05, (now - last) / 1000); last = now; if (state !== 'pause') update(dt); draw(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+addEventListener('blur', () => { if (state === 'play') state = 'pause'; holding = false; });
+window.__stomp = { get run() { return run; }, get foot() { return foot; }, get ants() { return ants; }, get state() { return state; }, startGame, stomp, spawnGroup };
+</script>

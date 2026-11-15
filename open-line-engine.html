@@ -253,17 +253,59 @@ function demoHands(t) {
 
 // ---------- loop ----------
 let landmarker = null, lastVideoT = -1, loadFailed = false;
+// ---------- better tracking ----------
+// 1) brighten the camera picture before looking for hands when the room is dark
+const probe = document.createElement('canvas'), pctx = probe.getContext('2d', { willReadFrequently: true }); probe.width = 32; probe.height = 18;
+const boostCv = document.createElement('canvas'), bctx = boostCv.getContext('2d');
+let boost = 1, boostCheck = 0;
+function detectInput() {
+  const vw = video.videoWidth, vh = video.videoHeight; if (!vw) return video;
+  if (--boostCheck <= 0) { // check how bright the picture is every 30 frames
+    boostCheck = 30; pctx.drawImage(video, 0, 0, 32, 18); const d = pctx.getImageData(0, 0, 32, 18).data; let sum = 0;
+    for (let i = 0; i < d.length; i += 4) sum += d[i] * 0.3 + d[i + 1] * 0.59 + d[i + 2] * 0.11;
+    const avg = sum / (d.length / 4); boost = avg < 95 ? Math.min(2.6, 115 / Math.max(avg, 20)) : 1;
+  }
+  if (boost <= 1.05) return video;
+  if (boostCv.width !== vw || boostCv.height !== vh) { boostCv.width = vw; boostCv.height = vh; }
+  bctx.filter = `brightness(${boost.toFixed(2)}) contrast(1.15)`; bctx.drawImage(video, 0, 0); bctx.filter = 'none';
+  return boostCv;
+}
+// 2) smoothing that stays still when you hold still but keeps up when you move fast (a "one euro" filter)
+function oneEuro(minCut = 1.6, beta = 5, dCut = 1) {
+  let x = null, dx = 0, lt = 0;
+  const a = (cut, dt) => { const r = 2 * Math.PI * cut * dt; return r / (r + 1); };
+  return (v, t) => {
+    if (x === null) { x = v; lt = t; return v; }
+    const dt = Math.max(1 / 240, (t - lt) / 1000); lt = t;
+    const d = (v - x) / dt; dx += a(dCut, dt) * (d - dx);
+    x += a(minCut + beta * Math.abs(dx), dt) * (v - x); return x;
+  };
+}
+// 3) keep track of which hand is which, and remember a hand for a moment if the camera loses it for a frame
+const tracks = [];
+function updateTracks(found, now) {
+  const used = new Set();
+  for (const h of found) {
+    let best = null, bd = 0.3;
+    for (const tr of tracks) { if (used.has(tr)) continue; const d = Math.hypot(tr.raw[0].x - h[0].x, tr.raw[0].y - h[0].y); if (d < bd) { bd = d; best = tr; } }
+    if (!best) { best = { filt: h.map(() => [oneEuro(), oneEuro()]) }; tracks.push(best); }
+    used.add(best); best.raw = h; best.seen = now;
+    best.pts = h.map((p, k) => ({ x: best.filt[k][0](p.x, now), y: best.filt[k][1](p.y, now) }));
+  }
+  for (let i = tracks.length - 1; i >= 0; i--) if (now - tracks[i].seen > 260) tracks.splice(i, 1); // gone for a quarter second: really gone
+  return tracks.slice(0, 2).map((tr) => tr.pts);
+}
 function frame(now) {
   const t = now / 1000, v = view();
   if (source && landmarker && video.readyState >= 2 && video.currentTime !== lastVideoT) {
     lastVideoT = video.currentTime;
-    try { const r = landmarker.detectForVideo(video, now); hands = (r.landmarks || []).map((h) => h.map((p) => ({ x: 1 - p.x, y: p.y }))); } catch (e) {}
-  }
+    try { const r = landmarker.detectForVideo(detectInput(), now); hands = updateTracks((r.landmarks || []).map((h) => h.map((p) => ({ x: 1 - p.x, y: p.y }))), now); } catch (e) {}
+  } else if (source && landmarker) hands = updateTracks([], now);
   const raw = source ? hands : demoHands(t);
   // smooth + to screen
   const hs = raw.slice(0, 2).map((h, i) => {
     const s = h.map((p) => toScreen(p, v));
-    const prev = smooth[i]; if (prev && prev.length === s.length) for (let k = 0; k < s.length; k++) { s[k].x = prev[k].x + (s[k].x - prev[k].x) * 0.6; s[k].y = prev[k].y + (s[k].y - prev[k].y) * 0.6; }
+    if (!source) { const prev = smooth[i]; if (prev && prev.length === s.length) for (let k = 0; k < s.length; k++) { s[k].x = prev[k].x + (s[k].x - prev[k].x) * 0.6; s[k].y = prev[k].y + (s[k].y - prev[k].y) * 0.6; } } // (the camera hands are already smoothed)
     smooth[i] = s; return s;
   });
   smooth.length = hs.length;
@@ -278,19 +320,25 @@ function frame(now) {
 }
 
 function begin() { $('start').hidden = true; $('bar').hidden = false; $('ttl').hidden = false; requestAnimationFrame(frame); }
-window.__ole = { setMode, get hands() { return hands; } };
+window.__ole = { setMode, get hands() { return hands; }, updateTracks, get boost() { return boost; } };
 
 $('demo').onclick = () => { source = null; begin(); };
 $('go').onclick = async () => {
   $('err').textContent = '';
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, facingMode: 'user' }, audio: false });
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { width: { ideal: 1280 }, height: { ideal: 720 }, frameRate: { ideal: 60 }, facingMode: 'user' }, audio: false });
     video.srcObject = stream; await video.play(); source = video; begin();
-  } catch (e) { $('err').textContent = "Couldn't turn on the camera (" + (e.name || 'blocked') + '). Allow camera access for this page, or watch the demo.'; return; }
+  } catch (e) {
+    let framed = false; try { framed = window.self !== window.top; } catch (x) { framed = true; }
+    $('err').textContent = framed && /claude/.test(location.hostname + document.referrer)
+      ? "This page is running inside Claude, which doesn't allow cameras. Open /open line engine on the OTM Games GitHub site (or open the .html file in Chrome) to use your hands. You can still watch the demo."
+      : "Couldn't turn on the camera (" + (e.name || 'blocked') + '). Allow camera access for this page, or watch the demo.';
+    return;
+  }
   try {
     const vision = await import('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs');
     const files = await vision.FilesetResolver.forVisionTasks('https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm');
-    const opts = (delegate) => ({ baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate }, runningMode: 'VIDEO', numHands: 2 });
+    const opts = (delegate) => ({ baseOptions: { modelAssetPath: 'https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task', delegate }, runningMode: 'VIDEO', numHands: 2, minHandDetectionConfidence: 0.3, minHandPresenceConfidence: 0.3, minTrackingConfidence: 0.3 }); // less picky: finds hands that are blurry, far away or partly hidden
     try { landmarker = await vision.HandLandmarker.createFromOptions(files, opts('GPU')); } catch (e) { landmarker = await vision.HandLandmarker.createFromOptions(files, opts('CPU')); }
   } catch (e) { loadFailed = true; console.warn(e); }
 };

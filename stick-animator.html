@@ -1,0 +1,776 @@
+<title>OTM Stick Animator</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;800&family=IBM+Plex+Mono:wght@500;600&family=Inter:wght@400;600&display=swap">
+<style>
+/* Layout: an animation studio — the stage on top, the keyframe timeline along the bottom, the inspector on the right. One committed dark look. */
+:root {
+  --bg: #0e0d13; --panel: #17151f; --raise: #211e2c; --line: #2f2b3d;
+  --fg: #eceaf4; --dim: #9993ad; --accent: #59d6ff; --key: #ffcf4a; --hot: #ff5c8a;
+  --stage: #f2f0ea; --ink: #15141a;
+  --display: 'Sora', 'Segoe UI', system-ui, sans-serif; --body: 'Inter', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 var(--body); overflow: hidden; }
+.app { height: 100%; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: 1fr 250px; grid-template-areas: "top top" "stage side" "time time"; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); box-sizing: border-box; }
+header { grid-area: top; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px max(16px, env(safe-area-inset-left, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); background: var(--panel); }
+h1 { margin: 0 8px 0 0; font: 800 17px var(--display); letter-spacing: -0.01em; white-space: nowrap; }
+h1 b { color: var(--accent); font-weight: 800; }
+button, select, input { font: inherit; color: var(--fg); }
+button { background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }
+button:hover { border-color: var(--dim); }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+button.on { background: var(--accent); color: #04121a; border-color: var(--accent); }
+button.play { background: var(--key); color: #1a1300; border-color: var(--key); min-width: 74px; }
+select { background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 13px; }
+.grp { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+.sp { flex: 1; }
+.stage { grid-area: stage; position: relative; min-width: 0; min-height: 0; background: var(--bg); }
+#cv { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: default; }
+.hint { position: absolute; left: 16px; bottom: 12px; font: 500 12px var(--mono); color: var(--dim); pointer-events: none; }
+aside { grid-area: side; background: var(--panel); border-left: 1px solid var(--line); padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+aside h2 { margin: 0; font: 600 11px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.field { display: grid; gap: 6px; }
+.field label { font-size: 12px; color: var(--dim); }
+.row { display: flex; gap: 6px; flex-wrap: wrap; }
+.row > * { flex: 1; }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+input[type=number] { width: 64px; background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 5px 7px; font: 500 13px var(--mono); }
+.keyinfo { font: 500 12px var(--mono); color: var(--fg); background: var(--raise); border-radius: 8px; padding: 8px 10px; }
+.keyinfo .k { color: var(--key); }
+.timeline { grid-area: time; background: var(--panel); border-top: 1px solid var(--line); padding: 8px max(16px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 6px; }
+.tbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font: 500 12px var(--mono); color: var(--dim); }
+.tbar .time { color: var(--fg); min-width: 110px; font-variant-numeric: tabular-nums; }
+#tl { width: 100%; height: 64px; display: block; touch-action: none; cursor: pointer; border-radius: 8px; background: var(--bg); }
+.toast { position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--raise); border: 1px solid var(--line); padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; z-index: 5; }
+[hidden] { display: none !important; }
+.modemenu { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; background: rgba(8,7,12,0.84); backdrop-filter: blur(6px); padding: 16px; overflow-y: auto; }
+.mm-box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px; max-width: 580px; width: 100%; box-sizing: border-box; text-align: center; }
+.mm-title { margin: 0 0 6px; font: 800 32px var(--display); letter-spacing: -0.02em; }
+.mm-sub { margin: 0 0 20px; color: var(--dim); }
+.mm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.mm-card { display: grid; gap: 8px; justify-items: center; padding: 16px 12px; border-radius: 14px; white-space: normal; text-align: center; transition: transform .12s, border-color .12s; }
+.mm-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.mm-card canvas { width: 160px; height: 120px; border-radius: 10px; max-width: 100%; }
+.mm-card b { font: 800 24px var(--display); }
+.mm-card span { font-weight: 400; color: var(--dim); font-size: 12.5px; line-height: 1.4; }
+#tl.graph { height: 190px; }
+.parts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
+.parts button { font: 500 11px var(--mono); padding: 5px 6px; text-align: left; overflow: hidden; text-overflow: ellipsis; }
+.parts button.sel { border-color: var(--accent); color: var(--accent); }
+@media (max-width: 460px) { .mm-row { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; grid-template-areas: "top" "stage" "time" "side"; }
+  aside { border-left: 0; border-top: 1px solid var(--line); max-height: 24vh; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+  .hint { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="app">
+  <header>
+    <h1>OTM <b>Stick</b> Animator</h1>
+    <div class="grp">
+      <button class="play" id="play" title="Play / pause (Space)">▶ Play</button>
+      <button id="loop" class="on" title="Loop">⟲ Loop</button>
+      <select id="speed" aria-label="Playback speed"><option value="0.25">0.25×</option><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+    </div>
+    <div class="grp">
+      <button id="modeBtn" title="Switch between 2D and 3D">2D ⇄</button>
+      <button id="undo" title="Undo (Ctrl+Z)">↶</button>
+      <button id="redo" title="Redo (Ctrl+Y)">↷</button>
+      <button id="onion" class="on" title="See the poses before and after (O)">Onion skin</button>
+      <button id="ik" class="on" title="Drag hands and feet to move the whole arm or leg (I)">IK</button>
+    </div>
+    <div class="sp"></div>
+    <div class="grp">
+      <select id="preset" aria-label="Load a starter animation"><option value="">Starter animations…</option><option>Walk</option><option>Idle</option><option>Wave</option><option>Jump</option><option>Backflip</option><option>Punch</option><option value="blank">Blank (one pose)</option></select>
+      <button id="save" title="Save the animation as a file">Save</button>
+      <button id="load" title="Open a saved animation file">Open</button>
+      <button id="video" title="Record a video of the animation">Export video</button>
+      <input type="file" id="file" accept=".json,application/json" hidden>
+    </div>
+  </header>
+
+  <div class="stage"><canvas id="cv"></canvas><div class="hint" id="hint">drag joints to pose · hips: move (Shift: spin) · Space play · K key · Del delete · , . step</div></div>
+
+  <aside>
+    <div class="field">
+      <h2>Keyframe</h2>
+      <div class="keyinfo" id="keyinfo">—</div>
+      <div class="row"><button id="addKey" title="Add a keyframe here (K)">+ Key</button><button id="delKey" title="Delete this keyframe (Delete)">Delete</button></div>
+      <div class="row"><button id="copy" title="Copy this pose (Ctrl+C)">Copy pose</button><button id="paste" title="Paste the pose here (Ctrl+V)">Paste</button></div>
+      <div class="row"><button id="mirror" title="Swap left and right">Mirror</button><button id="reset" title="Stand up straight">Reset pose</button></div>
+    </div>
+    <div class="field">
+      <h2>Easing (into the next key)</h2>
+      <label for="ease">Style</label>
+      <select id="ease"><option>Linear</option><option>Sine</option><option>Quad</option><option>Cubic</option><option>Back</option><option>Bounce</option><option>Elastic</option><option>Constant</option></select>
+      <label for="dir">Direction</label>
+      <select id="dir"><option>InOut</option><option>In</option><option>Out</option></select>
+    </div>
+    <div class="field">
+      <h2>Animation</h2>
+      <label for="len">Length (seconds)</label>
+      <div class="row"><input type="number" id="len" min="0.2" max="30" step="0.1" value="1"><span></span></div>
+      <div class="field" id="tilt2d"><label for="tilt">Spin the whole body</label>
+      <input type="range" id="tilt" min="-360" max="360" step="1" value="0"></div>
+      <label for="col">Stick color</label>
+      <input type="color" id="col" value="#15141a">
+    </div>
+    <div class="field" id="sec3" hidden>
+      <h2>3D tools</h2>
+      <div class="row"><button id="toolMove" class="on" title="Drag the dots to pose (G)">✥ Move</button><button id="toolRot" title="Turn the picked part with the rings (R)">⟳ Rotate</button></div>
+      <label>Parts (pick one, then drag a ring)</label>
+      <div class="parts" id="parts"></div>
+      <label for="yaw">Turn</label><input type="range" id="yaw" min="-360" max="360" step="1" value="0">
+      <label for="pitch">Flip</label><input type="range" id="pitch" min="-360" max="360" step="1" value="0">
+      <label for="roll">Lean</label><input type="range" id="roll" min="-360" max="360" step="1" value="0">
+      <h2>Camera</h2>
+      <div class="row"><button id="camView" title="Look through the animated camera (C)">🎥 Camera view</button><button id="camKey" title="Save the camera here as a camera keyframe">+ Cam key</button></div>
+      <div class="row"><button id="camDel" title="Delete the camera key here">Delete cam key</button><button id="camReset" title="Back to the front view (F)">Reset view</button></div>
+      <label for="fov">Field of view</label><input type="range" id="fov" min="20" max="100" step="1" value="50">
+    </div>
+  </aside>
+
+  <div class="timeline">
+    <div class="tbar"><span class="time" id="time">0.00 s · frame 0</span><button id="prev" title="Previous frame (,)">‹</button><button id="next" title="Next frame (.)">›</button><button id="prevKey" title="Previous keyframe">⇤ key</button><button id="nextKey" title="Next keyframe">key ⇥</button><button id="graphBtn" hidden title="Graph editor: the picked part's rotation as curves (X)">Graph</button><span>30 frames per second · drag keys to move them</span></div>
+    <canvas id="tl"></canvas>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+<div class="modemenu" id="modeMenu" hidden>
+  <div class="mm-box">
+    <h2 class="mm-title">2D or 3D?</h2>
+    <p class="mm-sub">Pick how you want to animate. You can switch any time with the 2D/3D button up top.</p>
+    <div class="mm-row">
+      <button class="mm-card" id="pick2d"><canvas id="mm2" width="320" height="240"></canvas><b>2D</b><span>A flat stick figure on paper. Quick and simple. (press 2)</span></button>
+      <button class="mm-card" id="pick3d"><canvas id="mm3" width="320" height="240"></canvas><b>3D</b><span>Like Eclipse: orbit the camera, turn parts with rings, animate a camera. (press 3)</span></button>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d'), tl = $('tl'), tctx = tl.getContext('2d');
+const FPS = 30;
+// ---------- the rig: bones, each turning from its parent (like Roblox Motor6Ds) ----------
+const BONES = {
+  torso: { parent: null, len: 62, from: 'hip' }, head: { parent: 'torso', len: 16 },
+  armL1: { parent: 'torso', len: 36 }, armL2: { parent: 'armL1', len: 34 }, armR1: { parent: 'torso', len: 36 }, armR2: { parent: 'armR1', len: 34 },
+  legL1: { parent: null, len: 44, from: 'hip' }, legL2: { parent: 'legL1', len: 42 }, legR1: { parent: null, len: 44, from: 'hip' }, legR2: { parent: 'legR1', len: 42 },
+};
+const ORDER = ['torso', 'head', 'armL1', 'armL2', 'armR1', 'armR2', 'legL1', 'legL2', 'legR1', 'legR2'];
+const D = Math.PI / 180;
+const STAND = () => ({ x: 0, y: 0, rot: 0, a: { torso: -90 * D, head: 0, armL1: 160 * D, armL2: 10 * D, armR1: -160 * D, armR2: -10 * D, legL1: 97 * D, legL2: 0, legR1: 83 * D, legR2: 0 } });
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+// where every joint is (world space, y down; feet stand on y = 0 when x,y = 0)
+function solve(p) {
+  const out = {}, hip = [p.x, p.y - 86], rot = p.rot || 0, ang = {};
+  out.hip = hip;
+  for (const b of ORDER) {
+    const B = BONES[b], base = B.parent ? ang[B.parent] : rot;
+    ang[b] = base + p.a[b];
+    const start = B.parent ? out[B.parent + '_end'] : hip;
+    out[b + '_start'] = start; out[b + '_end'] = [start[0] + Math.cos(ang[b]) * B.len, start[1] + Math.sin(ang[b]) * B.len];
+  }
+  out.ang = ang; return out;
+}
+// arms hang from the shoulders (top of the torso)
+BONES.armL1.parent = 'torso'; BONES.armR1.parent = 'torso';
+
+// ---------- easing (the Roblox easing styles) ----------
+const EASE = {
+  Linear: (t) => t, Sine: (t) => 1 - Math.cos(t * Math.PI / 2), Quad: (t) => t * t, Cubic: (t) => t * t * t,
+  Back: (t) => t * t * (2.70158 * t - 1.70158),
+  Bounce: (t) => 1 - bounceOut(1 - t), Elastic: (t) => t === 0 || t === 1 ? t : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * (2 * Math.PI / 3)),
+  Constant: (t) => 0,
+};
+function bounceOut(t) { const n = 7.5625, d = 2.75; if (t < 1 / d) return n * t * t; if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75; if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375; return n * (t -= 2.625 / d) * t + 0.984375; }
+function ease(style, dir, t) {
+  if (style === 'Constant') return 0;
+  const f = EASE[style] || EASE.Linear;
+  if (dir === 'In') return f(t); if (dir === 'Out') return 1 - f(1 - t);
+  return t < 0.5 ? f(t * 2) / 2 : 1 - f((1 - t) * 2) / 2;
+}
+
+// ---------- the animation: keyframes at whole frames ----------
+let anim = null; // { len: seconds, keys: [{ f, pose, ease, dir }] }, color
+let frame = 0, playing = false, playT = 0, loop = true, speed = 1, onion = true, useIK = true, clip = null;
+const undoStack = [], redoStack = [];
+const frames = () => Math.max(1, Math.round(anim.len * FPS));
+const sortKeys = () => anim.keys.sort((a, b) => a.f - b.f);
+const keyAt = (f) => anim.keys.find((k) => k.f === f);
+function lerpPose(a, b, t) { if (a.q) return lerpPose3(a, b, t); const o = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, rot: (a.rot || 0) + ((b.rot || 0) - (a.rot || 0)) * t, a: {} }; for (const k of ORDER) o.a[k] = a.a[k] + (b.a[k] - a.a[k]) * t; return o; }
+function poseAt(f) {
+  const ks = anim.keys; if (!ks.length) return standFor();
+  if (f <= ks[0].f) return clone(ks[0].pose);
+  for (let i = 0; i < ks.length - 1; i++) { const a = ks[i], b = ks[i + 1]; if (f >= a.f && f <= b.f) { const t = (f - a.f) / Math.max(1e-6, b.f - a.f); return lerpPose(a.pose, b.pose, ease(a.ease, a.dir, t)); } }
+  return clone(ks[ks.length - 1].pose);
+}
+function snapshot() { undoStack.push(JSON.stringify(anim)); if (undoStack.length > 80) undoStack.shift(); redoStack.length = 0; }
+function save() { try { localStorage.setItem(mode === '3d' ? 'otm-stick-anim3' : 'otm-stick-anim', JSON.stringify(anim)); } catch (e) {} }
+// edit the pose at the playhead: makes a keyframe there if there isn't one (auto-key)
+function editKey() { let k = keyAt(frame); if (!k) { k = { f: frame, pose: poseAt(frame), ease: 'Sine', dir: 'InOut' }; anim.keys.push(k); sortKeys(); } return k; }
+
+// ---------- starter animations ----------
+function P(x, y, rot, deg) { const a = {}; ORDER.forEach((k, i) => a[k] = deg[i] * D); return { x, y, rot: rot * D, a }; }
+//                 torso head armL1 armL2 armR1 armR2 legL1 legL2 legR1 legR2
+const PRESETS = {
+  Walk: { len: 1, keys: [
+    [0, P(0, 0, 0, [-86, 4, 125, -25, -125, -35, 120, -5, 62, 25])], [8, P(0, -6, 0, [-88, 2, 145, -15, -145, -15, 100, 30, 84, 0])],
+    [15, P(0, 0, 0, [-86, 4, 235, 35, -235, 25, 62, 25, 120, -5])], [23, P(0, -6, 0, [-88, 2, 215, 15, -215, 15, 84, 0, 100, 30])], [30, P(0, 0, 0, [-86, 4, 125, -25, -125, -35, 120, -5, 62, 25])]] },
+  Idle: { len: 2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [30, P(0, 2, 0, [-88, 5, 160, 14, -160, -14, 99, -4, 81, 4])], [60, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Wave: { len: 1.2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, 70, -60, 97, 0, 83, 0])], [9, P(0, 0, 0, [-92, -6, 165, 8, 70, -100, 97, 0, 83, 0])], [18, P(0, 0, 0, [-90, 0, 165, 8, 70, -40, 97, 0, 83, 0])], [27, P(0, 0, 0, [-92, -6, 165, 8, 70, -100, 97, 0, 83, 0])], [36, P(0, 0, 0, [-90, 0, 165, 8, 70, -60, 97, 0, 83, 0])]] },
+  Jump: { len: 1.2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [8, P(0, 26, 0, [-70, 15, 120, 20, -230, -20, 30, 100, 40, 95])], [14, P(0, -10, 0, [-95, -5, 240, 0, -60, 0, 100, 0, 80, 0])], [22, P(0, -110, 0, [-90, 0, 200, 40, -100, -40, 60, 70, 70, 75])], [30, P(0, 0, 0, [-75, 12, 125, 20, -235, -20, 35, 95, 45, 90])], [36, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Backflip: { len: 1.4, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [8, P(0, 24, 0, [-72, 10, 125, 20, -235, -20, 35, 95, 45, 90])], [14, P(0, -60, -30, [-95, -10, 250, 0, -70, 0, 95, 0, 85, 0])], [22, P(0, -120, -180, [-90, 0, 200, 60, -100, -60, 20, 130, 30, 120])], [30, P(0, -60, -320, [-90, 0, 170, 20, -150, -20, 70, 40, 80, 30])], [36, P(0, 0, -360, [-75, 10, 125, 20, -235, -20, 40, 90, 45, 85])], [42, P(0, 0, -360, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Punch: { len: 1, keys: [[0, P(0, 0, 0, [-90, 0, 170, -150, 150, -130, 115, -10, 70, 15])], [8, P(-6, 4, 0, [-97, 0, 175, -150, 168, -150, 118, -10, 68, 15])], [12, P(12, 2, 0, [-80, 5, 185, -150, 80, 0, 122, -15, 62, 10])], [20, P(12, 2, 0, [-80, 5, 185, -150, 80, 0, 122, -15, 62, 10])], [30, P(0, 0, 0, [-90, 0, 170, -150, 150, -130, 115, -10, 70, 15])]] },
+};
+function loadPreset(name) {
+  const pr = (mode === '3d' ? PRESETS3 : PRESETS)[name];
+  anim = { len: pr.len, color: anim ? anim.color : '#15141a', keys: pr.keys.map(([f, pose]) => ({ f, pose: clone(pose), ease: 'Sine', dir: 'InOut' })) };
+  if (mode === '3d') anim.cams = [];
+  if (name === 'Jump' || name === 'Backflip') { anim.keys[2].ease = 'Quad'; anim.keys[2].dir = 'Out'; anim.keys[3].ease = 'Quad'; anim.keys[3].dir = 'In'; }
+  if (name === 'Punch') { anim.keys[1].ease = 'Back'; anim.keys[1].dir = 'Out'; }
+  frame = 0; syncUI();
+}
+
+// ---------- view: stage camera ----------
+let W = 0, H = 0, dpr = 1, scale = 1, ox = 0, oy = 0;
+function resize() {
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr;
+  scale = Math.max(0.6, Math.min(W / 420, H / 330)); ox = W / 2; oy = H * 0.74;
+  const t = tl.getBoundingClientRect(); tl.width = t.width * dpr; tl.height = t.height * dpr;
+}
+const toScreen = (p) => [ox + p[0] * scale, oy + p[1] * scale];
+const toWorld = (x, y) => [(x - ox) / scale, (y - oy) / scale];
+
+// ---------- drawing ----------
+function drawFigure(c, pose, color, alpha, width, showJoints) {
+  const s = solve(pose);
+  c.save(); c.globalAlpha = alpha; c.strokeStyle = color; c.fillStyle = color; c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = width * scale;
+  const seg = (a, b) => { const A = toScreen(a), B = toScreen(b); c.beginPath(); c.moveTo(A[0], A[1]); c.lineTo(B[0], B[1]); c.stroke(); };
+  // back limbs a little lighter so you can tell left from right
+  c.globalAlpha = alpha * 0.55; seg(s.armL1_start, s.armL1_end); seg(s.armL2_start, s.armL2_end); seg(s.legL1_start, s.legL1_end); seg(s.legL2_start, s.legL2_end);
+  c.globalAlpha = alpha; seg(s.torso_start, s.torso_end); seg(s.head_start, s.head_end);
+  seg(s.legR1_start, s.legR1_end); seg(s.legR2_start, s.legR2_end); seg(s.armR1_start, s.armR1_end); seg(s.armR2_start, s.armR2_end);
+  const h = toScreen(s.head_end), ha = s.ang.head; const hc = [h[0] + Math.cos(ha) * 14 * scale, h[1] + Math.sin(ha) * 14 * scale];
+  c.beginPath(); c.arc(hc[0], hc[1], 17 * scale, 0, Math.PI * 2); c.fill();
+  c.restore();
+  if (showJoints) for (const j of JOINTS) { const p = toScreen(jointPos(s, j)), hot = drag && drag.j === j.id || hover === j.id; ctx.beginPath(); ctx.arc(p[0], p[1], (hot ? 9 : 7), 0, Math.PI * 2); ctx.fillStyle = j.kind === 'root' ? '#ffcf4a' : j.ik && useIK ? '#ff5c8a' : '#59d6ff'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#0e0d13'; ctx.stroke(); }
+  return s;
+}
+function headCenter(s) { const h = s.head_end, a = s.ang.head; return [h[0] + Math.cos(a) * 14, h[1] + Math.sin(a) * 14]; }
+// the handles you can grab
+const JOINTS = [
+  { id: 'hip', kind: 'root' }, { id: 'chest', bone: 'torso' }, { id: 'head', bone: 'head' },
+  { id: 'elbowL', bone: 'armL1' }, { id: 'handL', bone: 'armL2', ik: ['armL1', 'armL2'] }, { id: 'elbowR', bone: 'armR1' }, { id: 'handR', bone: 'armR2', ik: ['armR1', 'armR2'] },
+  { id: 'kneeL', bone: 'legL1' }, { id: 'footL', bone: 'legL2', ik: ['legL1', 'legL2'] }, { id: 'kneeR', bone: 'legR1' }, { id: 'footR', bone: 'legR2', ik: ['legR1', 'legR2'] },
+];
+function jointPos(s, j) { if (j.id === 'hip') return s.hip; if (j.id === 'head') return headCenter(s); return s[j.bone + '_end']; }
+
+function drawStage() {
+  if (mode === '3d') return draw3D();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  // the paper stage
+  ctx.fillStyle = '#f2f0ea'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(21,20,26,0.06)'; ctx.lineWidth = 1;
+  const g = 40 * scale; for (let x = ox % g; x < W; x += g) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); } for (let y = oy % g; y < H; y += g) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(21,20,26,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke(); // the floor
+  const f = playing ? playT * FPS : frame;
+  if (onion && !playing) { // ghosts of the keys before and after
+    const prev = [...anim.keys].reverse().find((k) => k.f < frame), next = anim.keys.find((k) => k.f > frame);
+    if (prev) drawFigure(ctx, prev.pose, '#e0457b', 0.22, 6, false);
+    if (next) drawFigure(ctx, next.pose, '#2a9fd6', 0.22, 6, false);
+  }
+  drawFigure(ctx, poseAt(f), anim.color || '#15141a', 1, 7, !playing);
+}
+function drawTimeline() {
+  const w = tl.width / dpr, h = tl.height / dpr, n = frames(), pad = 12, x = (fr) => pad + (fr / n) * (w - pad * 2), ky = h - 18;
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0); tctx.clearRect(0, 0, w, h);
+  tctx.font = '500 10px "IBM Plex Mono", monospace'; tctx.textAlign = 'center';
+  for (let fr = 0; fr <= n; fr++) { const xx = x(fr), sec = fr % FPS === 0; tctx.strokeStyle = sec ? '#4a4560' : '#2a2638'; tctx.beginPath(); tctx.moveTo(xx, sec ? 4 : 14); tctx.lineTo(xx, sec ? 26 : 22); tctx.stroke(); if (sec) { tctx.fillStyle = '#9993ad'; tctx.fillText((fr / FPS) + 's', xx, 38); } }
+  tctx.strokeStyle = '#2f2b3d'; tctx.beginPath(); tctx.moveTo(pad, ky); tctx.lineTo(w - pad, ky); tctx.stroke();
+  if (mode === '3d') drawTL3(w, h, x, ky);
+  // easing bars between keys
+  for (let i = 0; i < anim.keys.length - 1; i++) { const a = anim.keys[i], b = anim.keys[i + 1]; tctx.fillStyle = a.ease === 'Constant' ? 'rgba(255,92,138,0.35)' : 'rgba(255,207,74,0.18)'; tctx.fillRect(x(a.f), ky - 4, x(b.f) - x(a.f), 8); }
+  for (const k of anim.keys) { const xx = x(k.f), sel = k.f === frame; tctx.save(); tctx.translate(xx, ky); tctx.rotate(Math.PI / 4); tctx.fillStyle = sel ? '#ffffff' : '#ffcf4a'; tctx.strokeStyle = '#0e0d13'; tctx.lineWidth = 2; tctx.fillRect(-6, -6, 12, 12); tctx.strokeRect(-6, -6, 12, 12); tctx.restore(); }
+  const ph = x(playing ? playT * FPS : frame); tctx.strokeStyle = '#59d6ff'; tctx.lineWidth = 2; tctx.beginPath(); tctx.moveTo(ph, 0); tctx.lineTo(ph, h); tctx.stroke(); tctx.fillStyle = '#59d6ff'; tctx.beginPath(); tctx.moveTo(ph - 6, 0); tctx.lineTo(ph + 6, 0); tctx.lineTo(ph, 8); tctx.fill(); tctx.lineWidth = 1;
+}
+function syncUI() {
+  const k = keyAt(frame), f = playing ? Math.floor(playT * FPS) : frame;
+  $('time').textContent = `${(f / FPS).toFixed(2)} s · frame ${f}`;
+  const ki = $('keyinfo'); ki.textContent = ''; // built piece by piece (some sites block innerHTML)
+  if (k) { const sp = document.createElement('span'); sp.className = 'k'; sp.textContent = '◆ keyframe'; ki.append(sp, ` at frame ${k.f}`); } else ki.textContent = `no key here · ${anim.keys.length} key${anim.keys.length === 1 ? '' : 's'} in all`;
+  $('ease').disabled = $('dir').disabled = !k; $('delKey').disabled = !k;
+  if (k) { $('ease').value = k.ease; $('dir').value = k.dir; }
+  $('len').value = anim.len; $('tilt').value = Math.round((poseAt(frame).rot || 0) / D); $('col').value = anim.color || '#15141a';
+  $('play').textContent = playing ? '❚❚ Pause' : '▶ Play';
+  if (mode === '3d') sync3();
+}
+
+// ---------- dragging joints ----------
+let drag = null, hover = null;
+const unwrap = (a, ref) => { while (a - ref > Math.PI) a -= 2 * Math.PI; while (a - ref < -Math.PI) a += 2 * Math.PI; return a; };
+function pickJoint(mx, my) { const s = solve(poseAt(frame)); let best = null, bd = 18; for (const j of JOINTS) { const p = toScreen(jointPos(s, j)), d = Math.hypot(p[0] - mx, p[1] - my); if (d < bd) { bd = d; best = j; } } return best; }
+function applyDrag(mx, my, shift) {
+  const k = editKey(), pose = k.pose, w = toWorld(mx, my), j = drag.jt, s = solve(pose);
+  if (j.kind === 'root') {
+    if (shift || drag.spin) { const a = Math.atan2(w[1] - s.hip[1], w[0] - s.hip[0]); if (drag.a0 === undefined) { drag.a0 = a; drag.r0 = pose.rot || 0; } pose.rot = drag.r0 + unwrap(a - drag.a0, 0); drag.spin = true; }
+    else { pose.x = drag.px + (w[0] - drag.w0[0]); pose.y = drag.py + (w[1] - drag.w0[1]); }
+    return;
+  }
+  if (j.ik && useIK) { // two-bone IK: move the hand/foot, the elbow/knee bends to follow
+    const [b1, b2] = j.ik, L1 = BONES[b1].len, L2 = BONES[b2].len, st = s[b1 + '_start'];
+    const dx = w[0] - st[0], dy = w[1] - st[1], d = Math.max(1e-3, Math.min(L1 + L2 - 1e-3, Math.hypot(dx, dy)));
+    const base = Math.atan2(dy, dx), cosA = (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), A = Math.acos(Math.max(-1, Math.min(1, cosA)));
+    const bendSign = Math.sign(pose.a[b2] || drag.bend || 1) || 1; drag.bend = bendSign;
+    const parentAng = BONES[b1].parent ? s.ang[BONES[b1].parent] : (pose.rot || 0);
+    const a1 = base - bendSign * A, cosB = (L1 * L1 + L2 * L2 - d * d) / (2 * L1 * L2), Bn = Math.PI - Math.acos(Math.max(-1, Math.min(1, cosB)));
+    pose.a[b1] = unwrap(a1 - parentAng, pose.a[b1]); pose.a[b2] = unwrap(bendSign * Bn, pose.a[b2]);
+    return;
+  }
+  // turn one bone around its start
+  const b = j.bone, st = s[b + '_start'], parentAng = BONES[b].parent ? s.ang[BONES[b].parent] : (pose.rot || 0);
+  const a = Math.atan2(w[1] - st[1], w[0] - st[0]); pose.a[b] = unwrap(a - parentAng, pose.a[b]);
+}
+cv.addEventListener('pointerdown', (e) => {
+  if (mode === '3d') return pd3(e);
+  if (playing) togglePlay();
+  const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, j = pickJoint(mx, my);
+  if (!j) return;
+  snapshot(); const pose = poseAt(frame); const w = toWorld(mx, my);
+  drag = { j: j.id, jt: j, w0: w, px: pose.x, py: pose.y, spin: e.shiftKey || e.button === 2 }; cv.setPointerCapture(e.pointerId); applyDrag(mx, my, e.shiftKey); render();
+});
+cv.addEventListener('pointermove', (e) => {
+  if (mode === '3d') return pm3(e);
+  const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  if (drag) { applyDrag(mx, my, e.shiftKey); render(); return; }
+  const j = playing ? null : pickJoint(mx, my), id = j ? j.id : null; if (id !== hover) { hover = id; cv.style.cursor = j ? (j.kind === 'root' ? 'move' : 'grab') : 'default'; render(); }
+});
+const endDrag = () => { if (drag) { drag = null; save(); syncUI(); render(); } };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag); cv.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// ---------- timeline: click to scrub, drag keys to move them ----------
+let tdrag = null;
+function tlFrame(e) { const r = tl.getBoundingClientRect(), pad = 12, n = frames(); return Math.max(0, Math.min(n, Math.round(((e.clientX - r.left - pad) / (r.width - pad * 2)) * n))); }
+tl.addEventListener('pointerdown', (e) => {
+  if (playing) togglePlay();
+  const f = tlFrame(e), r = tl.getBoundingClientRect(), onKeys = e.clientY - r.top > r.height - 30, k = onKeys && anim.keys.find((q) => Math.abs(q.f - f) <= 1);
+  const ck = mode === '3d' && !k && Math.abs(e.clientY - r.top - (r.height - 42)) < 10 && (anim.cams || []).find((q) => Math.abs(q.f - f) <= 1);
+  tl.setPointerCapture(e.pointerId);
+  if (ck) { snapshot(); tdrag = { cam: ck }; frame = ck.f; } else if (k) { snapshot(); tdrag = { key: k }; frame = k.f; } else { tdrag = { scrub: true }; frame = f; }
+  syncUI(); render();
+});
+tl.addEventListener('pointermove', (e) => {
+  if (!tdrag) return; const f = tlFrame(e);
+  if (tdrag.key) { if (!anim.keys.some((q) => q !== tdrag.key && q.f === f)) { tdrag.key.f = f; sortKeys(); frame = f; } } else if (tdrag.cam) { if (!anim.cams.some((q) => q !== tdrag.cam && q.f === f)) { tdrag.cam.f = f; anim.cams.sort((a, b) => a.f - b.f); frame = f; } } else frame = f;
+  syncUI(); render();
+});
+tl.addEventListener('pointerup', () => { if (tdrag && (tdrag.key || tdrag.cam)) save(); tdrag = null; });
+
+// ---------- playback ----------
+let last = 0;
+function togglePlay() { playing = !playing; if (playing) { playT = frame / FPS; last = performance.now(); requestAnimationFrame(tick); } else { frame = Math.min(frames(), Math.round(playT * FPS)); } syncUI(); render(); }
+function tick(now) {
+  if (!playing) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; playT += dt * speed;
+  if (playT * FPS >= frames()) { if (loop) playT = playT % anim.len; else { playT = anim.len; togglePlay(); return; } }
+  render(); syncUI(); requestAnimationFrame(tick);
+}
+function render() { drawStage(); drawTimeline(); }
+
+// ---------- buttons ----------
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800); }
+$('play').onclick = togglePlay;
+$('loop').onclick = () => { loop = !loop; $('loop').classList.toggle('on', loop); };
+$('speed').onchange = (e) => speed = +e.target.value;
+$('onion').onclick = () => { onion = !onion; $('onion').classList.toggle('on', onion); render(); };
+$('ik').onclick = () => { useIK = !useIK; $('ik').classList.toggle('on', useIK); render(); };
+function undo() { if (!undoStack.length) return; redoStack.push(JSON.stringify(anim)); anim = JSON.parse(undoStack.pop()); save(); syncUI(); render(); }
+function redo() { if (!redoStack.length) return; undoStack.push(JSON.stringify(anim)); anim = JSON.parse(redoStack.pop()); save(); syncUI(); render(); }
+$('undo').onclick = undo; $('redo').onclick = redo;
+function addKey() { if (keyAt(frame)) return toast('There is already a key here'); snapshot(); editKey(); save(); syncUI(); render(); toast('Keyframe added'); }
+function delKey() { const k = keyAt(frame); if (!k) return; if (anim.keys.length === 1) return toast('An animation needs at least one key'); snapshot(); anim.keys.splice(anim.keys.indexOf(k), 1); save(); syncUI(); render(); }
+$('addKey').onclick = addKey; $('delKey').onclick = delKey;
+$('copy').onclick = () => { clip = clone(poseAt(frame)); toast('Pose copied'); };
+$('paste').onclick = () => { if (!clip) return toast('Copy a pose first'); if (!!clip.q !== (mode === '3d')) return toast('That pose is from the other mode'); snapshot(); editKey().pose = clone(clip); save(); syncUI(); render(); toast('Pose pasted'); };
+$('mirror').onclick = () => { // swap left and right (flip the figure)
+  if (mode === '3d') { snapshot(); const k = editKey(); k.pose = mirror3(k.pose); save(); syncUI(); render(); return; }
+  snapshot(); const k = editKey(), a = k.pose.a, m = (v) => Math.PI - v;
+  const t = { torso: m(a.torso), head: -a.head, armL1: -a.armR1, armL2: -a.armR2, armR1: -a.armL1, armR2: -a.armL2, legL1: m(a.legR1), legL2: -a.legR2, legR1: m(a.legL1), legR2: -a.legL2 };
+  t.armL1 = -a.armR1; t.armR1 = -a.armL1; k.pose.a = t; k.pose.x = -k.pose.x; k.pose.rot = -(k.pose.rot || 0); save(); syncUI(); render();
+};
+$('reset').onclick = () => { snapshot(); const k = editKey(), x = k.pose.x, z = k.pose.z; k.pose = standFor(); k.pose.x = x; if (mode === '3d') k.pose.z = z || 0; save(); syncUI(); render(); };
+$('ease').onchange = (e) => { const k = keyAt(frame); if (!k) return; snapshot(); k.ease = e.target.value; save(); render(); };
+$('dir').onchange = (e) => { const k = keyAt(frame); if (!k) return; snapshot(); k.dir = e.target.value; save(); render(); };
+$('len').onchange = (e) => { const v = Math.max(0.2, Math.min(30, +e.target.value || 1)); snapshot(); anim.len = v; const n = frames(); anim.keys.forEach((k) => k.f = Math.min(k.f, n)); (anim.cams || []).forEach((k) => k.f = Math.min(k.f, n)); frame = Math.min(frame, n); save(); syncUI(); render(); };
+$('tilt').oninput = (e) => { if (!$('tilt').dataset.busy) { snapshot(); $('tilt').dataset.busy = 1; } editKey().pose.rot = +e.target.value * D; render(); };
+$('tilt').onchange = () => { delete $('tilt').dataset.busy; save(); syncUI(); };
+$('col').oninput = (e) => { anim.color = e.target.value; save(); render(); };
+const step = (d) => { if (playing) togglePlay(); frame = Math.max(0, Math.min(frames(), frame + d)); syncUI(); render(); };
+$('prev').onclick = () => step(-1); $('next').onclick = () => step(1);
+$('prevKey').onclick = () => { const k = [...anim.keys].reverse().find((q) => q.f < frame); if (k) { frame = k.f; syncUI(); render(); } };
+$('nextKey').onclick = () => { const k = anim.keys.find((q) => q.f > frame); if (k) { frame = k.f; syncUI(); render(); } };
+$('preset').onchange = (e) => {
+  const v = e.target.value; e.target.value = ''; if (!v) return; snapshot();
+  if (v === 'blank') { anim = { len: 1, color: anim.color, keys: [{ f: 0, pose: standFor(), ease: 'Sine', dir: 'InOut' }] }; if (mode === '3d') anim.cams = []; frame = 0; } else loadPreset(v);
+  save(); syncUI(); render(); toast(v === 'blank' ? 'New animation (Undo to get the old one back)' : `Loaded ${v} (Undo to get your old one back)`);
+};
+
+// ---------- saving files and video ----------
+async function saveFile(name, blob) {
+  try { if (window.claude && window.claude.use) { const d = await window.claude.use('downloads'); if (d) { await d.save({ filename: name, data: blob }); return true; } } } catch (e) { if (e && e.code === 'declined') return false; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); return true;
+}
+$('save').onclick = async () => { if (await saveFile('stick-animation.json', new Blob([JSON.stringify(anim, null, 1)], { type: 'application/json' }))) toast('Saved'); };
+$('load').onclick = () => $('file').click();
+$('file').onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const d = JSON.parse(await f.text()); if (!d.keys || !d.keys.length || !d.keys[0].pose) throw 0; const is3 = !!d.keys[0].pose.q; if ((mode === '3d') !== is3) setMode(is3 ? '3d' : '2d'); snapshot(); anim = d; if (is3 && !anim.cams) anim.cams = []; frame = 0; save(); syncUI(); render(); toast('Opened ' + f.name); }
+  catch (x) { toast("That file isn't a stick animation"); }
+};
+$('video').onclick = async () => {
+  if (!window.MediaRecorder || !cv.captureStream) return toast("This browser can't record video");
+  const was = { onion, camView }; onion = false; exporting = true; if (mode === '3d' && anim.cams && anim.cams.length) camView = true; if (playing) togglePlay();
+  const stream = cv.captureStream(30), types = ['video/webm;codecs=vp9', 'video/webm'], type = types.find((t) => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+  const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 4e6 }), chunks = [];
+  rec.ondataavailable = (ev) => ev.data.size && chunks.push(ev.data);
+  const done = new Promise((r) => rec.onstop = r);
+  toast('Recording…'); $('video').disabled = true; rec.start();
+  const loops = anim.len < 2 ? Math.ceil(2 / anim.len) : 1, total = anim.len * loops, t0 = performance.now();
+  await new Promise((res) => { const go = (now) => { const t = (now - t0) / 1000; if (t >= total) return res(); playT = t % anim.len; playing = true; drawStage(); playing = false; requestAnimationFrame(go); }; requestAnimationFrame(go); });
+  rec.stop(); await done; onion = was.onion; camView = was.camView; exporting = false; $('video').disabled = false; render();
+  if (await saveFile('stick-animation.webm', new Blob(chunks, { type: 'video/webm' }))) toast('Video saved');
+};
+
+// ================= 3D MODE (works like Roblox's Eclipse animator) =================
+let mode = '2d', anim2 = null, anim3 = null, exporting = false;
+let cam = { yaw: 0.45, pitch: 0.22, dist: 4.2, tx: 0, ty: 0.95, tz: 0, fov: 50 };
+let camView = false, tool = 'move', sel = 'root', graph = false, V = null;
+// vectors [x, y, z] (y is up) and quaternions [w, x, y, z]
+const vadd = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], vmul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], vcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const vlen = (a) => Math.hypot(a[0], a[1], a[2]), vnorm = (a) => { const l = vlen(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const qid = () => [1, 0, 0, 0], qconj = (q) => [q[0], -q[1], -q[2], -q[3]];
+function qmul(a, b) { return [a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3], a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2], a[0] * b[2] - a[1] * b[3] + a[2] * b[0] + a[3] * b[1], a[0] * b[3] + a[1] * b[2] - a[2] * b[1] + a[3] * b[0]]; }
+function qnorm(q) { const l = Math.hypot(q[0], q[1], q[2], q[3]) || 1; return [q[0] / l, q[1] / l, q[2] / l, q[3] / l]; }
+function qrot(q, v) { const p = qmul(qmul(q, [0, v[0], v[1], v[2]]), qconj(q)); return [p[1], p[2], p[3]]; }
+function qaxis(ax, a) { const n = vnorm(ax), s = Math.sin(a / 2); return [Math.cos(a / 2), n[0] * s, n[1] * s, n[2] * s]; }
+function qfromTo(u, v) { u = vnorm(u); v = vnorm(v); const d = vdot(u, v); if (d < -0.99999) { let ax = vcross([1, 0, 0], u); if (vlen(ax) < 1e-4) ax = vcross([0, 1, 0], u); return qaxis(ax, Math.PI); } const c = vcross(u, v); return qnorm([1 + d, c[0], c[1], c[2]]); }
+function qslerp(a, b, t) { let d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]; if (d < 0) { b = b.map((v) => -v); d = -d; } if (d > 0.9995) return qnorm(a.map((v, i) => v + (b[i] - v) * t)); const th = Math.acos(d), s = Math.sin(th), wa = Math.sin((1 - t) * th) / s, wb = Math.sin(t * th) / s; return qnorm(a.map((v, i) => v * wa + b[i] * wb)); }
+const qeuler = (y, p, r) => qmul(qmul(qaxis([0, 1, 0], y), qaxis([1, 0, 0], p)), qaxis([0, 0, 1], r));
+function qToEuler(q) { const [w, x, y, z] = q, m13 = 2 * (x * z + w * y), m23 = 2 * (y * z - w * x), m33 = 1 - 2 * (x * x + y * y), m21 = 2 * (x * y + w * z), m22 = 1 - 2 * (x * x + z * z), m11 = 1 - 2 * (y * y + z * z), m31 = 2 * (x * z - w * y); const X = Math.asin(Math.max(-1, Math.min(1, -m23))); return Math.abs(m23) < 0.9999 ? [X, Math.atan2(m13, m33), Math.atan2(m21, m22)] : [X, Math.atan2(-m31, m11), 0]; }
+
+// the 3D rig, in meters. Each part turns from its parent (Motor6Ds again). The figure faces +z; its left is +x.
+const L3 = { torso: 0.62, head: 0.16, armL1: 0.36, armL2: 0.34, armR1: 0.36, armR2: 0.34, legL1: 0.44, legL2: 0.42, legR1: 0.44, legR2: 0.42 };
+const UP3 = { torso: 1, head: 1 }, SH3 = { armL1: [0.17, -0.05, 0], armR1: [-0.17, -0.05, 0], legL1: [0.1, 0, 0], legR1: [-0.1, 0, 0] };
+function solve3(p) {
+  const R = qeuler(p.yaw || 0, p.pitch || 0, p.roll || 0), out = { R, W: {}, hip: [p.x || 0, 0.86 + (p.y || 0), p.z || 0] };
+  for (const b of ORDER) {
+    const par = BONES[b].parent, W = out.W[b] = qmul(par ? out.W[par] : R, p.q[b]);
+    let st;
+    if (b === 'torso') st = out.hip; else if (b === 'head') st = out.torso_end;
+    else if (SH3[b]) st = vadd(b[0] === 'a' ? out.torso_end : out.hip, qrot(b[0] === 'a' ? out.W.torso : R, SH3[b]));
+    else st = out[par + '_end'];
+    out[b + '_start'] = st; out[b + '_end'] = vadd(st, qrot(W, [0, UP3[b] ? L3[b] : -L3[b], 0]));
+  }
+  return out;
+}
+// aim one part along a world direction (its children come along)
+function setDir(p, b, dir) { if (vlen(dir) < 1e-6) return; const s = solve3(p), par = BONES[b].parent, PW = par ? s.W[par] : s.R, Wn = qmul(qfromTo(vsub(s[b + '_end'], s[b + '_start']), dir), s.W[b]); p.q[b] = qnorm(qmul(qconj(PW), Wn)); }
+// 3D two-bone IK: keeps the elbow/knee bending the way it already bends
+function ik3(p, [b1, b2], T) {
+  const s = solve3(p), S = s[b1 + '_start'], E = s[b1 + '_end'], L1 = L3[b1], L2 = L3[b2], dv = vsub(T, S), d = Math.max(0.02, Math.min(L1 + L2 - 1e-3, vlen(dv))), u = vnorm(dv);
+  let pv = vsub(E, S); pv = vsub(pv, vmul(u, vdot(pv, u)));
+  if (vlen(pv) < 1e-3) { pv = qrot(s.R, b1[0] === 'l' ? [0, 0, 1] : [0, 0, -1]); pv = vsub(pv, vmul(u, vdot(pv, u))); }
+  const v = vnorm(pv), a = (L1 * L1 - L2 * L2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, L1 * L1 - a * a)), elbow = vadd(S, vadd(vmul(u, a), vmul(v, h)));
+  setDir(p, b1, vsub(elbow, S)); const s2 = solve3(p); setDir(p, b2, vsub(vadd(S, vmul(u, d)), s2[b1 + '_end']));
+}
+const DIRS = { torso: [0, 1, 0], head: [0, 1, 0], armL1: [0.15, -1, 0], armL2: [0.08, -1, 0.12], armR1: [-0.15, -1, 0], armR2: [-0.08, -1, 0.12], legL1: [0.04, -1, 0], legL2: [0, -1, 0], legR1: [-0.04, -1, 0], legR2: [0, -1, 0] };
+// build a pose from where each part points (body space) plus [x, y, z, turn°, flip°, lean°]
+function B3(root, dirs) {
+  const p = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, roll: 0, q: {} }; ORDER.forEach((b) => p.q[b] = qid());
+  for (const b of ORDER) setDir(p, b, (dirs || {})[b] || DIRS[b]);
+  const r = root || []; p.x = r[0] || 0; p.y = r[1] || 0; p.z = r[2] || 0; p.yaw = (r[3] || 0) * D; p.pitch = (r[4] || 0) * D; p.roll = (r[5] || 0) * D;
+  return p;
+}
+const STAND3 = () => B3();
+const standFor = () => mode === '3d' ? STAND3() : STAND();
+function lerpPose3(a, b, t) { const o = { q: {} }; for (const k of ['x', 'y', 'z', 'yaw', 'pitch', 'roll']) o[k] = (a[k] || 0) + ((b[k] || 0) - (a[k] || 0)) * t; for (const k of ORDER) o.q[k] = qslerp(a.q[k], b.q[k], t); return o; }
+function mirror3(p) { const o = { x: -(p.x || 0), y: p.y || 0, z: p.z || 0, yaw: -(p.yaw || 0), pitch: p.pitch || 0, roll: -(p.roll || 0), q: {} }; for (const b of ORDER) { const q = p.q[b.replace(/[LR](?=\d)/, (c) => c === 'L' ? 'R' : 'L')]; o.q[b] = [q[0], q[1], -q[2], -q[3]]; } return o; }
+
+// starter animations in 3D (same keyframe counts as the 2D ones)
+const PRESETS3 = (() => {
+  const walkA = B3([0, -0.05, 0], { torso: [0, 1, 0.08], armL1: [0.12, -1, -0.45], armL2: [0.08, -1, -0.1], armR1: [-0.12, -1, 0.5], armR2: [-0.08, -0.55, 0.85], legL1: [0.03, -0.87, 0.5], legL2: [0, -1, 0.12], legR1: [-0.03, -0.88, -0.45], legR2: [0, -0.75, -0.65] });
+  const walkB = B3([0, 0, 0], { torso: [0, 1, 0.06], armL1: [0.13, -1, -0.1], armL2: [0.08, -1, 0.1], armR1: [-0.13, -1, 0.15], armR2: [-0.08, -0.9, 0.45], legL1: [0.03, -1, 0.05], legL2: [0, -1, -0.02], legR1: [-0.03, -0.85, 0.5], legR2: [0, -0.95, -0.35] });
+  const stand = B3([0, -0.01, 0]);
+  const crouch = (arms) => B3([0, -0.21, 0], Object.assign({ torso: [0, 1, 0.45], head: [0, 1, 0.1], legL1: [0.06, -0.6, 0.8], legL2: [0, -0.9, -0.4], legR1: [-0.06, -0.6, 0.8], legR2: [0, -0.9, -0.4] }, arms));
+  const armsBack = { armL1: [0.1, -0.7, -0.7], armL2: [0.05, -0.8, -0.5], armR1: [-0.1, -0.7, -0.7], armR2: [-0.05, -0.8, -0.5] };
+  const armsUp = { armL1: [0.2, 1, 0.1], armL2: [0.1, 1, 0], armR1: [-0.2, 1, 0.1], armR2: [-0.1, 1, 0] };
+  const straight = { legL1: [0.04, -1, -0.05], legL2: [0, -1, -0.1], legR1: [-0.04, -1, -0.05], legR2: [0, -1, -0.1] };
+  const wave = (arm2, head) => B3([0, -0.01, 0], { armR1: [-1, 0.35, 0.1], armR2: arm2, head: head || [0, 1, 0] });
+  const guard = (root, more) => B3(root, Object.assign({ torso: [0, 1, 0.12], head: [0, 1, 0.05], armL1: [0.3, -0.85, 0.45], armL2: [-0.25, 1, 0.45], armR1: [-0.3, -0.9, 0.3], armR2: [0.2, 1, 0.35], legL1: [0.15, -1, 0.3], legL2: [0, -1, 0.1], legR1: [-0.15, -1, -0.3], legR2: [0, -1, -0.15] }, more));
+  const hit = guard([0, -0.06, 0.1, -15], { torso: [0, 1, 0.25], armR1: [0, 0.15, 1], armR2: [0, 0.08, 1] });
+  return {
+    Walk: { len: 1, keys: [[0, walkA], [8, walkB], [15, mirror3(walkA)], [23, mirror3(walkB)], [30, walkA]] },
+    Idle: { len: 2, keys: [[0, stand], [30, B3([0, -0.02, 0], { torso: [0, 1, -0.03], head: [0, 1, 0.08], armL1: [0.22, -1, 0], armR1: [-0.22, -1, 0] })], [60, stand]] },
+    Wave: { len: 1.2, keys: [[0, wave([-0.3, 1, 0.15])], [9, wave([-0.75, 1, 0.15], [0.1, 1, 0])], [18, wave([0.25, 1, 0.15])], [27, wave([-0.75, 1, 0.15], [0.1, 1, 0])], [36, wave([-0.3, 1, 0.15])]] },
+    Jump: { len: 1.2, keys: [[0, stand], [8, crouch(armsBack)], [14, B3([0, 0.08, 0], Object.assign({ torso: [0, 1, -0.05] }, armsUp, straight))],
+      [22, B3([0, 0.85, 0], { armL1: [0.8, 0.5, 0.1], armL2: [0.5, 0.8, 0], armR1: [-0.8, 0.5, 0.1], armR2: [-0.5, 0.8, 0], legL1: [0.05, -0.5, 0.85], legL2: [0, -1, -0.3], legR1: [-0.05, -0.5, 0.85], legR2: [0, -1, -0.3] })],
+      [30, crouch({ armL1: [0.1, -0.6, 0.8], armR1: [-0.1, -0.6, 0.8] })], [36, stand]] },
+    Backflip: { len: 1.4, keys: [[0, stand], [8, crouch(armsBack)], [14, B3([0, 0.35, 0, 0, -30], Object.assign({}, armsUp, straight))],
+      [22, B3([0, 1.05, 0, 0, -180], { torso: [0, 1, 0.3], legL1: [0.05, 0.3, 1], legL2: [0, -1, -0.1], legR1: [-0.05, 0.3, 1], legR2: [0, -1, -0.1], armL1: [0.15, -0.4, 0.9], armL2: [-0.05, -0.8, 0.3], armR1: [-0.15, -0.4, 0.9], armR2: [0.05, -0.8, 0.3] })],
+      [30, B3([0, 0.5, 0, 0, -320], { legL1: [0.04, -0.9, 0.4], legR1: [-0.04, -0.9, 0.4], armL1: [0.7, -0.3, 0.3], armR1: [-0.7, -0.3, 0.3] })],
+      [36, B3([0, -0.15, 0, 0, -360], { torso: [0, 1, 0.3], legL1: [0.05, -0.75, 0.6], legL2: [0, -0.95, -0.3], legR1: [-0.05, -0.75, 0.6], legR2: [0, -0.95, -0.3], armL1: [0.3, -0.5, 0.6], armR1: [-0.3, -0.5, 0.6] })], [42, B3([0, -0.01, 0, 0, -360])]] },
+    Punch: { len: 1, keys: [[0, guard([0, -0.06, 0, 25])], [8, guard([0, -0.08, -0.04, 40])], [12, hit], [20, hit], [30, guard([0, -0.06, 0, 25])]] },
+  };
+})();
+
+// ---------- the camera ----------
+function camBasis(c) { const cp = Math.cos(c.pitch), eye = [c.tx + c.dist * cp * Math.sin(c.yaw), c.ty + c.dist * Math.sin(c.pitch), c.tz + c.dist * cp * Math.cos(c.yaw)], fw = vnorm(vsub([c.tx, c.ty, c.tz], eye)), rt = vnorm(vcross(fw, [0, 1, 0])); return { eye, fw, rt, up: vcross(rt, fw) }; }
+function setView(c) { V = camBasis(c); V.foc = (H / 2) / Math.tan(c.fov * D / 2); }
+function proj(p) { const v = vsub(p, V.eye), z = vdot(v, V.fw); if (z < 0.05) return null; return [W / 2 + vdot(v, V.rt) / z * V.foc, H / 2 - vdot(v, V.up) / z * V.foc, z]; }
+function unproj(sx, sy, z) { return vadd(vadd(V.eye, vmul(V.fw, z)), vadd(vmul(V.rt, (sx - W / 2) / V.foc * z), vmul(V.up, -(sy - H / 2) / V.foc * z))); }
+function camAt(f) {
+  const cs = anim.cams || []; if (!cs.length) return null;
+  if (f <= cs[0].f) return Object.assign({}, cs[0].cam);
+  for (let i = 0; i < cs.length - 1; i++) { const a = cs[i], b = cs[i + 1]; if (f >= a.f && f <= b.f) { const t = ease('Sine', 'InOut', (f - a.f) / Math.max(1e-6, b.f - a.f)), o = {}; for (const k in a.cam) o[k] = a.cam[k] + (b.cam[k] - a.cam[k]) * t; return o; } }
+  return Object.assign({}, cs[cs.length - 1].cam);
+}
+const curF = () => playing ? playT * FPS : frame;
+function viewCam() { return (camView && camAt(curF())) || cam; }
+// the camera you're moving right now: in Camera view it's the animated camera (auto-keyed at the playhead)
+function editCam() {
+  if (!camView) return cam;
+  let k = anim.cams.find((c) => c.f === frame);
+  if (!k) { k = { f: frame, cam: camAt(frame) || Object.assign({}, cam) }; anim.cams.push(k); anim.cams.sort((a, b) => a.f - b.f); }
+  return k.cam;
+}
+
+// ---------- drawing in 3D ----------
+function seg3(c, a, b) { const n = 0.06; let za = vdot(vsub(a, V.eye), V.fw), zb = vdot(vsub(b, V.eye), V.fw); if (za < n && zb < n) return; if (za < n) a = vadd(a, vmul(vsub(b, a), (n - za) / (zb - za))); else if (zb < n) b = vadd(b, vmul(vsub(a, b), (n - zb) / (za - zb))); const A = proj(a), B = proj(b); if (!A || !B) return; c.moveTo(A[0], A[1]); c.lineTo(B[0], B[1]); }
+const headCenter3 = (s) => vadd(s.head_end, qrot(s.W.head, [0, 0.13, 0]));
+function jointPos3(s, j) { if (j.id === 'hip') return s.hip; if (j.id === 'head') return headCenter3(s); return s[j.bone + '_end']; }
+const partOf = (j) => j.kind === 'root' ? 'root' : j.bone;
+const PARTS = [['root', 'HumanoidRootPart'], ['torso', 'UpperTorso'], ['head', 'Head'], ['armL1', 'LeftUpperArm'], ['armL2', 'LeftLowerArm'], ['armR1', 'RightUpperArm'], ['armR2', 'RightLowerArm'], ['legL1', 'LeftUpperLeg'], ['legL2', 'LeftLowerLeg'], ['legR1', 'RightUpperLeg'], ['legR2', 'RightLowerLeg']];
+const RING_COL = ['#ff4d4d', '#2fd47a', '#4d8dff'];
+function gizmo(s, pose) { // where the rings sit and which way they face
+  if (sel === 'root') { const Y = qaxis([0, 1, 0], pose.yaw || 0); return { c: s.hip, r: 0.42, ax: [qrot(Y, [1, 0, 0]), [0, 1, 0], qrot(Y, [0, 0, 1])] }; }
+  return { c: s[sel + '_start'], r: 0.22, ax: [[1, 0, 0], [0, 1, 0], [0, 0, 1]] };
+}
+function ringPts(c, ax, r) { const n = vnorm(ax), t1 = vnorm(vcross(n, Math.abs(n[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0])), t2 = vcross(n, t1), pts = []; for (let i = 0; i <= 48; i++) { const a = i / 48 * Math.PI * 2; pts.push(proj(vadd(c, vadd(vmul(t1, Math.cos(a) * r), vmul(t2, Math.sin(a) * r))))); } return pts; }
+function pickRing(s, pose, mx, my) {
+  if (!sel) return -1; const g = gizmo(s, pose); let best = -1, bd = 9;
+  g.ax.forEach((ax, i) => { const pts = ringPts(g.c, ax, g.r); for (let k = 0; k < pts.length - 1; k++) { const A = pts[k], B = pts[k + 1]; if (!A || !B) continue; const dx = B[0] - A[0], dy = B[1] - A[1], t = Math.max(0, Math.min(1, ((mx - A[0]) * dx + (my - A[1]) * dy) / (dx * dx + dy * dy || 1))), d = Math.hypot(A[0] + dx * t - mx, A[1] + dy * t - my); if (d < bd) { bd = d; best = i; } } });
+  return best;
+}
+function drawFig3(pose, color, alpha, handles) {
+  const s = solve3(pose), items = [];
+  if (alpha === 1) { // a soft shadow on the floor
+    ctx.fillStyle = 'rgba(21,20,26,0.13)'; ctx.beginPath(); let first = true;
+    for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2, P = proj([s.hip[0] + Math.cos(a) * 0.3, 0.002, s.hip[2] + Math.sin(a) * 0.22]); if (!P) continue; if (first) { ctx.moveTo(P[0], P[1]); first = false; } else ctx.lineTo(P[0], P[1]); }
+    ctx.fill();
+  }
+  for (const b of ORDER) {
+    const A = proj(s[b + '_start']), B = proj(s[b + '_end']); if (!A || !B) continue;
+    const z = (A[2] + B[2]) / 2, side = /L\d/.test(b) ? 0.72 : 1;
+    items.push({ z, f: () => { ctx.globalAlpha = alpha * side; ctx.lineWidth = Math.max(1.5, 0.075 * V.foc / z); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); } });
+  }
+  const hc = headCenter3(s), HC = proj(hc);
+  if (HC) items.push({ z: HC[2] - 0.05, f: () => {
+    ctx.globalAlpha = alpha; const r = 0.17 * V.foc / HC[2]; ctx.beginPath(); ctx.arc(HC[0], HC[1], r, 0, Math.PI * 2); ctx.fill();
+    const fw = qrot(s.W.head, [0, 0, 1]); if (vdot(fw, vsub(V.eye, hc)) > 0 && alpha > 0.5) { // eyes, so you can see which way it looks
+      const rt = qrot(s.W.head, [1, 0, 0]), up = qrot(s.W.head, [0, 1, 0]); ctx.fillStyle = '#f2f0ea';
+      for (const sd of [-1, 1]) { const E = proj(vadd(hc, vadd(vmul(fw, 0.15), vadd(vmul(rt, sd * 0.065), vmul(up, 0.03))))); if (E) { ctx.beginPath(); ctx.arc(E[0], E[1], Math.max(1.2, 0.03 * V.foc / E[2]), 0, Math.PI * 2); ctx.fill(); } }
+      ctx.fillStyle = color;
+    }
+  } });
+  items.sort((a, b) => b.z - a.z);
+  ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const it of items) it.f();
+  ctx.restore();
+  if (handles) {
+    if (tool === 'rotate' && sel) { const g = gizmo(s, pose); g.ax.forEach((ax, i) => { const pts = ringPts(g.c, ax, g.r), hot = hover === 'ring' + i || (drag && drag.ring === i); ctx.strokeStyle = RING_COL[i]; ctx.lineWidth = hot ? 5 : 3; ctx.beginPath(); let pen = false; for (const P of pts) { if (!P) { pen = false; continue; } if (pen) ctx.lineTo(P[0], P[1]); else { ctx.moveTo(P[0], P[1]); pen = true; } } ctx.stroke(); }); }
+    for (const j of JOINTS) { const P = proj(jointPos3(s, j)); if (!P) continue; const hot = (drag && drag.j === j.id) || hover === j.id, picked = partOf(j) === sel; ctx.beginPath(); ctx.arc(P[0], P[1], hot ? 9 : 7, 0, Math.PI * 2); ctx.fillStyle = j.kind === 'root' ? '#ffcf4a' : j.ik && useIK ? '#ff5c8a' : '#59d6ff'; ctx.fill(); ctx.lineWidth = picked ? 3 : 2; ctx.strokeStyle = picked ? '#ffffff' : '#0e0d13'; ctx.stroke(); }
+  }
+  return s;
+}
+function drawCamObj(c) { // the animated camera, drawn as a little camera in the scene
+  const b = camBasis(c), e = b.eye, k = (x, y) => vadd(vadd(e, vmul(b.fw, 0.35)), vadd(vmul(b.rt, x * 0.22), vmul(b.up, y * 0.13)));
+  const cs = [k(-1, -1), k(1, -1), k(1, 1), k(-1, 1)];
+  ctx.strokeStyle = '#2a7fd6'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i < 4; i++) { seg3(ctx, e, cs[i]); seg3(ctx, cs[i], cs[(i + 1) % 4]); }
+  seg3(ctx, k(-0.4, 1.15), k(0, 1.6)); seg3(ctx, k(0, 1.6), k(0.4, 1.15)); seg3(ctx, k(0.4, 1.15), k(-0.4, 1.15)); ctx.stroke();
+}
+function draw3D() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); setView(viewCam());
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#c9d3e3'); g.addColorStop(1, '#eceef1'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.lineWidth = 1; // the baseplate
+  for (let i = -8; i <= 8; i++) { const v = i * 0.5; ctx.strokeStyle = i === 0 ? 'rgba(21,20,26,0.32)' : i % 2 ? 'rgba(21,20,26,0.07)' : 'rgba(21,20,26,0.15)'; ctx.beginPath(); seg3(ctx, [v, 0, -4], [v, 0, 4]); seg3(ctx, [-4, 0, v], [4, 0, v]); ctx.stroke(); }
+  const f = curF();
+  if (onion && !playing) { const prev = [...anim.keys].reverse().find((k) => k.f < frame), next = anim.keys.find((k) => k.f > frame); if (prev) drawFig3(prev.pose, '#e0457b', 0.22, false); if (next) drawFig3(next.pose, '#2a9fd6', 0.22, false); }
+  if (!camView && !exporting && anim.cams && anim.cams.length) { const c = camAt(f); if (c) drawCamObj(c); }
+  drawFig3(poseAt(f), anim.color || '#15141a', 1, !playing && !exporting);
+  if (exporting) return;
+  if (camView) { ctx.strokeStyle = '#2a7fd6'; ctx.lineWidth = 4; ctx.strokeRect(2, 2, W - 4, H - 4); ctx.fillStyle = '#2a7fd6'; ctx.font = '600 12px "IBM Plex Mono", monospace'; ctx.textAlign = 'left'; ctx.fillText(anim.cams.length ? '● CAMERA VIEW (moving the view keys the camera)' : '● CAMERA VIEW (move the view to make the first camera key)', 12, 22); }
+  const O = [W - 44, H - 44]; ctx.font = '600 11px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; // which way is which
+  [[1, 0, 0], [0, 1, 0], [0, 0, 1]].forEach((a, i) => { const ex = O[0] + vdot(a, V.rt) * 24, ey = O[1] - vdot(a, V.up) * 24; ctx.strokeStyle = ctx.fillStyle = RING_COL[i]; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(O[0], O[1]); ctx.lineTo(ex, ey); ctx.stroke(); ctx.fillText('XYZ'[i], O[0] + (ex - O[0]) * 1.4, O[1] + (ey - O[1]) * 1.4 + 4); });
+}
+function drawTL3(w, h, x, ky) {
+  if (graph) { // graph editor: the picked part's rotation as curves, like Eclipse's
+    const n = frames(), vals = [[], [], []]; let prev = null;
+    for (let fr = 0; fr <= n; fr++) { const p = poseAt(fr); let e = sel === 'root' ? [p.pitch || 0, p.yaw || 0, p.roll || 0] : qToEuler(p.q[sel]); if (prev) e = e.map((v, i) => unwrap(v, prev[i])); prev = e; e.forEach((v, i) => vals[i].push(v / D)); }
+    let lo = Infinity, hi = -Infinity; for (const a of vals) for (const v of a) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    if (hi - lo < 20) { const m = (hi + lo) / 2; lo = m - 10; hi = m + 10; }
+    const top = 64, bot = ky - 34, y = (v) => bot - (v - lo) / (hi - lo) * (bot - top);
+    tctx.fillStyle = 'rgba(255,255,255,0.025)'; tctx.fillRect(12, top - 6, w - 24, bot - top + 12);
+    if (lo < 0 && hi > 0) { tctx.strokeStyle = '#3a3550'; tctx.beginPath(); tctx.moveTo(12, y(0)); tctx.lineTo(w - 12, y(0)); tctx.stroke(); }
+    for (const k of anim.keys) { tctx.strokeStyle = 'rgba(255,207,74,0.18)'; tctx.beginPath(); tctx.moveTo(x(k.f), top - 6); tctx.lineTo(x(k.f), bot + 6); tctx.stroke(); }
+    vals.forEach((a, i) => { tctx.strokeStyle = RING_COL[i]; tctx.lineWidth = 2; tctx.beginPath(); a.forEach((v, fr) => fr ? tctx.lineTo(x(fr), y(v)) : tctx.moveTo(x(fr), y(v))); tctx.stroke(); tctx.lineWidth = 1; });
+    tctx.textAlign = 'left'; tctx.fillStyle = '#9993ad'; const nm = (PARTS.find((q) => q[0] === sel) || [0, 'nothing picked'])[1];
+    tctx.fillText(`${nm} rotation · X red  Y green  Z blue · ${Math.round(lo)}° to ${Math.round(hi)}°`, 16, top - 10); tctx.textAlign = 'center';
+  }
+  const cy = ky - 24; // camera keys
+  for (const c of anim.cams || []) { tctx.beginPath(); tctx.arc(x(c.f), cy, 5, 0, Math.PI * 2); tctx.fillStyle = c.f === frame ? '#ffffff' : '#2a9fd6'; tctx.fill(); tctx.strokeStyle = '#0e0d13'; tctx.lineWidth = 2; tctx.stroke(); tctx.lineWidth = 1; }
+}
+
+// ---------- posing in 3D ----------
+function pickJoint3(s, mx, my) { let best = null, bd = 18; for (const j of JOINTS) { const P = proj(jointPos3(s, j)); if (!P) continue; const d = Math.hypot(P[0] - mx, P[1] - my); if (d < bd) { bd = d; best = j; } } return best; }
+const mouse = (e) => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+function pd3(e) {
+  if (playing) togglePlay();
+  const [mx, my] = mouse(e), pose = poseAt(frame), s = solve3(pose); setView(viewCam());
+  if (tool === 'rotate') { const ri = pickRing(s, pose, mx, my); if (ri >= 0) { const g = gizmo(s, pose), C = proj(g.c); if (C) { snapshot(); const k = editKey(); drag = { ring: ri, ax: g.ax[ri], C, last: Math.atan2(my - C[1], mx - C[0]), tot: 0, pose0: clone(k.pose), sign: Math.sign(vdot(g.ax[ri], vsub(V.eye, g.c))) || 1 }; cv.setPointerCapture(e.pointerId); render(); return; } } }
+  const j = pickJoint3(s, mx, my);
+  if (j) {
+    sel = partOf(j);
+    if (tool === 'move') { snapshot(); const k = editKey(), jp = jointPos3(solve3(k.pose), j), P = proj(jp); drag = { j: j.id, jt: j, z: P[2], off: vsub(jp, unproj(mx, my, P[2])), jp0: jp, p0: [k.pose.x || 0, k.pose.y || 0, k.pose.z || 0], yaw0: k.pose.yaw || 0, mx0: mx, spin: e.shiftKey || e.button === 2 }; cv.setPointerCapture(e.pointerId); }
+    syncUI(); render(); return;
+  }
+  if (camView) snapshot(); // empty space: move the camera
+  drag = { cam: true, mx0: mx, my0: my, c0: Object.assign({}, editCam()), pan: e.button === 2 || e.button === 1 || e.shiftKey }; cv.setPointerCapture(e.pointerId);
+}
+function applyDrag3(mx, my, shift) {
+  const k = editKey(), pose = k.pose, j = drag.jt, T = vadd(unproj(mx, my, drag.z), drag.off);
+  if (j.kind === 'root') {
+    if (shift || drag.spin) { pose.yaw = drag.yaw0 + (mx - drag.mx0) * 0.012; drag.spin = true; }
+    else { pose.x = drag.p0[0] + T[0] - drag.jp0[0]; pose.y = drag.p0[1] + T[1] - drag.jp0[1]; pose.z = drag.p0[2] + T[2] - drag.jp0[2]; }
+    return;
+  }
+  if (j.ik && useIK) return ik3(pose, j.ik, T);
+  const s = solve3(pose); setDir(pose, j.bone, vsub(T, s[j.bone + '_start']));
+}
+function applyRing(mx, my) {
+  const a = Math.atan2(my - drag.C[1], mx - drag.C[0]); drag.tot += unwrap(a - drag.last, 0); drag.last = a;
+  const ang = -drag.tot * drag.sign, k = editKey(), p0 = drag.pose0;
+  if (sel === 'root') { const key = ['pitch', 'yaw', 'roll'][drag.ring]; k.pose[key] = (p0[key] || 0) + ang; return; }
+  const s0 = solve3(p0), par = BONES[sel].parent, PW = par ? s0.W[par] : s0.R; k.pose.q[sel] = qnorm(qmul(qconj(PW), qmul(qaxis(drag.ax, ang), s0.W[sel])));
+}
+function pm3(e) {
+  const [mx, my] = mouse(e); setView(viewCam());
+  if (drag) {
+    if (drag.cam) {
+      const c = editCam(), dx = mx - drag.mx0, dy = my - drag.my0;
+      if (drag.pan) { const k = c.dist / V.foc; ['tx', 'ty', 'tz'].forEach((n, i) => c[n] = drag.c0[n] + (-V.rt[i] * dx + V.up[i] * dy) * k); }
+      else { c.yaw = drag.c0.yaw - dx * 0.008; c.pitch = Math.max(-1.45, Math.min(1.45, drag.c0.pitch + dy * 0.008)); }
+    } else if (drag.ring !== undefined) applyRing(mx, my);
+    else applyDrag3(mx, my, e.shiftKey);
+    render(); return;
+  }
+  if (playing) return;
+  const pose = poseAt(frame), s = solve3(pose), j = pickJoint3(s, mx, my); let id = j ? j.id : null;
+  if (!j && tool === 'rotate') { const ri = pickRing(s, pose, mx, my); if (ri >= 0) id = 'ring' + ri; }
+  if (id !== hover) { hover = id; cv.style.cursor = id ? (id.startsWith('ring') ? 'grab' : j.kind === 'root' ? 'move' : 'grab') : 'default'; render(); }
+}
+cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); const fresh = camView && !anim.cams.some((c) => c.f === frame); if (fresh) snapshot(); const c = editCam(); c.dist = Math.max(0.8, Math.min(20, c.dist * Math.exp(e.deltaY * 0.0012))); clearTimeout(cv.wt); cv.wt = setTimeout(() => { save(); syncUI(); }, 250); render(); }, { passive: false });
+
+// ---------- 3D buttons ----------
+function setTool(t) { tool = t; if (t === 'rotate' && !sel) sel = 'root'; syncUI(); render(); }
+function toggleGraph() { graph = !graph; tl.classList.toggle('graph', graph); resize(); syncUI(); render(); }
+function sync3() {
+  const p = poseAt(frame); $('yaw').value = Math.round((p.yaw || 0) / D); $('pitch').value = Math.round((p.pitch || 0) / D); $('roll').value = Math.round((p.roll || 0) / D);
+  $('toolMove').classList.toggle('on', tool === 'move'); $('toolRot').classList.toggle('on', tool === 'rotate'); $('camView').classList.toggle('on', camView); $('graphBtn').classList.toggle('on', graph);
+  $('camDel').disabled = !(anim.cams || []).some((c) => c.f === frame); $('fov').value = Math.round(viewCam().fov);
+  for (const b of $('parts').children) b.classList.toggle('sel', b.dataset.p === sel);
+}
+for (const [id, name] of PARTS) { const b = document.createElement('button'); b.textContent = name; b.dataset.p = id; b.title = name; b.onclick = () => { sel = id; tool = 'rotate'; syncUI(); render(); }; $('parts').appendChild(b); }
+for (const id of ['yaw', 'pitch', 'roll']) { const el = $(id); el.oninput = () => { if (!el.dataset.busy) { snapshot(); el.dataset.busy = 1; } editKey().pose[id] = +el.value * D; render(); }; el.onchange = () => { delete el.dataset.busy; save(); syncUI(); }; }
+$('toolMove').onclick = () => setTool('move'); $('toolRot').onclick = () => setTool('rotate');
+$('graphBtn').onclick = toggleGraph;
+$('camView').onclick = () => { camView = !camView; toast(camView ? 'Camera view: move the view to key the camera' : 'Free view'); syncUI(); render(); };
+$('camKey').onclick = () => { snapshot(); const c = Object.assign({}, viewCam()), k = anim.cams.find((q) => q.f === frame); if (k) k.cam = c; else { anim.cams.push({ f: frame, cam: c }); anim.cams.sort((a, b) => a.f - b.f); } save(); syncUI(); render(); toast('Camera key added'); };
+$('camDel').onclick = () => { const i = anim.cams.findIndex((q) => q.f === frame); if (i < 0) return; snapshot(); anim.cams.splice(i, 1); save(); syncUI(); render(); };
+$('camReset').onclick = () => { const d = { yaw: 0.45, pitch: 0.22, dist: 4.2, tx: 0, ty: 0.95, tz: 0, fov: 50 }; if (camView) { snapshot(); Object.assign(editCam(), d); save(); } else cam = d; syncUI(); render(); };
+$('fov').oninput = () => { const el = $('fov'); if (camView && !el.dataset.busy) { snapshot(); el.dataset.busy = 1; } editCam().fov = +el.value; render(); };
+$('fov').onchange = () => { delete $('fov').dataset.busy; save(); syncUI(); };
+function key3(e) { const c = e.code; if (c === 'KeyR') setTool('rotate'); else if (c === 'KeyG') setTool('move'); else if (c === 'KeyX') toggleGraph(); else if (c === 'KeyC') $('camView').click(); else if (c === 'KeyF') $('camReset').click(); else return false; return true; }
+
+// ---------- 2D or 3D? ----------
+function modeUI() {
+  const is3 = mode === '3d'; $('sec3').hidden = !is3; $('tilt2d').hidden = is3; $('graphBtn').hidden = !is3; $('modeBtn').textContent = is3 ? '3D ⇄' : '2D ⇄';
+  if (!is3 && graph) { graph = false; tl.classList.remove('graph'); }
+  $('hint').textContent = is3 ? 'drag dots to pose · drag empty space: orbit (Shift/right: pan, wheel: zoom) · R rotate rings · G move · J key · X graph · C camera' : 'drag joints to pose · hips: move (Shift: spin) · Space play · K key · Del delete · , . step';
+}
+function setMode(m) {
+  if (playing) togglePlay();
+  if (mode === '3d') anim3 = anim; else anim2 = anim;
+  mode = m; anim = m === '3d' ? anim3 : anim2;
+  if (!anim && m === '3d') { try { const s = JSON.parse(localStorage.getItem('otm-stick-anim3')); if (s && s.keys && s.keys.length && s.keys[0].pose.q) anim = s; } catch (e) {} }
+  if (!anim) loadPreset('Walk');
+  if (m === '3d' && !anim.cams) anim.cams = [];
+  undoStack.length = 0; redoStack.length = 0; drag = null; hover = null; frame = Math.min(frame, frames());
+  modeUI(); resize(); syncUI(); render();
+}
+function showMenu() { $('modeMenu').hidden = false; drawModeIcons(); setTimeout(() => $(mode === '3d' ? 'pick3d' : 'pick2d').focus(), 0); }
+function pickMode(m) {
+  $('modeMenu').hidden = true; setMode(m);
+  try { const k = 'otm-stick-seen' + (m === '3d' ? '3' : ''); if (!localStorage.getItem(k)) { localStorage.setItem(k, '1'); togglePlay(); } } catch (e) {} // the first time, play the walk
+}
+$('pick2d').onclick = () => pickMode('2d'); $('pick3d').onclick = () => pickMode('3d');
+$('modeBtn').onclick = showMenu;
+function drawModeIcons() {
+  const a = $('mm2').getContext('2d'), b = $('mm3').getContext('2d'), stick = (c, pts, w) => { c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); for (const [p, q] of pts) { c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); } c.stroke(); };
+  a.fillStyle = '#f2f0ea'; a.fillRect(0, 0, 320, 240); a.strokeStyle = 'rgba(21,20,26,0.07)'; a.lineWidth = 1; for (let i = 0; i < 320; i += 32) { a.beginPath(); a.moveTo(i, 0); a.lineTo(i, 240); a.stroke(); } for (let i = 8; i < 240; i += 32) { a.beginPath(); a.moveTo(0, i); a.lineTo(320, i); a.stroke(); }
+  a.strokeStyle = 'rgba(21,20,26,0.4)'; a.lineWidth = 2; a.beginPath(); a.moveTo(0, 200); a.lineTo(320, 200); a.stroke();
+  a.strokeStyle = a.fillStyle = '#15141a'; stick(a, [[[160, 130], [164, 80]], [[164, 84], [140, 108]], [[140, 108], [126, 128]], [[164, 84], [190, 104]], [[190, 104], [204, 90]], [[160, 130], [140, 162]], [[140, 162], [130, 198]], [[160, 130], [178, 164]], [[178, 164], [196, 190]]], 7);
+  a.beginPath(); a.arc(166, 64, 16, 0, Math.PI * 2); a.fill();
+  const gr = b.createLinearGradient(0, 0, 0, 240); gr.addColorStop(0, '#c9d3e3'); gr.addColorStop(1, '#eceef1'); b.fillStyle = gr; b.fillRect(0, 0, 320, 240);
+  b.strokeStyle = 'rgba(21,20,26,0.16)'; b.lineWidth = 1; for (let i = -6; i <= 6; i++) { b.beginPath(); b.moveTo(160 + i * 18, 150); b.lineTo(160 + i * 48, 240); b.stroke(); } for (const yy of [150, 160, 174, 192, 216]) { b.beginPath(); b.moveTo(0, yy); b.lineTo(320, yy); b.stroke(); }
+  b.fillStyle = 'rgba(21,20,26,0.15)'; b.beginPath(); b.ellipse(160, 196, 36, 10, 0, 0, Math.PI * 2); b.fill();
+  b.strokeStyle = '#4d8dff'; b.lineWidth = 3; b.beginPath(); b.ellipse(160, 128, 46, 14, 0, 0, Math.PI * 2); b.stroke(); b.strokeStyle = '#ff4d4d'; b.beginPath(); b.ellipse(160, 128, 14, 46, 0, 0, Math.PI * 2); b.stroke();
+  b.strokeStyle = b.fillStyle = '#15141a'; stick(b, [[[160, 132], [158, 82]], [[158, 86], [136, 116]], [[136, 116], [128, 140]], [[158, 86], [188, 100]], [[188, 100], [212, 84]], [[160, 132], [146, 164]], [[146, 164], [150, 196]], [[160, 132], [176, 162]], [[176, 162], [170, 194]]], 7);
+  b.beginPath(); b.arc(158, 66, 15, 0, Math.PI * 2); b.fill(); b.fillStyle = '#f2f0ea'; b.beginPath(); b.arc(153, 64, 2.4, 0, 7); b.arc(163, 64, 2.4, 0, 7); b.fill();
+  b.strokeStyle = '#2a7fd6'; b.lineWidth = 2; b.strokeRect(244, 24, 40, 26); b.beginPath(); b.moveTo(284, 37); b.lineTo(300, 28); b.lineTo(300, 46); b.closePath(); b.stroke();
+}
+
+// ---------- keyboard ----------
+window.addEventListener('keydown', (e) => {
+  if (e.target.matches('input, select')) return;
+  if (!$('modeMenu').hidden) { if (e.key === '2') pickMode('2d'); else if (e.key === '3') pickMode('3d'); return; }
+  const ctl = e.ctrlKey || e.metaKey;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (ctl && e.code === 'KeyZ') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if (ctl && e.code === 'KeyY') { e.preventDefault(); redo(); }
+  else if (ctl && e.code === 'KeyC') $('copy').click();
+  else if (ctl && e.code === 'KeyV') $('paste').click();
+  else if (e.code === 'KeyK' || e.code === 'KeyJ') addKey();
+  else if (e.code === 'KeyP') togglePlay();
+  else if (mode === '3d' && key3(e)) e.preventDefault();
+  else if (e.code === 'Delete' || e.code === 'Backspace') delKey();
+  else if (e.code === 'Comma') step(-1);
+  else if (e.code === 'Period') step(1);
+  else if (e.code === 'KeyO') $('onion').click();
+  else if (e.code === 'KeyI') $('ik').click();
+});
+
+// ---------- start ----------
+try { const s = JSON.parse(localStorage.getItem('otm-stick-anim')); if (s && s.keys && s.keys.length) anim = s; } catch (e) {}
+if (!anim) { loadPreset('Walk'); }
+window.addEventListener('resize', () => { resize(); render(); });
+resize(); syncUI(); render();
+showMenu(); // ask 2D or 3D every time it opens
+window.__sa = { get mode() { return mode; }, setMode, pickMode, solve3, get cam() { return cam; }, get anim() { return anim; }, poseAt, solve, get frame() { return frame; }, set frame(v) { frame = v; syncUI(); render(); }, togglePlay, get playing() { return playing; }, loadPreset };
+</script>

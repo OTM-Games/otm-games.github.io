@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game) and Big Time (a console calculator).">
+<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
 <meta property="og:title" content="OTM Games">
-<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game) and Big Time (a console calculator).">
+<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
 <title>OTM Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Doodle+Shadow&family=Rubik:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -213,6 +213,8 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <p class="site-note" id="gba-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .gba file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them.</p>
       <p class="site-note" id="snes-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .sfc or .smc file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them. Games with extra chips inside the cartridge (Star Fox, Super Mario Kart, Yoshi's Island) don't work yet.</p>
       <p class="site-note" id="mori-note" hidden><b>Moribund is a full game page</b>, so there's no console code to copy. Press <b>▶ Play</b> to open it. Use headphones, and click the game so the mouse can look around. Your save files stay in your browser.</p>
+      <p class="site-note" id="stomp-note" hidden><b>OTM Stomp</b>: you're a giant sneaker over a pixel city. Move the mouse (or A/D) to aim, hold click or Space to load pressure, let go to STOMP. Fill all 4 dots for a full-pressure shockwave. Yellow hats only go down to full pressure. Click and hold again right after a stomp to slide the shoe across the street. If 1500 people get away, it's over. Press <b>▶ Open the game</b>, or copy the code and paste it into the console (F12 → Console) to play on any site. Esc closes it.</p>
+      <p class="site-note" id="anim-note" hidden><b>OTM Stick Animator</b> is a Roblox-style animation editor for stick figures, in 2D or in 3D (the 3D mode works like Eclipse, with a camera you can animate). Drag the joints to pose, the timeline makes keyframes, and each key gets an easing style (Sine, Bounce, Elastic…). Press <b>▶ Open the animator</b>, or copy the code and paste it into the console on any site (Esc closes it). It opens with a walk cycle, and has starter animations, onion skin, mirror, and video export.</p>
       <p class="site-note" id="lines-note" hidden><b>/open line engine</b> uses your webcam to track your hands. Press <b>▶ Play</b>, then <b>Turn on camera</b> and allow it. Keys: 1 strings · 2 window · 3 laser · 4 all · F filter · S skeleton · C customize how everything looks. The video stays on your computer. School computers might block the camera.</p>
       <p class="site-note" id="speed-note" hidden><b>Godspeed 💤 Good Try</b> is a 3D movement game. Press <b>▶ Play</b> (or copy the code and paste it into the console on any site), click the game so the mouse can look around, walk around the lobby, then walk into the bed in the middle to pick SLEEP (an endless path, nothing can hurt you) or SLEEPRUNNING (rounds: reach the bed at the end before the timer runs out, then rest in the pink room). WASD move · Space jump · C/Ctrl slide · R checkpoint (change them in ⌨ Keybinds). Jump again while touching a wall to wall jump. Slide-jumps and wall jumps keep your speed. The further you get, the more things hunt you. Reach the bed at the end and sleep.</p>
       <p class="site-note" id="calc-note" hidden><b>Big Time</b> is a calculator you can open on any website. Press <b>▶ Open here</b> to try it, or copy the code and paste it into the console. Hover over it to type: Enter is =, Backspace deletes, Esc clears. Drag it by the title, and ✕ closes it. It does ( ), ^ powers, √, %, π and ! too. Press <b>MODE</b> to switch to 7th grade helpers (distributive property, like terms, equations, inequalities, fractions, percents, proportions, circles, area, angles, stats and probability). They show every step.</p>
@@ -271,6 +273,16 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <span class="name">Big Time</span>
       <span class="sub">Calculator • 7th grade math with steps</span>
     </button>
+    <button class="game" id="g-anim" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-anim" aria-hidden="true"></canvas>
+      <span class="name">OTM Stick Animator</span>
+      <span class="sub">Animate stick figures • keyframes</span>
+    </button>
+    <button class="game" id="g-stomp" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-stomp" aria-hidden="true"></canvas>
+      <span class="name">OTM Stomp</span>
+      <span class="sub">Arcade • stomp the tiny people</span>
+    </button>
   </footer>
 </div>
 
@@ -291,6 +303,8 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
     <button type="button" data-g="lines" aria-pressed="false">/open line engine</button>
     <button type="button" data-g="speed" aria-pressed="false">Godspeed 💤 Good Try</button>
     <button type="button" data-g="calc" aria-pressed="false">Big Time</button>
+    <button type="button" data-g="anim" aria-pressed="false">Stick Animator</button>
+    <button type="button" data-g="stomp" aria-pressed="false">OTM Stomp</button>
   </div>
   <div class="releases" id="releases"></div>
 </aside>
@@ -10000,6 +10014,991 @@ window.__gs = { pathAdd, get round() { return round; }, set round(v) { round = v
 $('closeGame').onclick = quitGame;
 addEventListener('keydown', (e) => { if (e.key === 'Escape' && state === 'title' && !$('title').hidden) { e.preventDefault(); quitGame(); } });
 console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Close game) closes it.');
+})();
+</script>
+<script type="text/plain" id="otm-anim-code">// OTM STICK ANIMATOR: a Roblox-style animator for stick figures. Paste into the browser console (F12 → Console) to use it on any page.
+(() => {
+const CSS = "\n/* Layout: an animation studio \u2014 the stage on top, the keyframe timeline along the bottom, the inspector on the right. One committed dark look. */\n:host {\n  --bg: #0e0d13; --panel: #17151f; --raise: #211e2c; --line: #2f2b3d;\n  --fg: #eceaf4; --dim: #9993ad; --accent: #59d6ff; --key: #ffcf4a; --hot: #ff5c8a;\n  --stage: #f2f0ea; --ink: #15141a;\n  --display: 'Sora', 'Segoe UI', system-ui, sans-serif; --body: 'Inter', system-ui, sans-serif; --mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;\n  color-scheme: dark;\n}\n[hidden] { display: none !important; }\n.saroot { position: fixed; inset: 0; z-index: 0; font-size: 14px; margin: 0; background: var(--bg); color: var(--fg); font: 14px/1.4 var(--body); overflow: hidden; }\n.app { height: 100%; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: 1fr 250px; grid-template-areas: \"top top\" \"stage side\" \"time time\"; padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); box-sizing: border-box; }\nheader { grid-area: top; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px max(16px, env(safe-area-inset-left, 0px)) 8px max(16px, env(safe-area-inset-left, 0px)); border-bottom: 1px solid var(--line); background: var(--panel); }\nh1 { margin: 0 8px 0 0; font: 800 17px var(--display); letter-spacing: -0.01em; white-space: nowrap; }\nh1 b { color: var(--accent); font-weight: 800; }\nbutton, select, input { font: inherit; color: var(--fg); }\nbutton { background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 6px 10px; cursor: pointer; font-weight: 600; font-size: 13px; white-space: nowrap; }\nbutton:hover { border-color: var(--dim); }\nbutton:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }\nbutton.on { background: var(--accent); color: #04121a; border-color: var(--accent); }\nbutton.play { background: var(--key); color: #1a1300; border-color: var(--key); min-width: 74px; }\nselect { background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 6px 8px; font-size: 13px; }\n.grp { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }\n.sp { flex: 1; }\n.stage { grid-area: stage; position: relative; min-width: 0; min-height: 0; background: var(--bg); }\n#cv { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; cursor: default; }\n.hint { position: absolute; left: 16px; bottom: 12px; font: 500 12px var(--mono); color: var(--dim); pointer-events: none; }\naside { grid-area: side; background: var(--panel); border-left: 1px solid var(--line); padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }\naside h2 { margin: 0; font: 600 11px var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }\n.field { display: grid; gap: 6px; }\n.field label { font-size: 12px; color: var(--dim); }\n.row { display: flex; gap: 6px; flex-wrap: wrap; }\n.row > * { flex: 1; }\ninput[type=range] { width: 100%; accent-color: var(--accent); }\ninput[type=number] { width: 64px; background: var(--raise); border: 1px solid var(--line); border-radius: 8px; padding: 5px 7px; font: 500 13px var(--mono); }\n.keyinfo { font: 500 12px var(--mono); color: var(--fg); background: var(--raise); border-radius: 8px; padding: 8px 10px; }\n.keyinfo .k { color: var(--key); }\n.timeline { grid-area: time; background: var(--panel); border-top: 1px solid var(--line); padding: 8px max(16px, env(safe-area-inset-left, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 6px; }\n.tbar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font: 500 12px var(--mono); color: var(--dim); }\n.tbar .time { color: var(--fg); min-width: 110px; font-variant-numeric: tabular-nums; }\n#tl { width: 100%; height: 64px; display: block; touch-action: none; cursor: pointer; border-radius: 8px; background: var(--bg); }\n.toast { position: fixed; left: 50%; top: calc(64px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--raise); border: 1px solid var(--line); padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; z-index: 5; }\n[hidden] { display: none !important; }\n.modemenu { position: fixed; inset: 0; z-index: 8; display: grid; place-items: center; background: rgba(8,7,12,0.84); backdrop-filter: blur(6px); padding: 16px; overflow-y: auto; }\n.mm-box { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px; max-width: 580px; width: 100%; box-sizing: border-box; text-align: center; }\n.mm-title { margin: 0 0 6px; font: 800 32px var(--display); letter-spacing: -0.02em; }\n.mm-sub { margin: 0 0 20px; color: var(--dim); }\n.mm-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }\n.mm-card { display: grid; gap: 8px; justify-items: center; padding: 16px 12px; border-radius: 14px; white-space: normal; text-align: center; transition: transform .12s, border-color .12s; }\n.mm-card:hover { border-color: var(--accent); transform: translateY(-2px); }\n.mm-card canvas { width: 160px; height: 120px; border-radius: 10px; max-width: 100%; }\n.mm-card b { font: 800 24px var(--display); }\n.mm-card span { font-weight: 400; color: var(--dim); font-size: 12.5px; line-height: 1.4; }\n#tl.graph { height: 190px; }\n.parts { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }\n.parts button { font: 500 11px var(--mono); padding: 5px 6px; text-align: left; overflow: hidden; text-overflow: ellipsis; }\n.parts button.sel { border-color: var(--accent); color: var(--accent); }\n@media (max-width: 460px) { .mm-row { grid-template-columns: 1fr; } }\n@media (max-width: 760px) {\n  .app { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; grid-template-areas: \"top\" \"stage\" \"time\" \"side\"; }\n  aside { border-left: 0; border-top: 1px solid var(--line); max-height: 24vh; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }\n  .hint { display: none; }\n}\n@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }\n";
+const HTML = "\n\n<div class=\"app\">\n  <header>\n    <h1>OTM <b>Stick<\/b> Animator<\/h1>\n    <div class=\"grp\">\n      <button class=\"play\" id=\"play\" title=\"Play / pause (Space)\">\u25b6 Play<\/button>\n      <button id=\"loop\" class=\"on\" title=\"Loop\">\u27f2 Loop<\/button>\n      <select id=\"speed\" aria-label=\"Playback speed\"><option value=\"0.25\">0.25\u00d7<\/option><option value=\"0.5\">0.5\u00d7<\/option><option value=\"1\" selected>1\u00d7<\/option><option value=\"2\">2\u00d7<\/option><\/select>\n    <\/div>\n    <div class=\"grp\">\n      <button id=\"modeBtn\" title=\"Switch between 2D and 3D\">2D \u21c4<\/button>\n      <button id=\"undo\" title=\"Undo (Ctrl+Z)\">\u21b6<\/button>\n      <button id=\"redo\" title=\"Redo (Ctrl+Y)\">\u21b7<\/button>\n      <button id=\"onion\" class=\"on\" title=\"See the poses before and after (O)\">Onion skin<\/button>\n      <button id=\"ik\" class=\"on\" title=\"Drag hands and feet to move the whole arm or leg (I)\">IK<\/button>\n    <\/div>\n    <div class=\"sp\"><\/div>\n    <div class=\"grp\">\n      <select id=\"preset\" aria-label=\"Load a starter animation\"><option value=\"\">Starter animations\u2026<\/option><option>Walk<\/option><option>Idle<\/option><option>Wave<\/option><option>Jump<\/option><option>Backflip<\/option><option>Punch<\/option><option value=\"blank\">Blank (one pose)<\/option><\/select>\n      <button id=\"save\" title=\"Save the animation as a file\">Save<\/button>\n      <button id=\"load\" title=\"Open a saved animation file\">Open<\/button>\n      <button id=\"video\" title=\"Record a video of the animation\">Export video<\/button>\n      <input type=\"file\" id=\"file\" accept=\".json,application/json\" hidden>\n      <button id=\"closeApp\" title=\"Close the animator (Esc)\">\u2715 Close<\/button>\n    <\/div>\n  <\/header>\n\n  <div class=\"stage\"><canvas id=\"cv\"><\/canvas><div class=\"hint\" id=\"hint\">drag joints to pose \u00b7 hips: move (Shift: spin) \u00b7 Space play \u00b7 K key \u00b7 Del delete \u00b7 , . step<\/div><\/div>\n\n  <aside>\n    <div class=\"field\">\n      <h2>Keyframe<\/h2>\n      <div class=\"keyinfo\" id=\"keyinfo\">\u2014<\/div>\n      <div class=\"row\"><button id=\"addKey\" title=\"Add a keyframe here (K)\">+ Key<\/button><button id=\"delKey\" title=\"Delete this keyframe (Delete)\">Delete<\/button><\/div>\n      <div class=\"row\"><button id=\"copy\" title=\"Copy this pose (Ctrl+C)\">Copy pose<\/button><button id=\"paste\" title=\"Paste the pose here (Ctrl+V)\">Paste<\/button><\/div>\n      <div class=\"row\"><button id=\"mirror\" title=\"Swap left and right\">Mirror<\/button><button id=\"reset\" title=\"Stand up straight\">Reset pose<\/button><\/div>\n    <\/div>\n    <div class=\"field\">\n      <h2>Easing (into the next key)<\/h2>\n      <label for=\"ease\">Style<\/label>\n      <select id=\"ease\"><option>Linear<\/option><option>Sine<\/option><option>Quad<\/option><option>Cubic<\/option><option>Back<\/option><option>Bounce<\/option><option>Elastic<\/option><option>Constant<\/option><\/select>\n      <label for=\"dir\">Direction<\/label>\n      <select id=\"dir\"><option>InOut<\/option><option>In<\/option><option>Out<\/option><\/select>\n    <\/div>\n    <div class=\"field\">\n      <h2>Animation<\/h2>\n      <label for=\"len\">Length (seconds)<\/label>\n      <div class=\"row\"><input type=\"number\" id=\"len\" min=\"0.2\" max=\"30\" step=\"0.1\" value=\"1\"><span><\/span><\/div>\n      <div class=\"field\" id=\"tilt2d\"><label for=\"tilt\">Spin the whole body<\/label>\n      <input type=\"range\" id=\"tilt\" min=\"-360\" max=\"360\" step=\"1\" value=\"0\"><\/div>\n      <label for=\"col\">Stick color<\/label>\n      <input type=\"color\" id=\"col\" value=\"#15141a\">\n    <\/div>\n    <div class=\"field\" id=\"sec3\" hidden>\n      <h2>3D tools<\/h2>\n      <div class=\"row\"><button id=\"toolMove\" class=\"on\" title=\"Drag the dots to pose (G)\">\u2725 Move<\/button><button id=\"toolRot\" title=\"Turn the picked part with the rings (R)\">\u27f3 Rotate<\/button><\/div>\n      <label>Parts (pick one, then drag a ring)<\/label>\n      <div class=\"parts\" id=\"parts\"><\/div>\n      <label for=\"yaw\">Turn<\/label><input type=\"range\" id=\"yaw\" min=\"-360\" max=\"360\" step=\"1\" value=\"0\">\n      <label for=\"pitch\">Flip<\/label><input type=\"range\" id=\"pitch\" min=\"-360\" max=\"360\" step=\"1\" value=\"0\">\n      <label for=\"roll\">Lean<\/label><input type=\"range\" id=\"roll\" min=\"-360\" max=\"360\" step=\"1\" value=\"0\">\n      <h2>Camera<\/h2>\n      <div class=\"row\"><button id=\"camView\" title=\"Look through the animated camera (C)\">\ud83c\udfa5 Camera view<\/button><button id=\"camKey\" title=\"Save the camera here as a camera keyframe\">+ Cam key<\/button><\/div>\n      <div class=\"row\"><button id=\"camDel\" title=\"Delete the camera key here\">Delete cam key<\/button><button id=\"camReset\" title=\"Back to the front view (F)\">Reset view<\/button><\/div>\n      <label for=\"fov\">Field of view<\/label><input type=\"range\" id=\"fov\" min=\"20\" max=\"100\" step=\"1\" value=\"50\">\n    <\/div>\n  <\/aside>\n\n  <div class=\"timeline\">\n    <div class=\"tbar\"><span class=\"time\" id=\"time\">0.00 s \u00b7 frame 0<\/span><button id=\"prev\" title=\"Previous frame (,)\">\u2039<\/button><button id=\"next\" title=\"Next frame (.)\">\u203a<\/button><button id=\"prevKey\" title=\"Previous keyframe\">\u21e4 key<\/button><button id=\"nextKey\" title=\"Next keyframe\">key \u21e5<\/button><button id=\"graphBtn\" hidden title=\"Graph editor: the picked part's rotation as curves (X)\">Graph<\/button><span>30 frames per second \u00b7 drag keys to move them<\/span><\/div>\n    <canvas id=\"tl\"><\/canvas>\n  <\/div>\n<\/div>\n<div class=\"toast\" id=\"toast\" hidden><\/div>\n<div class=\"modemenu\" id=\"modeMenu\" hidden>\n  <div class=\"mm-box\">\n    <h2 class=\"mm-title\">2D or 3D?<\/h2>\n    <p class=\"mm-sub\">Pick how you want to animate. You can switch any time with the 2D/3D button up top.<\/p>\n    <div class=\"mm-row\">\n      <button class=\"mm-card\" id=\"pick2d\"><canvas id=\"mm2\" width=\"320\" height=\"240\"><\/canvas><b>2D<\/b><span>A flat stick figure on paper. Quick and simple. (press 2)<\/span><\/button>\n      <button class=\"mm-card\" id=\"pick3d\"><canvas id=\"mm3\" width=\"320\" height=\"240\"><\/canvas><b>3D<\/b><span>Like Eclipse: orbit the camera, turn parts with rings, animate a camera. (press 3)<\/span><\/button>\n    <\/div>\n  <\/div>\n<\/div>\n\n";
+
+if (window.__stickAnimQuit) window.__stickAnimQuit();
+const host = document.createElement('div');
+host.style.cssText = 'all: initial; position: fixed; inset: 0; z-index: 2147483647; display: block;';
+(document.body || document.documentElement).appendChild(host);
+const SH = host.attachShadow({ mode: 'open' });
+// some sites block innerHTML ("TrustedHTML"), so the page is built element by element
+function build(html, parent) {
+  const VOID = /^(input|br|img|meta|hr)$/i;
+  const dec = (t) => t.replace(/&(amp|lt|gt|quot|#39);/g, (m, k) => ({ amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'" }[k]));
+  const stack = [parent], re = /<(\/?)([a-zA-Z][\w-]*)((?:\s+[^\s=>\/]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+))?)*)\s*(\/?)>|([^<]+)/g;
+  let m;
+  while ((m = re.exec(html))) {
+    const top = stack[stack.length - 1];
+    if (m[5] != null) { if (m[5].trim()) top.appendChild(document.createTextNode(dec(m[5]))); continue; }
+    const [, close, tag, attrs, self] = m;
+    if (close) { if (stack.length > 1) stack.pop(); continue; }
+    const el = document.createElement(tag), ar = /([^\s=>\/]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+)))?/g; let a;
+    while ((a = ar.exec(attrs))) el.setAttribute(a[1], dec(a[2] ?? a[3] ?? a[4] ?? ''));
+    top.appendChild(el);
+    if (!self && !VOID.test(tag)) stack.push(el);
+  }
+}
+const styleEl = document.createElement('style'); styleEl.textContent = CSS; SH.appendChild(styleEl);
+const rootEl = document.createElement('div'); rootEl.className = 'saroot'; SH.appendChild(rootEl);
+build(HTML, rootEl);
+let quitted = false;
+const _ls = [];
+const addEventListener = (t, f, o) => { window.addEventListener(t, f, o); _ls.push([t, f, o]); if (t.startsWith('key')) host.addEventListener(t, f, o); }; // keys typed inside the animator stop at its layer, so listen there too
+// keep the website's own shortcuts from firing while you type in the animator
+for (const t of ['keydown', 'keyup', 'keypress']) host.addEventListener(t, (e) => e.stopPropagation());
+function quitApp() { quitted = true; playing = false; for (const [t, f, o] of _ls) window.removeEventListener(t, f, o); host.remove(); window.__stickAnimQuit = null; }
+window.__stickAnimQuit = () => quitApp();
+
+const $ = (id) => SH.getElementById(id);
+const cv = $('cv'), ctx = cv.getContext('2d'), tl = $('tl'), tctx = tl.getContext('2d');
+const FPS = 30;
+// ---------- the rig: bones, each turning from its parent (like Roblox Motor6Ds) ----------
+const BONES = {
+  torso: { parent: null, len: 62, from: 'hip' }, head: { parent: 'torso', len: 16 },
+  armL1: { parent: 'torso', len: 36 }, armL2: { parent: 'armL1', len: 34 }, armR1: { parent: 'torso', len: 36 }, armR2: { parent: 'armR1', len: 34 },
+  legL1: { parent: null, len: 44, from: 'hip' }, legL2: { parent: 'legL1', len: 42 }, legR1: { parent: null, len: 44, from: 'hip' }, legR2: { parent: 'legR1', len: 42 },
+};
+const ORDER = ['torso', 'head', 'armL1', 'armL2', 'armR1', 'armR2', 'legL1', 'legL2', 'legR1', 'legR2'];
+const D = Math.PI / 180;
+const STAND = () => ({ x: 0, y: 0, rot: 0, a: { torso: -90 * D, head: 0, armL1: 160 * D, armL2: 10 * D, armR1: -160 * D, armR2: -10 * D, legL1: 97 * D, legL2: 0, legR1: 83 * D, legR2: 0 } });
+const clone = (o) => JSON.parse(JSON.stringify(o));
+
+// where every joint is (world space, y down; feet stand on y = 0 when x,y = 0)
+function solve(p) {
+  const out = {}, hip = [p.x, p.y - 86], rot = p.rot || 0, ang = {};
+  out.hip = hip;
+  for (const b of ORDER) {
+    const B = BONES[b], base = B.parent ? ang[B.parent] : rot;
+    ang[b] = base + p.a[b];
+    const start = B.parent ? out[B.parent + '_end'] : hip;
+    out[b + '_start'] = start; out[b + '_end'] = [start[0] + Math.cos(ang[b]) * B.len, start[1] + Math.sin(ang[b]) * B.len];
+  }
+  out.ang = ang; return out;
+}
+// arms hang from the shoulders (top of the torso)
+BONES.armL1.parent = 'torso'; BONES.armR1.parent = 'torso';
+
+// ---------- easing (the Roblox easing styles) ----------
+const EASE = {
+  Linear: (t) => t, Sine: (t) => 1 - Math.cos(t * Math.PI / 2), Quad: (t) => t * t, Cubic: (t) => t * t * t,
+  Back: (t) => t * t * (2.70158 * t - 1.70158),
+  Bounce: (t) => 1 - bounceOut(1 - t), Elastic: (t) => t === 0 || t === 1 ? t : -Math.pow(2, 10 * t - 10) * Math.sin((t * 10 - 10.75) * (2 * Math.PI / 3)),
+  Constant: (t) => 0,
+};
+function bounceOut(t) { const n = 7.5625, d = 2.75; if (t < 1 / d) return n * t * t; if (t < 2 / d) return n * (t -= 1.5 / d) * t + 0.75; if (t < 2.5 / d) return n * (t -= 2.25 / d) * t + 0.9375; return n * (t -= 2.625 / d) * t + 0.984375; }
+function ease(style, dir, t) {
+  if (style === 'Constant') return 0;
+  const f = EASE[style] || EASE.Linear;
+  if (dir === 'In') return f(t); if (dir === 'Out') return 1 - f(1 - t);
+  return t < 0.5 ? f(t * 2) / 2 : 1 - f((1 - t) * 2) / 2;
+}
+
+// ---------- the animation: keyframes at whole frames ----------
+let anim = null; // { len: seconds, keys: [{ f, pose, ease, dir }] }, color
+let frame = 0, playing = false, playT = 0, loop = true, speed = 1, onion = true, useIK = true, clip = null;
+const undoStack = [], redoStack = [];
+const frames = () => Math.max(1, Math.round(anim.len * FPS));
+const sortKeys = () => anim.keys.sort((a, b) => a.f - b.f);
+const keyAt = (f) => anim.keys.find((k) => k.f === f);
+function lerpPose(a, b, t) { if (a.q) return lerpPose3(a, b, t); const o = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t, rot: (a.rot || 0) + ((b.rot || 0) - (a.rot || 0)) * t, a: {} }; for (const k of ORDER) o.a[k] = a.a[k] + (b.a[k] - a.a[k]) * t; return o; }
+function poseAt(f) {
+  const ks = anim.keys; if (!ks.length) return standFor();
+  if (f <= ks[0].f) return clone(ks[0].pose);
+  for (let i = 0; i < ks.length - 1; i++) { const a = ks[i], b = ks[i + 1]; if (f >= a.f && f <= b.f) { const t = (f - a.f) / Math.max(1e-6, b.f - a.f); return lerpPose(a.pose, b.pose, ease(a.ease, a.dir, t)); } }
+  return clone(ks[ks.length - 1].pose);
+}
+function snapshot() { undoStack.push(JSON.stringify(anim)); if (undoStack.length > 80) undoStack.shift(); redoStack.length = 0; }
+function save() { try { localStorage.setItem(mode === '3d' ? 'otm-stick-anim3' : 'otm-stick-anim', JSON.stringify(anim)); } catch (e) {} }
+// edit the pose at the playhead: makes a keyframe there if there isn't one (auto-key)
+function editKey() { let k = keyAt(frame); if (!k) { k = { f: frame, pose: poseAt(frame), ease: 'Sine', dir: 'InOut' }; anim.keys.push(k); sortKeys(); } return k; }
+
+// ---------- starter animations ----------
+function P(x, y, rot, deg) { const a = {}; ORDER.forEach((k, i) => a[k] = deg[i] * D); return { x, y, rot: rot * D, a }; }
+//                 torso head armL1 armL2 armR1 armR2 legL1 legL2 legR1 legR2
+const PRESETS = {
+  Walk: { len: 1, keys: [
+    [0, P(0, 0, 0, [-86, 4, 125, -25, -125, -35, 120, -5, 62, 25])], [8, P(0, -6, 0, [-88, 2, 145, -15, -145, -15, 100, 30, 84, 0])],
+    [15, P(0, 0, 0, [-86, 4, 235, 35, -235, 25, 62, 25, 120, -5])], [23, P(0, -6, 0, [-88, 2, 215, 15, -215, 15, 84, 0, 100, 30])], [30, P(0, 0, 0, [-86, 4, 125, -25, -125, -35, 120, -5, 62, 25])]] },
+  Idle: { len: 2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [30, P(0, 2, 0, [-88, 5, 160, 14, -160, -14, 99, -4, 81, 4])], [60, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Wave: { len: 1.2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, 70, -60, 97, 0, 83, 0])], [9, P(0, 0, 0, [-92, -6, 165, 8, 70, -100, 97, 0, 83, 0])], [18, P(0, 0, 0, [-90, 0, 165, 8, 70, -40, 97, 0, 83, 0])], [27, P(0, 0, 0, [-92, -6, 165, 8, 70, -100, 97, 0, 83, 0])], [36, P(0, 0, 0, [-90, 0, 165, 8, 70, -60, 97, 0, 83, 0])]] },
+  Jump: { len: 1.2, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [8, P(0, 26, 0, [-70, 15, 120, 20, -230, -20, 30, 100, 40, 95])], [14, P(0, -10, 0, [-95, -5, 240, 0, -60, 0, 100, 0, 80, 0])], [22, P(0, -110, 0, [-90, 0, 200, 40, -100, -40, 60, 70, 70, 75])], [30, P(0, 0, 0, [-75, 12, 125, 20, -235, -20, 35, 95, 45, 90])], [36, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Backflip: { len: 1.4, keys: [[0, P(0, 0, 0, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])], [8, P(0, 24, 0, [-72, 10, 125, 20, -235, -20, 35, 95, 45, 90])], [14, P(0, -60, -30, [-95, -10, 250, 0, -70, 0, 95, 0, 85, 0])], [22, P(0, -120, -180, [-90, 0, 200, 60, -100, -60, 20, 130, 30, 120])], [30, P(0, -60, -320, [-90, 0, 170, 20, -150, -20, 70, 40, 80, 30])], [36, P(0, 0, -360, [-75, 10, 125, 20, -235, -20, 40, 90, 45, 85])], [42, P(0, 0, -360, [-90, 0, 165, 8, -165, -8, 97, 0, 83, 0])]] },
+  Punch: { len: 1, keys: [[0, P(0, 0, 0, [-90, 0, 170, -150, 150, -130, 115, -10, 70, 15])], [8, P(-6, 4, 0, [-97, 0, 175, -150, 168, -150, 118, -10, 68, 15])], [12, P(12, 2, 0, [-80, 5, 185, -150, 80, 0, 122, -15, 62, 10])], [20, P(12, 2, 0, [-80, 5, 185, -150, 80, 0, 122, -15, 62, 10])], [30, P(0, 0, 0, [-90, 0, 170, -150, 150, -130, 115, -10, 70, 15])]] },
+};
+function loadPreset(name) {
+  const pr = (mode === '3d' ? PRESETS3 : PRESETS)[name];
+  anim = { len: pr.len, color: anim ? anim.color : '#15141a', keys: pr.keys.map(([f, pose]) => ({ f, pose: clone(pose), ease: 'Sine', dir: 'InOut' })) };
+  if (mode === '3d') anim.cams = [];
+  if (name === 'Jump' || name === 'Backflip') { anim.keys[2].ease = 'Quad'; anim.keys[2].dir = 'Out'; anim.keys[3].ease = 'Quad'; anim.keys[3].dir = 'In'; }
+  if (name === 'Punch') { anim.keys[1].ease = 'Back'; anim.keys[1].dir = 'Out'; }
+  frame = 0; syncUI();
+}
+
+// ---------- view: stage camera ----------
+let W = 0, H = 0, dpr = 1, scale = 1, ox = 0, oy = 0;
+function resize() {
+  dpr = Math.min(2, window.devicePixelRatio || 1);
+  const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = W * dpr; cv.height = H * dpr;
+  scale = Math.max(0.6, Math.min(W / 420, H / 330)); ox = W / 2; oy = H * 0.74;
+  const t = tl.getBoundingClientRect(); tl.width = t.width * dpr; tl.height = t.height * dpr;
+}
+const toScreen = (p) => [ox + p[0] * scale, oy + p[1] * scale];
+const toWorld = (x, y) => [(x - ox) / scale, (y - oy) / scale];
+
+// ---------- drawing ----------
+function drawFigure(c, pose, color, alpha, width, showJoints) {
+  const s = solve(pose);
+  c.save(); c.globalAlpha = alpha; c.strokeStyle = color; c.fillStyle = color; c.lineCap = 'round'; c.lineJoin = 'round'; c.lineWidth = width * scale;
+  const seg = (a, b) => { const A = toScreen(a), B = toScreen(b); c.beginPath(); c.moveTo(A[0], A[1]); c.lineTo(B[0], B[1]); c.stroke(); };
+  // back limbs a little lighter so you can tell left from right
+  c.globalAlpha = alpha * 0.55; seg(s.armL1_start, s.armL1_end); seg(s.armL2_start, s.armL2_end); seg(s.legL1_start, s.legL1_end); seg(s.legL2_start, s.legL2_end);
+  c.globalAlpha = alpha; seg(s.torso_start, s.torso_end); seg(s.head_start, s.head_end);
+  seg(s.legR1_start, s.legR1_end); seg(s.legR2_start, s.legR2_end); seg(s.armR1_start, s.armR1_end); seg(s.armR2_start, s.armR2_end);
+  const h = toScreen(s.head_end), ha = s.ang.head; const hc = [h[0] + Math.cos(ha) * 14 * scale, h[1] + Math.sin(ha) * 14 * scale];
+  c.beginPath(); c.arc(hc[0], hc[1], 17 * scale, 0, Math.PI * 2); c.fill();
+  c.restore();
+  if (showJoints) for (const j of JOINTS) { const p = toScreen(jointPos(s, j)), hot = drag && drag.j === j.id || hover === j.id; ctx.beginPath(); ctx.arc(p[0], p[1], (hot ? 9 : 7), 0, Math.PI * 2); ctx.fillStyle = j.kind === 'root' ? '#ffcf4a' : j.ik && useIK ? '#ff5c8a' : '#59d6ff'; ctx.fill(); ctx.lineWidth = 2; ctx.strokeStyle = '#0e0d13'; ctx.stroke(); }
+  return s;
+}
+function headCenter(s) { const h = s.head_end, a = s.ang.head; return [h[0] + Math.cos(a) * 14, h[1] + Math.sin(a) * 14]; }
+// the handles you can grab
+const JOINTS = [
+  { id: 'hip', kind: 'root' }, { id: 'chest', bone: 'torso' }, { id: 'head', bone: 'head' },
+  { id: 'elbowL', bone: 'armL1' }, { id: 'handL', bone: 'armL2', ik: ['armL1', 'armL2'] }, { id: 'elbowR', bone: 'armR1' }, { id: 'handR', bone: 'armR2', ik: ['armR1', 'armR2'] },
+  { id: 'kneeL', bone: 'legL1' }, { id: 'footL', bone: 'legL2', ik: ['legL1', 'legL2'] }, { id: 'kneeR', bone: 'legR1' }, { id: 'footR', bone: 'legR2', ik: ['legR1', 'legR2'] },
+];
+function jointPos(s, j) { if (j.id === 'hip') return s.hip; if (j.id === 'head') return headCenter(s); return s[j.bone + '_end']; }
+
+function drawStage() {
+  if (mode === '3d') return draw3D();
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+  // the paper stage
+  ctx.fillStyle = '#f2f0ea'; ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = 'rgba(21,20,26,0.06)'; ctx.lineWidth = 1;
+  const g = 40 * scale; for (let x = ox % g; x < W; x += g) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); } for (let y = oy % g; y < H; y += g) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.strokeStyle = 'rgba(21,20,26,0.35)'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(0, oy); ctx.lineTo(W, oy); ctx.stroke(); // the floor
+  const f = playing ? playT * FPS : frame;
+  if (onion && !playing) { // ghosts of the keys before and after
+    const prev = [...anim.keys].reverse().find((k) => k.f < frame), next = anim.keys.find((k) => k.f > frame);
+    if (prev) drawFigure(ctx, prev.pose, '#e0457b', 0.22, 6, false);
+    if (next) drawFigure(ctx, next.pose, '#2a9fd6', 0.22, 6, false);
+  }
+  drawFigure(ctx, poseAt(f), anim.color || '#15141a', 1, 7, !playing);
+}
+function drawTimeline() {
+  const w = tl.width / dpr, h = tl.height / dpr, n = frames(), pad = 12, x = (fr) => pad + (fr / n) * (w - pad * 2), ky = h - 18;
+  tctx.setTransform(dpr, 0, 0, dpr, 0, 0); tctx.clearRect(0, 0, w, h);
+  tctx.font = '500 10px "IBM Plex Mono", monospace'; tctx.textAlign = 'center';
+  for (let fr = 0; fr <= n; fr++) { const xx = x(fr), sec = fr % FPS === 0; tctx.strokeStyle = sec ? '#4a4560' : '#2a2638'; tctx.beginPath(); tctx.moveTo(xx, sec ? 4 : 14); tctx.lineTo(xx, sec ? 26 : 22); tctx.stroke(); if (sec) { tctx.fillStyle = '#9993ad'; tctx.fillText((fr / FPS) + 's', xx, 38); } }
+  tctx.strokeStyle = '#2f2b3d'; tctx.beginPath(); tctx.moveTo(pad, ky); tctx.lineTo(w - pad, ky); tctx.stroke();
+  if (mode === '3d') drawTL3(w, h, x, ky);
+  // easing bars between keys
+  for (let i = 0; i < anim.keys.length - 1; i++) { const a = anim.keys[i], b = anim.keys[i + 1]; tctx.fillStyle = a.ease === 'Constant' ? 'rgba(255,92,138,0.35)' : 'rgba(255,207,74,0.18)'; tctx.fillRect(x(a.f), ky - 4, x(b.f) - x(a.f), 8); }
+  for (const k of anim.keys) { const xx = x(k.f), sel = k.f === frame; tctx.save(); tctx.translate(xx, ky); tctx.rotate(Math.PI / 4); tctx.fillStyle = sel ? '#ffffff' : '#ffcf4a'; tctx.strokeStyle = '#0e0d13'; tctx.lineWidth = 2; tctx.fillRect(-6, -6, 12, 12); tctx.strokeRect(-6, -6, 12, 12); tctx.restore(); }
+  const ph = x(playing ? playT * FPS : frame); tctx.strokeStyle = '#59d6ff'; tctx.lineWidth = 2; tctx.beginPath(); tctx.moveTo(ph, 0); tctx.lineTo(ph, h); tctx.stroke(); tctx.fillStyle = '#59d6ff'; tctx.beginPath(); tctx.moveTo(ph - 6, 0); tctx.lineTo(ph + 6, 0); tctx.lineTo(ph, 8); tctx.fill(); tctx.lineWidth = 1;
+}
+function syncUI() {
+  const k = keyAt(frame), f = playing ? Math.floor(playT * FPS) : frame;
+  $('time').textContent = `${(f / FPS).toFixed(2)} s · frame ${f}`;
+  const ki = $('keyinfo'); ki.textContent = ''; // built piece by piece (some sites block innerHTML)
+  if (k) { const sp = document.createElement('span'); sp.className = 'k'; sp.textContent = '◆ keyframe'; ki.append(sp, ` at frame ${k.f}`); } else ki.textContent = `no key here · ${anim.keys.length} key${anim.keys.length === 1 ? '' : 's'} in all`;
+  $('ease').disabled = $('dir').disabled = !k; $('delKey').disabled = !k;
+  if (k) { $('ease').value = k.ease; $('dir').value = k.dir; }
+  $('len').value = anim.len; $('tilt').value = Math.round((poseAt(frame).rot || 0) / D); $('col').value = anim.color || '#15141a';
+  $('play').textContent = playing ? '❚❚ Pause' : '▶ Play';
+  if (mode === '3d') sync3();
+}
+
+// ---------- dragging joints ----------
+let drag = null, hover = null;
+const unwrap = (a, ref) => { while (a - ref > Math.PI) a -= 2 * Math.PI; while (a - ref < -Math.PI) a += 2 * Math.PI; return a; };
+function pickJoint(mx, my) { const s = solve(poseAt(frame)); let best = null, bd = 18; for (const j of JOINTS) { const p = toScreen(jointPos(s, j)), d = Math.hypot(p[0] - mx, p[1] - my); if (d < bd) { bd = d; best = j; } } return best; }
+function applyDrag(mx, my, shift) {
+  const k = editKey(), pose = k.pose, w = toWorld(mx, my), j = drag.jt, s = solve(pose);
+  if (j.kind === 'root') {
+    if (shift || drag.spin) { const a = Math.atan2(w[1] - s.hip[1], w[0] - s.hip[0]); if (drag.a0 === undefined) { drag.a0 = a; drag.r0 = pose.rot || 0; } pose.rot = drag.r0 + unwrap(a - drag.a0, 0); drag.spin = true; }
+    else { pose.x = drag.px + (w[0] - drag.w0[0]); pose.y = drag.py + (w[1] - drag.w0[1]); }
+    return;
+  }
+  if (j.ik && useIK) { // two-bone IK: move the hand/foot, the elbow/knee bends to follow
+    const [b1, b2] = j.ik, L1 = BONES[b1].len, L2 = BONES[b2].len, st = s[b1 + '_start'];
+    const dx = w[0] - st[0], dy = w[1] - st[1], d = Math.max(1e-3, Math.min(L1 + L2 - 1e-3, Math.hypot(dx, dy)));
+    const base = Math.atan2(dy, dx), cosA = (L1 * L1 + d * d - L2 * L2) / (2 * L1 * d), A = Math.acos(Math.max(-1, Math.min(1, cosA)));
+    const bendSign = Math.sign(pose.a[b2] || drag.bend || 1) || 1; drag.bend = bendSign;
+    const parentAng = BONES[b1].parent ? s.ang[BONES[b1].parent] : (pose.rot || 0);
+    const a1 = base - bendSign * A, cosB = (L1 * L1 + L2 * L2 - d * d) / (2 * L1 * L2), Bn = Math.PI - Math.acos(Math.max(-1, Math.min(1, cosB)));
+    pose.a[b1] = unwrap(a1 - parentAng, pose.a[b1]); pose.a[b2] = unwrap(bendSign * Bn, pose.a[b2]);
+    return;
+  }
+  // turn one bone around its start
+  const b = j.bone, st = s[b + '_start'], parentAng = BONES[b].parent ? s.ang[BONES[b].parent] : (pose.rot || 0);
+  const a = Math.atan2(w[1] - st[1], w[0] - st[0]); pose.a[b] = unwrap(a - parentAng, pose.a[b]);
+}
+cv.addEventListener('pointerdown', (e) => {
+  if (mode === '3d') return pd3(e);
+  if (playing) togglePlay();
+  const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top, j = pickJoint(mx, my);
+  if (!j) return;
+  snapshot(); const pose = poseAt(frame); const w = toWorld(mx, my);
+  drag = { j: j.id, jt: j, w0: w, px: pose.x, py: pose.y, spin: e.shiftKey || e.button === 2 }; cv.setPointerCapture(e.pointerId); applyDrag(mx, my, e.shiftKey); render();
+});
+cv.addEventListener('pointermove', (e) => {
+  if (mode === '3d') return pm3(e);
+  const r = cv.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  if (drag) { applyDrag(mx, my, e.shiftKey); render(); return; }
+  const j = playing ? null : pickJoint(mx, my), id = j ? j.id : null; if (id !== hover) { hover = id; cv.style.cursor = j ? (j.kind === 'root' ? 'move' : 'grab') : 'default'; render(); }
+});
+const endDrag = () => { if (drag) { drag = null; save(); syncUI(); render(); } };
+cv.addEventListener('pointerup', endDrag); cv.addEventListener('pointercancel', endDrag); cv.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// ---------- timeline: click to scrub, drag keys to move them ----------
+let tdrag = null;
+function tlFrame(e) { const r = tl.getBoundingClientRect(), pad = 12, n = frames(); return Math.max(0, Math.min(n, Math.round(((e.clientX - r.left - pad) / (r.width - pad * 2)) * n))); }
+tl.addEventListener('pointerdown', (e) => {
+  if (playing) togglePlay();
+  const f = tlFrame(e), r = tl.getBoundingClientRect(), onKeys = e.clientY - r.top > r.height - 30, k = onKeys && anim.keys.find((q) => Math.abs(q.f - f) <= 1);
+  const ck = mode === '3d' && !k && Math.abs(e.clientY - r.top - (r.height - 42)) < 10 && (anim.cams || []).find((q) => Math.abs(q.f - f) <= 1);
+  tl.setPointerCapture(e.pointerId);
+  if (ck) { snapshot(); tdrag = { cam: ck }; frame = ck.f; } else if (k) { snapshot(); tdrag = { key: k }; frame = k.f; } else { tdrag = { scrub: true }; frame = f; }
+  syncUI(); render();
+});
+tl.addEventListener('pointermove', (e) => {
+  if (!tdrag) return; const f = tlFrame(e);
+  if (tdrag.key) { if (!anim.keys.some((q) => q !== tdrag.key && q.f === f)) { tdrag.key.f = f; sortKeys(); frame = f; } } else if (tdrag.cam) { if (!anim.cams.some((q) => q !== tdrag.cam && q.f === f)) { tdrag.cam.f = f; anim.cams.sort((a, b) => a.f - b.f); frame = f; } } else frame = f;
+  syncUI(); render();
+});
+tl.addEventListener('pointerup', () => { if (tdrag && (tdrag.key || tdrag.cam)) save(); tdrag = null; });
+
+// ---------- playback ----------
+let last = 0;
+function togglePlay() { playing = !playing; if (playing) { playT = frame / FPS; last = performance.now(); requestAnimationFrame(tick); } else { frame = Math.min(frames(), Math.round(playT * FPS)); } syncUI(); render(); }
+function tick(now) {
+  if (!playing || quitted) return;
+  const dt = Math.min(0.1, (now - last) / 1000); last = now; playT += dt * speed;
+  if (playT * FPS >= frames()) { if (loop) playT = playT % anim.len; else { playT = anim.len; togglePlay(); return; } }
+  render(); syncUI(); requestAnimationFrame(tick);
+}
+function render() { drawStage(); drawTimeline(); }
+
+// ---------- buttons ----------
+function toast(t) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => el.hidden = true, 1800); }
+$('play').onclick = togglePlay;
+$('loop').onclick = () => { loop = !loop; $('loop').classList.toggle('on', loop); };
+$('speed').onchange = (e) => speed = +e.target.value;
+$('onion').onclick = () => { onion = !onion; $('onion').classList.toggle('on', onion); render(); };
+$('ik').onclick = () => { useIK = !useIK; $('ik').classList.toggle('on', useIK); render(); };
+function undo() { if (!undoStack.length) return; redoStack.push(JSON.stringify(anim)); anim = JSON.parse(undoStack.pop()); save(); syncUI(); render(); }
+function redo() { if (!redoStack.length) return; undoStack.push(JSON.stringify(anim)); anim = JSON.parse(redoStack.pop()); save(); syncUI(); render(); }
+$('undo').onclick = undo; $('redo').onclick = redo;
+function addKey() { if (keyAt(frame)) return toast('There is already a key here'); snapshot(); editKey(); save(); syncUI(); render(); toast('Keyframe added'); }
+function delKey() { const k = keyAt(frame); if (!k) return; if (anim.keys.length === 1) return toast('An animation needs at least one key'); snapshot(); anim.keys.splice(anim.keys.indexOf(k), 1); save(); syncUI(); render(); }
+$('addKey').onclick = addKey; $('delKey').onclick = delKey;
+$('copy').onclick = () => { clip = clone(poseAt(frame)); toast('Pose copied'); };
+$('paste').onclick = () => { if (!clip) return toast('Copy a pose first'); if (!!clip.q !== (mode === '3d')) return toast('That pose is from the other mode'); snapshot(); editKey().pose = clone(clip); save(); syncUI(); render(); toast('Pose pasted'); };
+$('mirror').onclick = () => { // swap left and right (flip the figure)
+  if (mode === '3d') { snapshot(); const k = editKey(); k.pose = mirror3(k.pose); save(); syncUI(); render(); return; }
+  snapshot(); const k = editKey(), a = k.pose.a, m = (v) => Math.PI - v;
+  const t = { torso: m(a.torso), head: -a.head, armL1: -a.armR1, armL2: -a.armR2, armR1: -a.armL1, armR2: -a.armL2, legL1: m(a.legR1), legL2: -a.legR2, legR1: m(a.legL1), legR2: -a.legL2 };
+  t.armL1 = -a.armR1; t.armR1 = -a.armL1; k.pose.a = t; k.pose.x = -k.pose.x; k.pose.rot = -(k.pose.rot || 0); save(); syncUI(); render();
+};
+$('reset').onclick = () => { snapshot(); const k = editKey(), x = k.pose.x, z = k.pose.z; k.pose = standFor(); k.pose.x = x; if (mode === '3d') k.pose.z = z || 0; save(); syncUI(); render(); };
+$('ease').onchange = (e) => { const k = keyAt(frame); if (!k) return; snapshot(); k.ease = e.target.value; save(); render(); };
+$('dir').onchange = (e) => { const k = keyAt(frame); if (!k) return; snapshot(); k.dir = e.target.value; save(); render(); };
+$('len').onchange = (e) => { const v = Math.max(0.2, Math.min(30, +e.target.value || 1)); snapshot(); anim.len = v; const n = frames(); anim.keys.forEach((k) => k.f = Math.min(k.f, n)); (anim.cams || []).forEach((k) => k.f = Math.min(k.f, n)); frame = Math.min(frame, n); save(); syncUI(); render(); };
+$('tilt').oninput = (e) => { if (!$('tilt').dataset.busy) { snapshot(); $('tilt').dataset.busy = 1; } editKey().pose.rot = +e.target.value * D; render(); };
+$('tilt').onchange = () => { delete $('tilt').dataset.busy; save(); syncUI(); };
+$('col').oninput = (e) => { anim.color = e.target.value; save(); render(); };
+const step = (d) => { if (playing) togglePlay(); frame = Math.max(0, Math.min(frames(), frame + d)); syncUI(); render(); };
+$('prev').onclick = () => step(-1); $('next').onclick = () => step(1);
+$('prevKey').onclick = () => { const k = [...anim.keys].reverse().find((q) => q.f < frame); if (k) { frame = k.f; syncUI(); render(); } };
+$('nextKey').onclick = () => { const k = anim.keys.find((q) => q.f > frame); if (k) { frame = k.f; syncUI(); render(); } };
+$('preset').onchange = (e) => {
+  const v = e.target.value; e.target.value = ''; if (!v) return; snapshot();
+  if (v === 'blank') { anim = { len: 1, color: anim.color, keys: [{ f: 0, pose: standFor(), ease: 'Sine', dir: 'InOut' }] }; if (mode === '3d') anim.cams = []; frame = 0; } else loadPreset(v);
+  save(); syncUI(); render(); toast(v === 'blank' ? 'New animation (Undo to get the old one back)' : `Loaded ${v} (Undo to get your old one back)`);
+};
+
+// ---------- saving files and video ----------
+async function saveFile(name, blob) {
+  try { if (window.claude && window.claude.use) { const d = await window.claude.use('downloads'); if (d) { await d.save({ filename: name, data: blob }); return true; } } } catch (e) { if (e && e.code === 'declined') return false; }
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); return true;
+}
+$('save').onclick = async () => { if (await saveFile('stick-animation.json', new Blob([JSON.stringify(anim, null, 1)], { type: 'application/json' }))) toast('Saved'); };
+$('load').onclick = () => $('file').click();
+$('file').onchange = async (e) => {
+  const f = e.target.files[0]; e.target.value = ''; if (!f) return;
+  try { const d = JSON.parse(await f.text()); if (!d.keys || !d.keys.length || !d.keys[0].pose) throw 0; const is3 = !!d.keys[0].pose.q; if ((mode === '3d') !== is3) setMode(is3 ? '3d' : '2d'); snapshot(); anim = d; if (is3 && !anim.cams) anim.cams = []; frame = 0; save(); syncUI(); render(); toast('Opened ' + f.name); }
+  catch (x) { toast("That file isn't a stick animation"); }
+};
+$('video').onclick = async () => {
+  if (!window.MediaRecorder || !cv.captureStream) return toast("This browser can't record video");
+  const was = { onion, camView }; onion = false; exporting = true; if (mode === '3d' && anim.cams && anim.cams.length) camView = true; if (playing) togglePlay();
+  const stream = cv.captureStream(30), types = ['video/webm;codecs=vp9', 'video/webm'], type = types.find((t) => MediaRecorder.isTypeSupported(t)) || 'video/webm';
+  const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 4e6 }), chunks = [];
+  rec.ondataavailable = (ev) => ev.data.size && chunks.push(ev.data);
+  const done = new Promise((r) => rec.onstop = r);
+  toast('Recording…'); $('video').disabled = true; rec.start();
+  const loops = anim.len < 2 ? Math.ceil(2 / anim.len) : 1, total = anim.len * loops, t0 = performance.now();
+  await new Promise((res) => { const go = (now) => { const t = (now - t0) / 1000; if (t >= total) return res(); playT = t % anim.len; playing = true; drawStage(); playing = false; requestAnimationFrame(go); }; requestAnimationFrame(go); });
+  rec.stop(); await done; onion = was.onion; camView = was.camView; exporting = false; $('video').disabled = false; render();
+  if (await saveFile('stick-animation.webm', new Blob(chunks, { type: 'video/webm' }))) toast('Video saved');
+};
+
+// ================= 3D MODE (works like Roblox's Eclipse animator) =================
+let mode = '2d', anim2 = null, anim3 = null, exporting = false;
+let cam = { yaw: 0.45, pitch: 0.22, dist: 4.2, tx: 0, ty: 0.95, tz: 0, fov: 50 };
+let camView = false, tool = 'move', sel = 'root', graph = false, V = null;
+// vectors [x, y, z] (y is up) and quaternions [w, x, y, z]
+const vadd = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]], vsub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]], vmul = (a, s) => [a[0] * s, a[1] * s, a[2] * s];
+const vdot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2], vcross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const vlen = (a) => Math.hypot(a[0], a[1], a[2]), vnorm = (a) => { const l = vlen(a) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+const qid = () => [1, 0, 0, 0], qconj = (q) => [q[0], -q[1], -q[2], -q[3]];
+function qmul(a, b) { return [a[0] * b[0] - a[1] * b[1] - a[2] * b[2] - a[3] * b[3], a[0] * b[1] + a[1] * b[0] + a[2] * b[3] - a[3] * b[2], a[0] * b[2] - a[1] * b[3] + a[2] * b[0] + a[3] * b[1], a[0] * b[3] + a[1] * b[2] - a[2] * b[1] + a[3] * b[0]]; }
+function qnorm(q) { const l = Math.hypot(q[0], q[1], q[2], q[3]) || 1; return [q[0] / l, q[1] / l, q[2] / l, q[3] / l]; }
+function qrot(q, v) { const p = qmul(qmul(q, [0, v[0], v[1], v[2]]), qconj(q)); return [p[1], p[2], p[3]]; }
+function qaxis(ax, a) { const n = vnorm(ax), s = Math.sin(a / 2); return [Math.cos(a / 2), n[0] * s, n[1] * s, n[2] * s]; }
+function qfromTo(u, v) { u = vnorm(u); v = vnorm(v); const d = vdot(u, v); if (d < -0.99999) { let ax = vcross([1, 0, 0], u); if (vlen(ax) < 1e-4) ax = vcross([0, 1, 0], u); return qaxis(ax, Math.PI); } const c = vcross(u, v); return qnorm([1 + d, c[0], c[1], c[2]]); }
+function qslerp(a, b, t) { let d = a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3]; if (d < 0) { b = b.map((v) => -v); d = -d; } if (d > 0.9995) return qnorm(a.map((v, i) => v + (b[i] - v) * t)); const th = Math.acos(d), s = Math.sin(th), wa = Math.sin((1 - t) * th) / s, wb = Math.sin(t * th) / s; return qnorm(a.map((v, i) => v * wa + b[i] * wb)); }
+const qeuler = (y, p, r) => qmul(qmul(qaxis([0, 1, 0], y), qaxis([1, 0, 0], p)), qaxis([0, 0, 1], r));
+function qToEuler(q) { const [w, x, y, z] = q, m13 = 2 * (x * z + w * y), m23 = 2 * (y * z - w * x), m33 = 1 - 2 * (x * x + y * y), m21 = 2 * (x * y + w * z), m22 = 1 - 2 * (x * x + z * z), m11 = 1 - 2 * (y * y + z * z), m31 = 2 * (x * z - w * y); const X = Math.asin(Math.max(-1, Math.min(1, -m23))); return Math.abs(m23) < 0.9999 ? [X, Math.atan2(m13, m33), Math.atan2(m21, m22)] : [X, Math.atan2(-m31, m11), 0]; }
+
+// the 3D rig, in meters. Each part turns from its parent (Motor6Ds again). The figure faces +z; its left is +x.
+const L3 = { torso: 0.62, head: 0.16, armL1: 0.36, armL2: 0.34, armR1: 0.36, armR2: 0.34, legL1: 0.44, legL2: 0.42, legR1: 0.44, legR2: 0.42 };
+const UP3 = { torso: 1, head: 1 }, SH3 = { armL1: [0.17, -0.05, 0], armR1: [-0.17, -0.05, 0], legL1: [0.1, 0, 0], legR1: [-0.1, 0, 0] };
+function solve3(p) {
+  const R = qeuler(p.yaw || 0, p.pitch || 0, p.roll || 0), out = { R, W: {}, hip: [p.x || 0, 0.86 + (p.y || 0), p.z || 0] };
+  for (const b of ORDER) {
+    const par = BONES[b].parent, W = out.W[b] = qmul(par ? out.W[par] : R, p.q[b]);
+    let st;
+    if (b === 'torso') st = out.hip; else if (b === 'head') st = out.torso_end;
+    else if (SH3[b]) st = vadd(b[0] === 'a' ? out.torso_end : out.hip, qrot(b[0] === 'a' ? out.W.torso : R, SH3[b]));
+    else st = out[par + '_end'];
+    out[b + '_start'] = st; out[b + '_end'] = vadd(st, qrot(W, [0, UP3[b] ? L3[b] : -L3[b], 0]));
+  }
+  return out;
+}
+// aim one part along a world direction (its children come along)
+function setDir(p, b, dir) { if (vlen(dir) < 1e-6) return; const s = solve3(p), par = BONES[b].parent, PW = par ? s.W[par] : s.R, Wn = qmul(qfromTo(vsub(s[b + '_end'], s[b + '_start']), dir), s.W[b]); p.q[b] = qnorm(qmul(qconj(PW), Wn)); }
+// 3D two-bone IK: keeps the elbow/knee bending the way it already bends
+function ik3(p, [b1, b2], T) {
+  const s = solve3(p), S = s[b1 + '_start'], E = s[b1 + '_end'], L1 = L3[b1], L2 = L3[b2], dv = vsub(T, S), d = Math.max(0.02, Math.min(L1 + L2 - 1e-3, vlen(dv))), u = vnorm(dv);
+  let pv = vsub(E, S); pv = vsub(pv, vmul(u, vdot(pv, u)));
+  if (vlen(pv) < 1e-3) { pv = qrot(s.R, b1[0] === 'l' ? [0, 0, 1] : [0, 0, -1]); pv = vsub(pv, vmul(u, vdot(pv, u))); }
+  const v = vnorm(pv), a = (L1 * L1 - L2 * L2 + d * d) / (2 * d), h = Math.sqrt(Math.max(0, L1 * L1 - a * a)), elbow = vadd(S, vadd(vmul(u, a), vmul(v, h)));
+  setDir(p, b1, vsub(elbow, S)); const s2 = solve3(p); setDir(p, b2, vsub(vadd(S, vmul(u, d)), s2[b1 + '_end']));
+}
+const DIRS = { torso: [0, 1, 0], head: [0, 1, 0], armL1: [0.15, -1, 0], armL2: [0.08, -1, 0.12], armR1: [-0.15, -1, 0], armR2: [-0.08, -1, 0.12], legL1: [0.04, -1, 0], legL2: [0, -1, 0], legR1: [-0.04, -1, 0], legR2: [0, -1, 0] };
+// build a pose from where each part points (body space) plus [x, y, z, turn°, flip°, lean°]
+function B3(root, dirs) {
+  const p = { x: 0, y: 0, z: 0, yaw: 0, pitch: 0, roll: 0, q: {} }; ORDER.forEach((b) => p.q[b] = qid());
+  for (const b of ORDER) setDir(p, b, (dirs || {})[b] || DIRS[b]);
+  const r = root || []; p.x = r[0] || 0; p.y = r[1] || 0; p.z = r[2] || 0; p.yaw = (r[3] || 0) * D; p.pitch = (r[4] || 0) * D; p.roll = (r[5] || 0) * D;
+  return p;
+}
+const STAND3 = () => B3();
+const standFor = () => mode === '3d' ? STAND3() : STAND();
+function lerpPose3(a, b, t) { const o = { q: {} }; for (const k of ['x', 'y', 'z', 'yaw', 'pitch', 'roll']) o[k] = (a[k] || 0) + ((b[k] || 0) - (a[k] || 0)) * t; for (const k of ORDER) o.q[k] = qslerp(a.q[k], b.q[k], t); return o; }
+function mirror3(p) { const o = { x: -(p.x || 0), y: p.y || 0, z: p.z || 0, yaw: -(p.yaw || 0), pitch: p.pitch || 0, roll: -(p.roll || 0), q: {} }; for (const b of ORDER) { const q = p.q[b.replace(/[LR](?=\d)/, (c) => c === 'L' ? 'R' : 'L')]; o.q[b] = [q[0], q[1], -q[2], -q[3]]; } return o; }
+
+// starter animations in 3D (same keyframe counts as the 2D ones)
+const PRESETS3 = (() => {
+  const walkA = B3([0, -0.05, 0], { torso: [0, 1, 0.08], armL1: [0.12, -1, -0.45], armL2: [0.08, -1, -0.1], armR1: [-0.12, -1, 0.5], armR2: [-0.08, -0.55, 0.85], legL1: [0.03, -0.87, 0.5], legL2: [0, -1, 0.12], legR1: [-0.03, -0.88, -0.45], legR2: [0, -0.75, -0.65] });
+  const walkB = B3([0, 0, 0], { torso: [0, 1, 0.06], armL1: [0.13, -1, -0.1], armL2: [0.08, -1, 0.1], armR1: [-0.13, -1, 0.15], armR2: [-0.08, -0.9, 0.45], legL1: [0.03, -1, 0.05], legL2: [0, -1, -0.02], legR1: [-0.03, -0.85, 0.5], legR2: [0, -0.95, -0.35] });
+  const stand = B3([0, -0.01, 0]);
+  const crouch = (arms) => B3([0, -0.21, 0], Object.assign({ torso: [0, 1, 0.45], head: [0, 1, 0.1], legL1: [0.06, -0.6, 0.8], legL2: [0, -0.9, -0.4], legR1: [-0.06, -0.6, 0.8], legR2: [0, -0.9, -0.4] }, arms));
+  const armsBack = { armL1: [0.1, -0.7, -0.7], armL2: [0.05, -0.8, -0.5], armR1: [-0.1, -0.7, -0.7], armR2: [-0.05, -0.8, -0.5] };
+  const armsUp = { armL1: [0.2, 1, 0.1], armL2: [0.1, 1, 0], armR1: [-0.2, 1, 0.1], armR2: [-0.1, 1, 0] };
+  const straight = { legL1: [0.04, -1, -0.05], legL2: [0, -1, -0.1], legR1: [-0.04, -1, -0.05], legR2: [0, -1, -0.1] };
+  const wave = (arm2, head) => B3([0, -0.01, 0], { armR1: [-1, 0.35, 0.1], armR2: arm2, head: head || [0, 1, 0] });
+  const guard = (root, more) => B3(root, Object.assign({ torso: [0, 1, 0.12], head: [0, 1, 0.05], armL1: [0.3, -0.85, 0.45], armL2: [-0.25, 1, 0.45], armR1: [-0.3, -0.9, 0.3], armR2: [0.2, 1, 0.35], legL1: [0.15, -1, 0.3], legL2: [0, -1, 0.1], legR1: [-0.15, -1, -0.3], legR2: [0, -1, -0.15] }, more));
+  const hit = guard([0, -0.06, 0.1, -15], { torso: [0, 1, 0.25], armR1: [0, 0.15, 1], armR2: [0, 0.08, 1] });
+  return {
+    Walk: { len: 1, keys: [[0, walkA], [8, walkB], [15, mirror3(walkA)], [23, mirror3(walkB)], [30, walkA]] },
+    Idle: { len: 2, keys: [[0, stand], [30, B3([0, -0.02, 0], { torso: [0, 1, -0.03], head: [0, 1, 0.08], armL1: [0.22, -1, 0], armR1: [-0.22, -1, 0] })], [60, stand]] },
+    Wave: { len: 1.2, keys: [[0, wave([-0.3, 1, 0.15])], [9, wave([-0.75, 1, 0.15], [0.1, 1, 0])], [18, wave([0.25, 1, 0.15])], [27, wave([-0.75, 1, 0.15], [0.1, 1, 0])], [36, wave([-0.3, 1, 0.15])]] },
+    Jump: { len: 1.2, keys: [[0, stand], [8, crouch(armsBack)], [14, B3([0, 0.08, 0], Object.assign({ torso: [0, 1, -0.05] }, armsUp, straight))],
+      [22, B3([0, 0.85, 0], { armL1: [0.8, 0.5, 0.1], armL2: [0.5, 0.8, 0], armR1: [-0.8, 0.5, 0.1], armR2: [-0.5, 0.8, 0], legL1: [0.05, -0.5, 0.85], legL2: [0, -1, -0.3], legR1: [-0.05, -0.5, 0.85], legR2: [0, -1, -0.3] })],
+      [30, crouch({ armL1: [0.1, -0.6, 0.8], armR1: [-0.1, -0.6, 0.8] })], [36, stand]] },
+    Backflip: { len: 1.4, keys: [[0, stand], [8, crouch(armsBack)], [14, B3([0, 0.35, 0, 0, -30], Object.assign({}, armsUp, straight))],
+      [22, B3([0, 1.05, 0, 0, -180], { torso: [0, 1, 0.3], legL1: [0.05, 0.3, 1], legL2: [0, -1, -0.1], legR1: [-0.05, 0.3, 1], legR2: [0, -1, -0.1], armL1: [0.15, -0.4, 0.9], armL2: [-0.05, -0.8, 0.3], armR1: [-0.15, -0.4, 0.9], armR2: [0.05, -0.8, 0.3] })],
+      [30, B3([0, 0.5, 0, 0, -320], { legL1: [0.04, -0.9, 0.4], legR1: [-0.04, -0.9, 0.4], armL1: [0.7, -0.3, 0.3], armR1: [-0.7, -0.3, 0.3] })],
+      [36, B3([0, -0.15, 0, 0, -360], { torso: [0, 1, 0.3], legL1: [0.05, -0.75, 0.6], legL2: [0, -0.95, -0.3], legR1: [-0.05, -0.75, 0.6], legR2: [0, -0.95, -0.3], armL1: [0.3, -0.5, 0.6], armR1: [-0.3, -0.5, 0.6] })], [42, B3([0, -0.01, 0, 0, -360])]] },
+    Punch: { len: 1, keys: [[0, guard([0, -0.06, 0, 25])], [8, guard([0, -0.08, -0.04, 40])], [12, hit], [20, hit], [30, guard([0, -0.06, 0, 25])]] },
+  };
+})();
+
+// ---------- the camera ----------
+function camBasis(c) { const cp = Math.cos(c.pitch), eye = [c.tx + c.dist * cp * Math.sin(c.yaw), c.ty + c.dist * Math.sin(c.pitch), c.tz + c.dist * cp * Math.cos(c.yaw)], fw = vnorm(vsub([c.tx, c.ty, c.tz], eye)), rt = vnorm(vcross(fw, [0, 1, 0])); return { eye, fw, rt, up: vcross(rt, fw) }; }
+function setView(c) { V = camBasis(c); V.foc = (H / 2) / Math.tan(c.fov * D / 2); }
+function proj(p) { const v = vsub(p, V.eye), z = vdot(v, V.fw); if (z < 0.05) return null; return [W / 2 + vdot(v, V.rt) / z * V.foc, H / 2 - vdot(v, V.up) / z * V.foc, z]; }
+function unproj(sx, sy, z) { return vadd(vadd(V.eye, vmul(V.fw, z)), vadd(vmul(V.rt, (sx - W / 2) / V.foc * z), vmul(V.up, -(sy - H / 2) / V.foc * z))); }
+function camAt(f) {
+  const cs = anim.cams || []; if (!cs.length) return null;
+  if (f <= cs[0].f) return Object.assign({}, cs[0].cam);
+  for (let i = 0; i < cs.length - 1; i++) { const a = cs[i], b = cs[i + 1]; if (f >= a.f && f <= b.f) { const t = ease('Sine', 'InOut', (f - a.f) / Math.max(1e-6, b.f - a.f)), o = {}; for (const k in a.cam) o[k] = a.cam[k] + (b.cam[k] - a.cam[k]) * t; return o; } }
+  return Object.assign({}, cs[cs.length - 1].cam);
+}
+const curF = () => playing ? playT * FPS : frame;
+function viewCam() { return (camView && camAt(curF())) || cam; }
+// the camera you're moving right now: in Camera view it's the animated camera (auto-keyed at the playhead)
+function editCam() {
+  if (!camView) return cam;
+  let k = anim.cams.find((c) => c.f === frame);
+  if (!k) { k = { f: frame, cam: camAt(frame) || Object.assign({}, cam) }; anim.cams.push(k); anim.cams.sort((a, b) => a.f - b.f); }
+  return k.cam;
+}
+
+// ---------- drawing in 3D ----------
+function seg3(c, a, b) { const n = 0.06; let za = vdot(vsub(a, V.eye), V.fw), zb = vdot(vsub(b, V.eye), V.fw); if (za < n && zb < n) return; if (za < n) a = vadd(a, vmul(vsub(b, a), (n - za) / (zb - za))); else if (zb < n) b = vadd(b, vmul(vsub(a, b), (n - zb) / (za - zb))); const A = proj(a), B = proj(b); if (!A || !B) return; c.moveTo(A[0], A[1]); c.lineTo(B[0], B[1]); }
+const headCenter3 = (s) => vadd(s.head_end, qrot(s.W.head, [0, 0.13, 0]));
+function jointPos3(s, j) { if (j.id === 'hip') return s.hip; if (j.id === 'head') return headCenter3(s); return s[j.bone + '_end']; }
+const partOf = (j) => j.kind === 'root' ? 'root' : j.bone;
+const PARTS = [['root', 'HumanoidRootPart'], ['torso', 'UpperTorso'], ['head', 'Head'], ['armL1', 'LeftUpperArm'], ['armL2', 'LeftLowerArm'], ['armR1', 'RightUpperArm'], ['armR2', 'RightLowerArm'], ['legL1', 'LeftUpperLeg'], ['legL2', 'LeftLowerLeg'], ['legR1', 'RightUpperLeg'], ['legR2', 'RightLowerLeg']];
+const RING_COL = ['#ff4d4d', '#2fd47a', '#4d8dff'];
+function gizmo(s, pose) { // where the rings sit and which way they face
+  if (sel === 'root') { const Y = qaxis([0, 1, 0], pose.yaw || 0); return { c: s.hip, r: 0.42, ax: [qrot(Y, [1, 0, 0]), [0, 1, 0], qrot(Y, [0, 0, 1])] }; }
+  return { c: s[sel + '_start'], r: 0.22, ax: [[1, 0, 0], [0, 1, 0], [0, 0, 1]] };
+}
+function ringPts(c, ax, r) { const n = vnorm(ax), t1 = vnorm(vcross(n, Math.abs(n[1]) < 0.9 ? [0, 1, 0] : [1, 0, 0])), t2 = vcross(n, t1), pts = []; for (let i = 0; i <= 48; i++) { const a = i / 48 * Math.PI * 2; pts.push(proj(vadd(c, vadd(vmul(t1, Math.cos(a) * r), vmul(t2, Math.sin(a) * r))))); } return pts; }
+function pickRing(s, pose, mx, my) {
+  if (!sel) return -1; const g = gizmo(s, pose); let best = -1, bd = 9;
+  g.ax.forEach((ax, i) => { const pts = ringPts(g.c, ax, g.r); for (let k = 0; k < pts.length - 1; k++) { const A = pts[k], B = pts[k + 1]; if (!A || !B) continue; const dx = B[0] - A[0], dy = B[1] - A[1], t = Math.max(0, Math.min(1, ((mx - A[0]) * dx + (my - A[1]) * dy) / (dx * dx + dy * dy || 1))), d = Math.hypot(A[0] + dx * t - mx, A[1] + dy * t - my); if (d < bd) { bd = d; best = i; } } });
+  return best;
+}
+function drawFig3(pose, color, alpha, handles) {
+  const s = solve3(pose), items = [];
+  if (alpha === 1) { // a soft shadow on the floor
+    ctx.fillStyle = 'rgba(21,20,26,0.13)'; ctx.beginPath(); let first = true;
+    for (let i = 0; i <= 24; i++) { const a = i / 24 * Math.PI * 2, P = proj([s.hip[0] + Math.cos(a) * 0.3, 0.002, s.hip[2] + Math.sin(a) * 0.22]); if (!P) continue; if (first) { ctx.moveTo(P[0], P[1]); first = false; } else ctx.lineTo(P[0], P[1]); }
+    ctx.fill();
+  }
+  for (const b of ORDER) {
+    const A = proj(s[b + '_start']), B = proj(s[b + '_end']); if (!A || !B) continue;
+    const z = (A[2] + B[2]) / 2, side = /L\d/.test(b) ? 0.72 : 1;
+    items.push({ z, f: () => { ctx.globalAlpha = alpha * side; ctx.lineWidth = Math.max(1.5, 0.075 * V.foc / z); ctx.beginPath(); ctx.moveTo(A[0], A[1]); ctx.lineTo(B[0], B[1]); ctx.stroke(); } });
+  }
+  const hc = headCenter3(s), HC = proj(hc);
+  if (HC) items.push({ z: HC[2] - 0.05, f: () => {
+    ctx.globalAlpha = alpha; const r = 0.17 * V.foc / HC[2]; ctx.beginPath(); ctx.arc(HC[0], HC[1], r, 0, Math.PI * 2); ctx.fill();
+    const fw = qrot(s.W.head, [0, 0, 1]); if (vdot(fw, vsub(V.eye, hc)) > 0 && alpha > 0.5) { // eyes, so you can see which way it looks
+      const rt = qrot(s.W.head, [1, 0, 0]), up = qrot(s.W.head, [0, 1, 0]); ctx.fillStyle = '#f2f0ea';
+      for (const sd of [-1, 1]) { const E = proj(vadd(hc, vadd(vmul(fw, 0.15), vadd(vmul(rt, sd * 0.065), vmul(up, 0.03))))); if (E) { ctx.beginPath(); ctx.arc(E[0], E[1], Math.max(1.2, 0.03 * V.foc / E[2]), 0, Math.PI * 2); ctx.fill(); } }
+      ctx.fillStyle = color;
+    }
+  } });
+  items.sort((a, b) => b.z - a.z);
+  ctx.save(); ctx.strokeStyle = color; ctx.fillStyle = color; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  for (const it of items) it.f();
+  ctx.restore();
+  if (handles) {
+    if (tool === 'rotate' && sel) { const g = gizmo(s, pose); g.ax.forEach((ax, i) => { const pts = ringPts(g.c, ax, g.r), hot = hover === 'ring' + i || (drag && drag.ring === i); ctx.strokeStyle = RING_COL[i]; ctx.lineWidth = hot ? 5 : 3; ctx.beginPath(); let pen = false; for (const P of pts) { if (!P) { pen = false; continue; } if (pen) ctx.lineTo(P[0], P[1]); else { ctx.moveTo(P[0], P[1]); pen = true; } } ctx.stroke(); }); }
+    for (const j of JOINTS) { const P = proj(jointPos3(s, j)); if (!P) continue; const hot = (drag && drag.j === j.id) || hover === j.id, picked = partOf(j) === sel; ctx.beginPath(); ctx.arc(P[0], P[1], hot ? 9 : 7, 0, Math.PI * 2); ctx.fillStyle = j.kind === 'root' ? '#ffcf4a' : j.ik && useIK ? '#ff5c8a' : '#59d6ff'; ctx.fill(); ctx.lineWidth = picked ? 3 : 2; ctx.strokeStyle = picked ? '#ffffff' : '#0e0d13'; ctx.stroke(); }
+  }
+  return s;
+}
+function drawCamObj(c) { // the animated camera, drawn as a little camera in the scene
+  const b = camBasis(c), e = b.eye, k = (x, y) => vadd(vadd(e, vmul(b.fw, 0.35)), vadd(vmul(b.rt, x * 0.22), vmul(b.up, y * 0.13)));
+  const cs = [k(-1, -1), k(1, -1), k(1, 1), k(-1, 1)];
+  ctx.strokeStyle = '#2a7fd6'; ctx.lineWidth = 2; ctx.beginPath();
+  for (let i = 0; i < 4; i++) { seg3(ctx, e, cs[i]); seg3(ctx, cs[i], cs[(i + 1) % 4]); }
+  seg3(ctx, k(-0.4, 1.15), k(0, 1.6)); seg3(ctx, k(0, 1.6), k(0.4, 1.15)); seg3(ctx, k(0.4, 1.15), k(-0.4, 1.15)); ctx.stroke();
+}
+function draw3D() {
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0); setView(viewCam());
+  const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, '#c9d3e3'); g.addColorStop(1, '#eceef1'); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+  ctx.lineWidth = 1; // the baseplate
+  for (let i = -8; i <= 8; i++) { const v = i * 0.5; ctx.strokeStyle = i === 0 ? 'rgba(21,20,26,0.32)' : i % 2 ? 'rgba(21,20,26,0.07)' : 'rgba(21,20,26,0.15)'; ctx.beginPath(); seg3(ctx, [v, 0, -4], [v, 0, 4]); seg3(ctx, [-4, 0, v], [4, 0, v]); ctx.stroke(); }
+  const f = curF();
+  if (onion && !playing) { const prev = [...anim.keys].reverse().find((k) => k.f < frame), next = anim.keys.find((k) => k.f > frame); if (prev) drawFig3(prev.pose, '#e0457b', 0.22, false); if (next) drawFig3(next.pose, '#2a9fd6', 0.22, false); }
+  if (!camView && !exporting && anim.cams && anim.cams.length) { const c = camAt(f); if (c) drawCamObj(c); }
+  drawFig3(poseAt(f), anim.color || '#15141a', 1, !playing && !exporting);
+  if (exporting) return;
+  if (camView) { ctx.strokeStyle = '#2a7fd6'; ctx.lineWidth = 4; ctx.strokeRect(2, 2, W - 4, H - 4); ctx.fillStyle = '#2a7fd6'; ctx.font = '600 12px "IBM Plex Mono", monospace'; ctx.textAlign = 'left'; ctx.fillText(anim.cams.length ? '● CAMERA VIEW (moving the view keys the camera)' : '● CAMERA VIEW (move the view to make the first camera key)', 12, 22); }
+  const O = [W - 44, H - 44]; ctx.font = '600 11px "IBM Plex Mono", monospace'; ctx.textAlign = 'center'; // which way is which
+  [[1, 0, 0], [0, 1, 0], [0, 0, 1]].forEach((a, i) => { const ex = O[0] + vdot(a, V.rt) * 24, ey = O[1] - vdot(a, V.up) * 24; ctx.strokeStyle = ctx.fillStyle = RING_COL[i]; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.moveTo(O[0], O[1]); ctx.lineTo(ex, ey); ctx.stroke(); ctx.fillText('XYZ'[i], O[0] + (ex - O[0]) * 1.4, O[1] + (ey - O[1]) * 1.4 + 4); });
+}
+function drawTL3(w, h, x, ky) {
+  if (graph) { // graph editor: the picked part's rotation as curves, like Eclipse's
+    const n = frames(), vals = [[], [], []]; let prev = null;
+    for (let fr = 0; fr <= n; fr++) { const p = poseAt(fr); let e = sel === 'root' ? [p.pitch || 0, p.yaw || 0, p.roll || 0] : qToEuler(p.q[sel]); if (prev) e = e.map((v, i) => unwrap(v, prev[i])); prev = e; e.forEach((v, i) => vals[i].push(v / D)); }
+    let lo = Infinity, hi = -Infinity; for (const a of vals) for (const v of a) { lo = Math.min(lo, v); hi = Math.max(hi, v); }
+    if (hi - lo < 20) { const m = (hi + lo) / 2; lo = m - 10; hi = m + 10; }
+    const top = 64, bot = ky - 34, y = (v) => bot - (v - lo) / (hi - lo) * (bot - top);
+    tctx.fillStyle = 'rgba(255,255,255,0.025)'; tctx.fillRect(12, top - 6, w - 24, bot - top + 12);
+    if (lo < 0 && hi > 0) { tctx.strokeStyle = '#3a3550'; tctx.beginPath(); tctx.moveTo(12, y(0)); tctx.lineTo(w - 12, y(0)); tctx.stroke(); }
+    for (const k of anim.keys) { tctx.strokeStyle = 'rgba(255,207,74,0.18)'; tctx.beginPath(); tctx.moveTo(x(k.f), top - 6); tctx.lineTo(x(k.f), bot + 6); tctx.stroke(); }
+    vals.forEach((a, i) => { tctx.strokeStyle = RING_COL[i]; tctx.lineWidth = 2; tctx.beginPath(); a.forEach((v, fr) => fr ? tctx.lineTo(x(fr), y(v)) : tctx.moveTo(x(fr), y(v))); tctx.stroke(); tctx.lineWidth = 1; });
+    tctx.textAlign = 'left'; tctx.fillStyle = '#9993ad'; const nm = (PARTS.find((q) => q[0] === sel) || [0, 'nothing picked'])[1];
+    tctx.fillText(`${nm} rotation · X red  Y green  Z blue · ${Math.round(lo)}° to ${Math.round(hi)}°`, 16, top - 10); tctx.textAlign = 'center';
+  }
+  const cy = ky - 24; // camera keys
+  for (const c of anim.cams || []) { tctx.beginPath(); tctx.arc(x(c.f), cy, 5, 0, Math.PI * 2); tctx.fillStyle = c.f === frame ? '#ffffff' : '#2a9fd6'; tctx.fill(); tctx.strokeStyle = '#0e0d13'; tctx.lineWidth = 2; tctx.stroke(); tctx.lineWidth = 1; }
+}
+
+// ---------- posing in 3D ----------
+function pickJoint3(s, mx, my) { let best = null, bd = 18; for (const j of JOINTS) { const P = proj(jointPos3(s, j)); if (!P) continue; const d = Math.hypot(P[0] - mx, P[1] - my); if (d < bd) { bd = d; best = j; } } return best; }
+const mouse = (e) => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+function pd3(e) {
+  if (playing) togglePlay();
+  const [mx, my] = mouse(e), pose = poseAt(frame), s = solve3(pose); setView(viewCam());
+  if (tool === 'rotate') { const ri = pickRing(s, pose, mx, my); if (ri >= 0) { const g = gizmo(s, pose), C = proj(g.c); if (C) { snapshot(); const k = editKey(); drag = { ring: ri, ax: g.ax[ri], C, last: Math.atan2(my - C[1], mx - C[0]), tot: 0, pose0: clone(k.pose), sign: Math.sign(vdot(g.ax[ri], vsub(V.eye, g.c))) || 1 }; cv.setPointerCapture(e.pointerId); render(); return; } } }
+  const j = pickJoint3(s, mx, my);
+  if (j) {
+    sel = partOf(j);
+    if (tool === 'move') { snapshot(); const k = editKey(), jp = jointPos3(solve3(k.pose), j), P = proj(jp); drag = { j: j.id, jt: j, z: P[2], off: vsub(jp, unproj(mx, my, P[2])), jp0: jp, p0: [k.pose.x || 0, k.pose.y || 0, k.pose.z || 0], yaw0: k.pose.yaw || 0, mx0: mx, spin: e.shiftKey || e.button === 2 }; cv.setPointerCapture(e.pointerId); }
+    syncUI(); render(); return;
+  }
+  if (camView) snapshot(); // empty space: move the camera
+  drag = { cam: true, mx0: mx, my0: my, c0: Object.assign({}, editCam()), pan: e.button === 2 || e.button === 1 || e.shiftKey }; cv.setPointerCapture(e.pointerId);
+}
+function applyDrag3(mx, my, shift) {
+  const k = editKey(), pose = k.pose, j = drag.jt, T = vadd(unproj(mx, my, drag.z), drag.off);
+  if (j.kind === 'root') {
+    if (shift || drag.spin) { pose.yaw = drag.yaw0 + (mx - drag.mx0) * 0.012; drag.spin = true; }
+    else { pose.x = drag.p0[0] + T[0] - drag.jp0[0]; pose.y = drag.p0[1] + T[1] - drag.jp0[1]; pose.z = drag.p0[2] + T[2] - drag.jp0[2]; }
+    return;
+  }
+  if (j.ik && useIK) return ik3(pose, j.ik, T);
+  const s = solve3(pose); setDir(pose, j.bone, vsub(T, s[j.bone + '_start']));
+}
+function applyRing(mx, my) {
+  const a = Math.atan2(my - drag.C[1], mx - drag.C[0]); drag.tot += unwrap(a - drag.last, 0); drag.last = a;
+  const ang = -drag.tot * drag.sign, k = editKey(), p0 = drag.pose0;
+  if (sel === 'root') { const key = ['pitch', 'yaw', 'roll'][drag.ring]; k.pose[key] = (p0[key] || 0) + ang; return; }
+  const s0 = solve3(p0), par = BONES[sel].parent, PW = par ? s0.W[par] : s0.R; k.pose.q[sel] = qnorm(qmul(qconj(PW), qmul(qaxis(drag.ax, ang), s0.W[sel])));
+}
+function pm3(e) {
+  const [mx, my] = mouse(e); setView(viewCam());
+  if (drag) {
+    if (drag.cam) {
+      const c = editCam(), dx = mx - drag.mx0, dy = my - drag.my0;
+      if (drag.pan) { const k = c.dist / V.foc; ['tx', 'ty', 'tz'].forEach((n, i) => c[n] = drag.c0[n] + (-V.rt[i] * dx + V.up[i] * dy) * k); }
+      else { c.yaw = drag.c0.yaw - dx * 0.008; c.pitch = Math.max(-1.45, Math.min(1.45, drag.c0.pitch + dy * 0.008)); }
+    } else if (drag.ring !== undefined) applyRing(mx, my);
+    else applyDrag3(mx, my, e.shiftKey);
+    render(); return;
+  }
+  if (playing) return;
+  const pose = poseAt(frame), s = solve3(pose), j = pickJoint3(s, mx, my); let id = j ? j.id : null;
+  if (!j && tool === 'rotate') { const ri = pickRing(s, pose, mx, my); if (ri >= 0) id = 'ring' + ri; }
+  if (id !== hover) { hover = id; cv.style.cursor = id ? (id.startsWith('ring') ? 'grab' : j.kind === 'root' ? 'move' : 'grab') : 'default'; render(); }
+}
+cv.addEventListener('wheel', (e) => { if (mode !== '3d') return; e.preventDefault(); const fresh = camView && !anim.cams.some((c) => c.f === frame); if (fresh) snapshot(); const c = editCam(); c.dist = Math.max(0.8, Math.min(20, c.dist * Math.exp(e.deltaY * 0.0012))); clearTimeout(cv.wt); cv.wt = setTimeout(() => { save(); syncUI(); }, 250); render(); }, { passive: false });
+
+// ---------- 3D buttons ----------
+function setTool(t) { tool = t; if (t === 'rotate' && !sel) sel = 'root'; syncUI(); render(); }
+function toggleGraph() { graph = !graph; tl.classList.toggle('graph', graph); resize(); syncUI(); render(); }
+function sync3() {
+  const p = poseAt(frame); $('yaw').value = Math.round((p.yaw || 0) / D); $('pitch').value = Math.round((p.pitch || 0) / D); $('roll').value = Math.round((p.roll || 0) / D);
+  $('toolMove').classList.toggle('on', tool === 'move'); $('toolRot').classList.toggle('on', tool === 'rotate'); $('camView').classList.toggle('on', camView); $('graphBtn').classList.toggle('on', graph);
+  $('camDel').disabled = !(anim.cams || []).some((c) => c.f === frame); $('fov').value = Math.round(viewCam().fov);
+  for (const b of $('parts').children) b.classList.toggle('sel', b.dataset.p === sel);
+}
+for (const [id, name] of PARTS) { const b = document.createElement('button'); b.textContent = name; b.dataset.p = id; b.title = name; b.onclick = () => { sel = id; tool = 'rotate'; syncUI(); render(); }; $('parts').appendChild(b); }
+for (const id of ['yaw', 'pitch', 'roll']) { const el = $(id); el.oninput = () => { if (!el.dataset.busy) { snapshot(); el.dataset.busy = 1; } editKey().pose[id] = +el.value * D; render(); }; el.onchange = () => { delete el.dataset.busy; save(); syncUI(); }; }
+$('toolMove').onclick = () => setTool('move'); $('toolRot').onclick = () => setTool('rotate');
+$('graphBtn').onclick = toggleGraph;
+$('camView').onclick = () => { camView = !camView; toast(camView ? 'Camera view: move the view to key the camera' : 'Free view'); syncUI(); render(); };
+$('camKey').onclick = () => { snapshot(); const c = Object.assign({}, viewCam()), k = anim.cams.find((q) => q.f === frame); if (k) k.cam = c; else { anim.cams.push({ f: frame, cam: c }); anim.cams.sort((a, b) => a.f - b.f); } save(); syncUI(); render(); toast('Camera key added'); };
+$('camDel').onclick = () => { const i = anim.cams.findIndex((q) => q.f === frame); if (i < 0) return; snapshot(); anim.cams.splice(i, 1); save(); syncUI(); render(); };
+$('camReset').onclick = () => { const d = { yaw: 0.45, pitch: 0.22, dist: 4.2, tx: 0, ty: 0.95, tz: 0, fov: 50 }; if (camView) { snapshot(); Object.assign(editCam(), d); save(); } else cam = d; syncUI(); render(); };
+$('fov').oninput = () => { const el = $('fov'); if (camView && !el.dataset.busy) { snapshot(); el.dataset.busy = 1; } editCam().fov = +el.value; render(); };
+$('fov').onchange = () => { delete $('fov').dataset.busy; save(); syncUI(); };
+function key3(e) { const c = e.code; if (c === 'KeyR') setTool('rotate'); else if (c === 'KeyG') setTool('move'); else if (c === 'KeyX') toggleGraph(); else if (c === 'KeyC') $('camView').click(); else if (c === 'KeyF') $('camReset').click(); else return false; return true; }
+
+// ---------- 2D or 3D? ----------
+function modeUI() {
+  const is3 = mode === '3d'; $('sec3').hidden = !is3; $('tilt2d').hidden = is3; $('graphBtn').hidden = !is3; $('modeBtn').textContent = is3 ? '3D ⇄' : '2D ⇄';
+  if (!is3 && graph) { graph = false; tl.classList.remove('graph'); }
+  $('hint').textContent = is3 ? 'drag dots to pose · drag empty space: orbit (Shift/right: pan, wheel: zoom) · R rotate rings · G move · J key · X graph · C camera' : 'drag joints to pose · hips: move (Shift: spin) · Space play · K key · Del delete · , . step';
+}
+function setMode(m) {
+  if (playing) togglePlay();
+  if (mode === '3d') anim3 = anim; else anim2 = anim;
+  mode = m; anim = m === '3d' ? anim3 : anim2;
+  if (!anim && m === '3d') { try { const s = JSON.parse(localStorage.getItem('otm-stick-anim3')); if (s && s.keys && s.keys.length && s.keys[0].pose.q) anim = s; } catch (e) {} }
+  if (!anim) loadPreset('Walk');
+  if (m === '3d' && !anim.cams) anim.cams = [];
+  undoStack.length = 0; redoStack.length = 0; drag = null; hover = null; frame = Math.min(frame, frames());
+  modeUI(); resize(); syncUI(); render();
+}
+function showMenu() { $('modeMenu').hidden = false; drawModeIcons(); setTimeout(() => $(mode === '3d' ? 'pick3d' : 'pick2d').focus(), 0); }
+function pickMode(m) {
+  $('modeMenu').hidden = true; setMode(m);
+  try { const k = 'otm-stick-seen' + (m === '3d' ? '3' : ''); if (!localStorage.getItem(k)) { localStorage.setItem(k, '1'); togglePlay(); } } catch (e) {} // the first time, play the walk
+}
+$('pick2d').onclick = () => pickMode('2d'); $('pick3d').onclick = () => pickMode('3d');
+$('modeBtn').onclick = showMenu;
+function drawModeIcons() {
+  const a = $('mm2').getContext('2d'), b = $('mm3').getContext('2d'), stick = (c, pts, w) => { c.lineWidth = w; c.lineCap = 'round'; c.beginPath(); for (const [p, q] of pts) { c.moveTo(p[0], p[1]); c.lineTo(q[0], q[1]); } c.stroke(); };
+  a.fillStyle = '#f2f0ea'; a.fillRect(0, 0, 320, 240); a.strokeStyle = 'rgba(21,20,26,0.07)'; a.lineWidth = 1; for (let i = 0; i < 320; i += 32) { a.beginPath(); a.moveTo(i, 0); a.lineTo(i, 240); a.stroke(); } for (let i = 8; i < 240; i += 32) { a.beginPath(); a.moveTo(0, i); a.lineTo(320, i); a.stroke(); }
+  a.strokeStyle = 'rgba(21,20,26,0.4)'; a.lineWidth = 2; a.beginPath(); a.moveTo(0, 200); a.lineTo(320, 200); a.stroke();
+  a.strokeStyle = a.fillStyle = '#15141a'; stick(a, [[[160, 130], [164, 80]], [[164, 84], [140, 108]], [[140, 108], [126, 128]], [[164, 84], [190, 104]], [[190, 104], [204, 90]], [[160, 130], [140, 162]], [[140, 162], [130, 198]], [[160, 130], [178, 164]], [[178, 164], [196, 190]]], 7);
+  a.beginPath(); a.arc(166, 64, 16, 0, Math.PI * 2); a.fill();
+  const gr = b.createLinearGradient(0, 0, 0, 240); gr.addColorStop(0, '#c9d3e3'); gr.addColorStop(1, '#eceef1'); b.fillStyle = gr; b.fillRect(0, 0, 320, 240);
+  b.strokeStyle = 'rgba(21,20,26,0.16)'; b.lineWidth = 1; for (let i = -6; i <= 6; i++) { b.beginPath(); b.moveTo(160 + i * 18, 150); b.lineTo(160 + i * 48, 240); b.stroke(); } for (const yy of [150, 160, 174, 192, 216]) { b.beginPath(); b.moveTo(0, yy); b.lineTo(320, yy); b.stroke(); }
+  b.fillStyle = 'rgba(21,20,26,0.15)'; b.beginPath(); b.ellipse(160, 196, 36, 10, 0, 0, Math.PI * 2); b.fill();
+  b.strokeStyle = '#4d8dff'; b.lineWidth = 3; b.beginPath(); b.ellipse(160, 128, 46, 14, 0, 0, Math.PI * 2); b.stroke(); b.strokeStyle = '#ff4d4d'; b.beginPath(); b.ellipse(160, 128, 14, 46, 0, 0, Math.PI * 2); b.stroke();
+  b.strokeStyle = b.fillStyle = '#15141a'; stick(b, [[[160, 132], [158, 82]], [[158, 86], [136, 116]], [[136, 116], [128, 140]], [[158, 86], [188, 100]], [[188, 100], [212, 84]], [[160, 132], [146, 164]], [[146, 164], [150, 196]], [[160, 132], [176, 162]], [[176, 162], [170, 194]]], 7);
+  b.beginPath(); b.arc(158, 66, 15, 0, Math.PI * 2); b.fill(); b.fillStyle = '#f2f0ea'; b.beginPath(); b.arc(153, 64, 2.4, 0, 7); b.arc(163, 64, 2.4, 0, 7); b.fill();
+  b.strokeStyle = '#2a7fd6'; b.lineWidth = 2; b.strokeRect(244, 24, 40, 26); b.beginPath(); b.moveTo(284, 37); b.lineTo(300, 28); b.lineTo(300, 46); b.closePath(); b.stroke();
+}
+
+// ---------- keyboard ----------
+addEventListener('keydown', (e) => {
+  const tg = e.composedPath()[0]; if (tg && tg.matches && tg.matches('input, select')) return;
+  if (e.key === 'Escape') { e.preventDefault(); quitApp(); return; }
+  if (!$('modeMenu').hidden) { if (e.key === '2') pickMode('2d'); else if (e.key === '3') pickMode('3d'); return; }
+  const ctl = e.ctrlKey || e.metaKey;
+  if (e.code === 'Space') { e.preventDefault(); togglePlay(); }
+  else if (ctl && e.code === 'KeyZ') { e.preventDefault(); e.shiftKey ? redo() : undo(); }
+  else if (ctl && e.code === 'KeyY') { e.preventDefault(); redo(); }
+  else if (ctl && e.code === 'KeyC') $('copy').click();
+  else if (ctl && e.code === 'KeyV') $('paste').click();
+  else if (e.code === 'KeyK' || e.code === 'KeyJ') addKey();
+  else if (e.code === 'KeyP') togglePlay();
+  else if (mode === '3d' && key3(e)) e.preventDefault();
+  else if (e.code === 'Delete' || e.code === 'Backspace') delKey();
+  else if (e.code === 'Comma') step(-1);
+  else if (e.code === 'Period') step(1);
+  else if (e.code === 'KeyO') $('onion').click();
+  else if (e.code === 'KeyI') $('ik').click();
+});
+
+// ---------- start ----------
+try { const s = JSON.parse(localStorage.getItem('otm-stick-anim')); if (s && s.keys && s.keys.length) anim = s; } catch (e) {}
+if (!anim) { loadPreset('Walk'); }
+addEventListener('resize', () => { resize(); render(); });
+resize(); syncUI(); render();
+showMenu(); // ask 2D or 3D every time it opens
+window.__sa = { get mode() { return mode; }, setMode, pickMode, solve3, get cam() { return cam; }, get anim() { return anim; }, poseAt, solve, get frame() { return frame; }, set frame(v) { frame = v; syncUI(); render(); }, togglePlay, get playing() { return playing; }, loadPreset };
+
+$('closeApp').onclick = quitApp;
+console.log('OTM Stick Animator loaded! Esc or ✕ Close closes it. Your animation is saved on this site.');
+})();
+</script>
+<script type="text/plain" id="otm-stomp-code">// OTM STOMP: stomp the tiny people. Paste into the browser console (F12 → Console) to play on any page. Esc closes it.
+(() => {
+
+if (window.__otmStompQuit) window.__otmStompQuit();
+const host = document.createElement('div');
+host.style.cssText = 'all: initial; position: fixed; inset: 0; z-index: 2147483647; display: block; background: #140d1f;';
+(document.body || document.documentElement).appendChild(host);
+const SH = host.attachShadow({ mode: 'open' });
+try { const f = document.createElement('link'); f.rel = 'stylesheet'; f.href = 'https://fonts.googleapis.com/css2?family=VT323&display=swap'; document.head.appendChild(f); } catch (e) {}
+const CV = document.createElement('canvas'); CV.style.cssText = 'position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; cursor: none; image-rendering: pixelated;'; SH.appendChild(CV);
+const closeBtn = document.createElement('button'); closeBtn.textContent = '✕ Close (Esc)';
+closeBtn.style.cssText = 'position: fixed; bottom: 10px; right: 10px; z-index: 2; font: 600 13px system-ui, sans-serif; color: #f3ecff; background: rgba(20,13,31,0.8); border: 1px solid #5a3560; border-radius: 8px; padding: 6px 10px; cursor: pointer;';
+SH.appendChild(closeBtn);
+let quitted = false;
+const _ls = [];
+const addEventListener = (t, f, o) => { window.addEventListener(t, f, o); _ls.push([t, f, o]); };
+function quitApp() { quitted = true; for (const [t, f, o] of _ls) window.removeEventListener(t, f, o); host.remove(); window.__otmStompQuit = null; }
+window.__otmStompQuit = () => quitApp();
+closeBtn.onclick = quitApp;
+
+// ---------- setup: everything is drawn on a small pixel canvas, then blown up ----------
+const cv = CV, out = cv.getContext('2d');
+const BW = 400, BH = 225, GROUND = 196;
+const buf = document.createElement('canvas'); buf.width = BW; buf.height = BH; const g = buf.getContext('2d');
+let S = 1, OX = 0, OY = 0, dpr = 1;
+function resize() {
+  dpr = Math.min(2, window.devicePixelRatio || 1); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr;
+  S = Math.min(cv.width / BW, cv.height / BH); OX = (cv.width - BW * S) / 2; OY = (cv.height - BH * S) / 2;
+}
+addEventListener('resize', resize); resize();
+const rnd = (a, b) => a + Math.random() * (b - a), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+let best = {}; try { best = JSON.parse(localStorage.getItem('otm-stomp-best')) || {}; } catch (e) {}
+const saveBest = () => { try { localStorage.setItem('otm-stomp-best', JSON.stringify(best)); } catch (e) {} };
+
+// ---------- the city (drawn once) ----------
+const city = document.createElement('canvas'); city.width = BW; city.height = BH;
+(function drawCity() {
+  const c = city.getContext('2d'), sky = c.createLinearGradient(0, 0, 0, GROUND);
+  sky.addColorStop(0, '#3b2350'); sky.addColorStop(0.6, '#6e3d6b'); sky.addColorStop(1, '#9b5a72'); c.fillStyle = sky; c.fillRect(0, 0, BW, GROUND);
+  let seed = 7; const r = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  const layer = (col, win, minH, maxH, wmin, wmax, lit) => { let x = -10; while (x < BW) { const w = Math.floor(wmin + r() * (wmax - wmin)), h = Math.floor(minH + r() * (maxH - minH)); c.fillStyle = col; c.fillRect(x, GROUND - h, w, h); for (let wy = GROUND - h + 5; wy < GROUND - 14; wy += 7) for (let wx = x + 3; wx < x + w - 3; wx += 5) { c.fillStyle = r() < lit ? win : 'rgba(0,0,0,0.18)'; c.fillRect(wx, wy, 2, 3); } x += w + Math.floor(r() * 4); } };
+  layer('#5a3560', '#c98bb0', 70, 150, 22, 44, 0.25);
+  layer('#43274d', '#ffcf8a', 40, 110, 26, 52, 0.35);
+  // a highway sign and a billboard
+  c.fillStyle = '#2b1a33'; c.fillRect(70, 150, 2, 40); c.fillRect(132, 150, 2, 40);
+  c.fillStyle = '#1f6b4f'; c.fillRect(64, 128, 76, 28); c.strokeStyle = '#d8f3e6'; c.strokeRect(65.5, 129.5, 73, 25);
+  c.fillStyle = '#d8f3e6'; c.fillRect(100, 134, 2, 16); c.beginPath(); c.moveTo(97, 137); c.lineTo(101, 132); c.lineTo(105, 137); c.fill(); c.fillRect(70, 135, 18, 2); c.fillRect(70, 141, 22, 2); c.fillRect(110, 135, 22, 2); c.fillRect(110, 141, 16, 2);
+  c.fillStyle = '#2b1a33'; c.fillRect(262, 152, 2, 40); c.fillStyle = '#e9dccf'; c.fillRect(244, 118, 40, 34); c.fillStyle = '#5ee0ff'; c.fillRect(248, 122, 32, 18); c.fillStyle = '#140d1f'; c.font = '10px VT323, monospace'; c.fillText('OTM', 254, 149);
+  // the street with hazard stripes
+  c.fillStyle = '#2a2233'; c.fillRect(0, GROUND, BW, BH - GROUND); c.fillStyle = '#4b4058'; c.fillRect(0, GROUND, BW, 2);
+  for (let x = -6; x < BW; x += 8) { c.fillStyle = '#d9d2e3'; c.beginPath(); c.moveTo(x, GROUND + 4); c.lineTo(x + 4, GROUND + 4); c.lineTo(x + 8, GROUND + 9); c.lineTo(x + 4, GROUND + 9); c.fill(); }
+  c.fillStyle = '#1b1522'; c.fillRect(0, GROUND + 10, BW, BH);
+})();
+
+// ---------- sound (made in code) ----------
+let AC = null;
+function sfx(type, k = 1) {
+  try {
+    if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); const t = AC.currentTime, o = AC.createOscillator(), v = AC.createGain(); o.connect(v); v.connect(AC.destination);
+    if (type === 'thud') { o.type = 'sine'; o.frequency.setValueAtTime(110 * (1.2 - 0.4 * k), t); o.frequency.exponentialRampToValueAtTime(30, t + 0.35); v.gain.setValueAtTime(0.6 * (0.6 + k * 0.5), t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.4); o.start(t); o.stop(t + 0.42);
+      const n = AC.createBufferSource(), b = AC.createBuffer(1, AC.sampleRate * 0.25, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length) ** 3; n.buffer = b; const ng = AC.createGain(); ng.gain.value = 0.25 * k + 0.1; n.connect(ng); ng.connect(AC.destination); n.start(t); }
+    else if (type === 'pop') { o.type = 'square'; o.frequency.setValueAtTime(rnd(600, 900), t); o.frequency.exponentialRampToValueAtTime(200, t + 0.06); v.gain.setValueAtTime(0.05, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.07); o.start(t); o.stop(t + 0.08); }
+    else if (type === 'charge') { o.type = 'triangle'; o.frequency.setValueAtTime(200 + k * 500, t); v.gain.setValueAtTime(0.04, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.08); o.start(t); o.stop(t + 0.09); }
+    else if (type === 'scrape') { const n = AC.createBufferSource(), b = AC.createBuffer(1, AC.sampleRate * 0.09, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length); n.buffer = b; const f = AC.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 500 + k * 900; const ng = AC.createGain(); ng.gain.value = 0.12; n.connect(f); f.connect(ng); ng.connect(AC.destination); n.start(t); return; }
+    else if (type === 'escape') { o.type = 'square'; o.frequency.setValueAtTime(330, t); o.frequency.setValueAtTime(247, t + 0.08); v.gain.setValueAtTime(0.04, t); v.gain.exponentialRampToValueAtTime(0.001, t + 0.18); o.start(t); o.stop(t + 0.2); }
+  } catch (e) {}
+}
+
+// ---------- game state ----------
+const MAX_ESCAPED = 1500, MAX_ANTS = 3000;
+let state = 'title', time = 0, ants = [], splats = [], fx = [], lines = [], stains = [], strings = [], shake = 0;
+let foot, run;
+function newRun() {
+  foot = { x: BW / 2, tx: BW / 2, y: GROUND - 70, vy: 0, mode: 'hover', charge: 0, planted: 0, pips: 0 };
+  run = { t: 0, kills: 0, escaped: 0, ego: 0, combo: 0, comboT: 0, bestCombo: 0, bestStomp: 0, bestEgo: 0, fullKills: 0, trash: 0, slideKills: 0, spawnT: 1 };
+  ants = []; splats = []; fx = []; lines = []; stains = []; strings = [];
+}
+newRun();
+// the people: tiny ink folk walking along the street
+const KINDS = {
+  walker: { sp: [12, 20], ego: 5 }, runner: { sp: [34, 46], ego: 10 }, trash: { sp: [10, 15], ego: 15 }, hard: { sp: [9, 13], ego: 12 },
+};
+function spawnGroup() {
+  if (ants.length > MAX_ANTS) return;
+  const left = Math.random() < 0.5, n = Math.floor(rnd(60, 140 + Math.min(260, run.t * 4)));
+  for (let i = 0; i < n; i++) {
+    const r = Math.random(), kind = run.t > 20 && r < 0.12 ? 'hard' : run.t > 10 && r < 0.27 ? 'runner' : r < 0.36 ? 'trash' : 'walker', K = KINDS[kind];
+    ants.push({ row: Math.floor(Math.random() * 4), x: left ? -4 - i * rnd(0.3, 1.3) : BW + 4 + i * rnd(0.3, 1.3), dir: left ? 1 : -1, sp: rnd(...K.sp) * (1 + run.t / 150), kind, y: 0, vy: 0, vx: 0, stun: 0, step: Math.random() * 6, helmet: kind === 'hard', panic: 0 });
+  }
+}
+// the giant sneaker (drawn 1.5x big): sole from x-39 (heel) to x+58 (toe)
+const SLIDE_TIME = 2.5, SLIDE_SPEED = 260, FS = 1.5, soleL = () => foot.x - 26 * FS, soleR = () => foot.x + 39 * FS;
+function stomp() { if (foot.mode !== 'hover' && foot.mode !== 'charge') return; foot.power = foot.charge; foot.mode = 'stomp'; foot.vy = 120 + foot.charge * 200; foot.charge = 0; }
+function slideCrush(dx) {
+  const L = soleL(), R = soleR(), front = dx > 0 ? R : L; let kills = 0, ego = 0;
+  for (const a of ants) {
+    if (a.dead || a.y < -10 || a.x < L - 1 || a.x > R + 1) continue;
+    if (a.helmet) { a.helmet = false; a.vy = -70; a.vx = Math.sign(dx) * 90; a.x = dx > 0 ? R + 3 : L - 3; a.stun = 1; fx.push({ t: 'helmet', x: a.x, y: GROUND - 6, vx: Math.sign(dx) * 60, vy: -90, life: 1 }); continue; }
+    a.dead = a.done = true; kills++; ego += KINDS[a.kind].ego; if (a.kind === 'trash') run.trash++;
+    if (fx.length < 5000) for (let i = 0; i < (kills > 30 ? 1 : 4); i++) fx.push({ t: 'ink', x: front + rnd(-2, 2), y: GROUND - 2, vx: Math.sign(dx) * rnd(40, 160), vy: -rnd(40, 160), life: 2, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
+    if (Math.random() < Math.min(1, 20 / Math.max(1, kills)) && stains.length < 400) stains.push({ dx: front - foot.x - Math.sign(dx) * rnd(0, 6), dy: -rnd(1, 10), life: rnd(4, 8), drip: 0, max: rnd(4, 14), s: 2 });
+    if (Math.random() < 0.3) fx.push({ t: 'halo', x: a.x, y: GROUND - 6, vy: -rnd(14, 24), life: 1.6, wob: Math.random() * 6 });
+  }
+  if (!kills) return;
+  if (Math.random() < 0.5) sfx('pop');
+  foot.inky = 1.5; foot.slideKills += kills; run.combo += kills; run.comboT = 1.6;
+  ego = Math.round(ego * (1 + Math.min(3, run.combo * 0.05))); run.kills += kills; run.ego += ego;
+  if (run.combo > run.bestCombo) run.bestCombo = run.combo;
+}
+function impact() {
+  const p = foot.power, full = p >= 0.999, L = soleL(), R = soleR();
+  shake = 3 + p * 6; sfx('thud', p);
+  let kills = 0, fullK = 0, trash = 0, egoGain = 0;
+  for (const a of ants) {
+    if (a.dead) continue;
+    const inside = a.x >= L - 1 && a.x <= R + 1 && a.y > -10, edge = a.x < L ? L - a.x : a.x - R;
+    if (inside && a.helmet && !full) { a.helmet = false; a.stun = 1.2; a.vy = -60; a.vx = (a.x < foot.x ? -1 : 1) * 50; fx.push({ t: 'helmet', x: a.x, y: GROUND - 6, vx: rnd(-30, 30), vy: -80, life: 1 }); continue; }
+    if (inside || (full && edge < 30 && a.y > -6)) { a.dead = true; kills++; if (!inside) fullK++; if (a.kind === 'trash') trash++; egoGain += KINDS[a.kind].ego; }
+    else if (edge < 45 + p * 25 && a.y > -4) { a.vy = -rnd(70, 110) * (0.5 + p); a.vx = (a.x < foot.x ? -1 : 1) * rnd(30, 70); a.stun = 1; }
+  }
+  for (let i = 0; i < 10 + p * 18; i++) fx.push({ t: 'dust', x: rnd(L - 6, R + 6), y: GROUND, vx: (Math.random() < 0.5 ? -1 : 1) * rnd(20, 90) * (1 + p), vy: -rnd(5, 40), life: rnd(0.4, 0.9) });
+  if (full) fx.push({ t: 'ring', x: foot.x + 6 * FS, y: GROUND, r: 30, life: 0.35 });
+  if (!kills) { run.combo = 0; return; }
+  run.combo += kills; run.comboT = 1.6;
+  const mult = 1 + Math.min(3, run.combo * 0.05) + (full ? 0.5 : 0); egoGain = Math.round(egoGain * mult);
+  run.kills += kills; run.ego += egoGain; run.fullKills += fullK; run.trash += trash;
+  for (const a of ants) if (a.dead && !a.done) { a.done = true; if (splats.length < 900) splats.push({ x: a.x, w: rnd(8, 15), life: 14, seed: Math.random() });
+    const under = a.x >= L && a.x <= R, ex = under ? (a.x - L < R - a.x ? L - 1 : R + 1) : a.x, out = under ? (ex < foot.x ? -1 : 1) : (a.x < foot.x ? -1 : 1), many = kills > 400 ? 0.06 : kills > 150 ? 0.12 : kills > 60 ? 0.25 : kills > 25 ? 0.5 : 1; // lots of people: fewer drops each, so it stays smooth
+    if (fx.length < 5000) for (let i = 0; i < Math.max(1, Math.round(20 * many)); i++) fx.push({ t: 'ink', x: ex + rnd(-2, 2), y: GROUND - 2, vx: (Math.random() < 0.75 ? out : -out) * rnd(10, 90) * (1 + p * 0.6), vy: -rnd(80, 300) * (0.7 + p * 0.5), life: 2.5, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
+    if (Math.random() < Math.min(1, 50 / kills)) fx.push({ t: 'spike', x: ex, h: rnd(30, 70) * (0.7 + p * 0.5), life: 0.45, seed: Math.random() * 99 });
+    if (under) for (let i = 0; i < 2; i++) if (strings.length < 140) { const gx = a.x + rnd(-4, 4); strings.push({ gx, dx: gx - foot.x + rnd(-3, 3), max: rnd(30, 120), w: Math.random() < 0.4 ? 2 : 1, sway: rnd(-8, 8), ph: Math.random() * 6 }); }
+    if (under) for (let i = 0; i < 4; i++) if (stains.length < 400) stains.push({ dx: a.x - foot.x + rnd(-4, 4), dy: -rnd(2, 18), life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: Math.random() < 0.5 ? 3 : 2 });
+    if (kills <= 8) fx.push({ t: 'num', x: a.x, y: GROUND - 14, txt: '+' + KINDS[a.kind].ego, life: 0.9, small: true }); if (Math.random() < Math.min(1, 80 / kills)) fx.push({ t: 'halo', x: a.x, y: GROUND - 6, vy: -rnd(14, 24), life: 1.6, wob: Math.random() * 6 }); if (Math.random() < 6 / kills) sfx('pop'); }
+  fx.push({ t: 'num', x: foot.x + 6 * FS, y: GROUND - 64, txt: '+' + kills, life: 1.1 });
+  // the stat lines in the corner, like the clip
+  const add = (txt) => lines.push({ txt, life: 2.6 });
+  if (run.combo > run.bestCombo) { run.bestCombo = run.combo; add(`+${run.combo} Highest Kill Combo`); }
+  if (kills > run.bestStomp) { run.bestStomp = kills; add(`+${kills} Most Ants Killed in One Stomp`); }
+  if (egoGain > run.bestEgo) { run.bestEgo = egoGain; add(`+${egoGain} Most Ego Gained in One Stomp`); }
+  if (full) add(`+${kills} Full Pressure Kills`);
+  if (trash) add(`+${trash} Trash Taken Out`);
+  while (lines.length > 5) lines.shift();
+}
+
+// ---------- input: move to aim, hold to load pressure, let go to stomp ----------
+let holding = false, keys = {};
+const toBuf = (e) => [((e.clientX * dpr) - OX) / S, ((e.clientY * dpr) - OY) / S];
+let mouseX = BW / 2;
+cv.addEventListener('pointermove', (e) => { mouseX = toBuf(e)[0]; foot.tx = clamp(mouseX - 6 * FS, 20, BW - 60); });
+cv.addEventListener('pointerdown', (e) => { cv.setPointerCapture(e.pointerId); mouseX = toBuf(e)[0]; foot.tx = clamp(mouseX - 6 * FS, 20, BW - 60); if (state !== 'play') return startGame(); holding = true; press(); });
+function press() { if (foot.mode === 'hover') foot.mode = 'charge'; else if (foot.mode === 'stomp') foot.wantSlide = true; else if (foot.mode === 'planted') startSlide(); }
+function startSlide() { foot.mode = 'slide'; foot.slideT = SLIDE_TIME; foot.slideKills = 0; foot.wantSlide = false; }
+function endSlide() { foot.mode = 'hover'; if (foot.slideKills) { run.slideKills += foot.slideKills; lines.push({ txt: `+${foot.slideKills} Slide Kills`, life: 2.6 }); while (lines.length > 5) lines.shift(); } foot.slideKills = 0; }
+const release = () => { if (holding && state === 'play') { if (foot.mode === 'slide') endSlide(); else if (foot.mode === 'stomp') foot.wantSlide = false; else stomp(); } holding = false; };
+cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', () => holding = false);
+addEventListener('keydown', (e) => {
+  if (e.code === 'Escape') { e.preventDefault(); quitApp(); return; }
+  keys[e.code] = true;
+  if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') { e.preventDefault(); if (state !== 'play') { if (!e.repeat) startGame(); return; } if (!holding) { holding = true; press(); } }
+  if (e.code === 'KeyP' && state === 'play') state = 'pause'; else if (e.code === 'KeyP' && state === 'pause') state = 'play';
+});
+addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') release(); });
+function startGame() { if (state === 'play') return; if (state === 'pause') { state = 'play'; return; } newRun(); state = 'play'; sfx('pop'); for (let i = 0; i < 3; i++) spawnGroup(); for (const a of ants) a.x += a.dir * rnd(30, 110); }
+
+// ---------- update ----------
+function update(dt) {
+  time += dt; shake = Math.max(0, shake - dt * 20);
+  for (const s of splats) s.life -= dt; splats = splats.filter((s) => s.life > 0);
+  for (const f of fx) { f.life -= dt; if (f.t === 'dust') { f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.92; f.vy += 60 * dt; } else if (f.t === 'halo') { f.y += f.vy * dt; } else if (f.t === 'num') f.y -= 18 * dt; else if (f.t === 'helmet') { f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 300 * dt; } else if (f.t === 'ring') f.r += 260 * dt;
+    else if (f.t === 'ink') { f.vy += 420 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.age += dt;
+      if (f.age > 0.04 && f.x > soleL() && f.x < soleR() && f.y > foot.y - 34 * FS && f.y < foot.y - 2 && Math.random() < 0.6) { if (stains.length < 400) stains.push({ dx: f.x - foot.x, dy: f.y - foot.y, life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: f.s }); f.life = 0; }
+      else if (f.y >= GROUND) { if (splats.length < 500) splats.push({ x: f.x, w: f.s + 1, life: 8, seed: Math.random(), dot: true }); f.life = 0; } } }
+  fx = fx.filter((f) => f.life > 0); for (const st of stains) { st.life -= dt; st.drip = Math.min(st.max || 7, st.drip + dt * rnd(0, 6)); } stains = stains.filter((st) => st.life > 0);
+  for (const sr of strings) { const len = GROUND - foot.y; // a strand snaps when the shoe lifts too far: one end hangs off the sole, the rest falls
+    if (len > sr.max || Math.abs(foot.x + sr.dx - sr.gx) > sr.max) { sr.dead = true; if (stains.length < 400) stains.push({ dx: sr.dx, dy: -1, life: rnd(3, 6), drip: Math.min(len, sr.max) * 0.45, max: Math.min(len, sr.max) * 0.5, s: sr.w });
+      for (let k = 0; k < 4; k++) fx.push({ t: 'ink', x: sr.gx + (foot.x + sr.dx - sr.gx) * k / 6, y: GROUND - len * (0.25 + k * 0.1), vx: rnd(-10, 10), vy: rnd(-20, 10), life: 1.5, age: 1, s: 1 }); } }
+  strings = strings.filter((sr) => !sr.dead); for (const l of lines) l.life -= dt; lines = lines.filter((l) => l.life > 0);
+  if (state !== 'play') { if (state === 'title') { foot.tx = BW / 2 + Math.sin(time * 0.7) * 120; foot.x += (foot.tx - foot.x) * Math.min(1, dt * 3); foot.y = GROUND - 80 + Math.sin(time * 2) * 4; } return; }
+  run.t += dt;
+  if (keys.ArrowLeft || keys.KeyA) foot.tx = clamp(foot.tx - 180 * dt, 20, BW - 40);
+  if (keys.ArrowRight || keys.KeyD) foot.tx = clamp(foot.tx + 180 * dt, 20, BW - 40);
+  const air = foot.mode === 'hover' || foot.mode === 'charge';
+  if (air) foot.x += (foot.tx - foot.x) * Math.min(1, dt * (foot.mode === 'charge' ? 5 : 9));
+  if (foot.mode === 'hover') foot.y += (GROUND - 70 - foot.y) * Math.min(1, dt * 8);
+  else if (foot.mode === 'charge') { const before = Math.floor(foot.charge * 4); foot.charge = Math.min(1, foot.charge + dt / 0.75); const now = Math.floor(foot.charge * 4); if (now > before) sfx('charge', foot.charge); foot.y += (GROUND - 70 - foot.charge * 70 - foot.y) * Math.min(1, dt * 10); }
+  else if (foot.mode === 'stomp') { foot.vy += 2800 * dt; foot.y += foot.vy * dt; if (foot.y >= GROUND) { foot.y = GROUND; foot.mode = 'planted'; foot.planted = 0.35; impact(); if (foot.wantSlide && holding) startSlide(); } }
+  else if (foot.mode === 'planted') { foot.planted -= dt; if (foot.planted <= 0) foot.mode = holding ? 'charge' : 'hover'; }
+  else if (foot.mode === 'slide') { // drag the shoe along the street, squashing everyone under it
+    foot.slideT -= dt; foot.y = GROUND; const dx = clamp(foot.tx - foot.x, -SLIDE_SPEED * dt, SLIDE_SPEED * dt); foot.x += dx;
+    if (Math.abs(dx) > 0.2) { slideCrush(dx); if ((foot.scrT = (foot.scrT || 0) - dt) <= 0) { foot.scrT = 0.07; sfx('scrape', Math.abs(dx) / (SLIDE_SPEED * dt)); }
+      if (Math.random() < 0.5) fx.push({ t: 'dust', x: dx > 0 ? soleL() : soleR(), y: GROUND, vx: -Math.sign(dx) * rnd(10, 40), vy: -rnd(5, 25), life: rnd(0.3, 0.6) });
+      if (foot.inky > 0 && splats.length < 900) splats.push({ x: (dx > 0 ? soleL() : soleR()) - dx / 2, w: Math.abs(dx) + 2, life: 10, seed: Math.random(), dot: true }); }
+    foot.inky = Math.max(0, (foot.inky || 0) - dt);
+    if (foot.slideT <= 0) endSlide(); }
+  if ((run.comboT -= dt) <= 0) run.combo = 0;
+  // crowds
+  if ((run.spawnT -= dt) <= 0) { spawnGroup(); run.spawnT = Math.max(0.35, rnd(0.8, 1.4) - run.t / 80); }
+  for (const a of ants) {
+    if (a.dead) continue;
+    if (a.y < 0 || a.vy) { a.vy += 300 * dt; a.y += a.vy * dt; a.x += a.vx * dt; if (a.y >= 0) { a.y = 0; a.vy = 0; a.vx = 0; } continue; }
+    if (a.stun > 0) { a.stun -= dt; continue; }
+    // they panic when the shoe hangs low over them
+    const near = Math.abs(a.x - (foot.x + 6 * FS)) < 46 && foot.y > GROUND - 120 && (foot.mode === 'hover' || foot.mode === 'charge' || foot.mode === 'slide');
+    let v = a.sp * a.dir;
+    if (near) { a.panic = 0.6; } if (a.panic > 0) { a.panic -= dt; v = (a.x < foot.x + 6 * FS ? -1 : 1) * a.sp * 1.9; }
+    // they can't walk through a planted shoe
+    if (foot.mode === 'planted' && a.x + v * dt > soleL() - 2 && a.x + v * dt < soleR() + 2) { a.dir = -a.dir; v = -v; }
+    a.x += v * dt; a.step += Math.abs(v) * dt * 0.6;
+    if ((a.dir > 0 && a.x > BW + 6) || (a.dir < 0 && a.x < -6) || (a.panic > 0 && (a.x > BW + 6 || a.x < -6))) { a.gone = true; run.escaped++; if (time - (run.escT || 0) > 0.2) { run.escT = time; sfx('escape'); } }
+  }
+  ants = ants.filter((a) => !a.dead && !a.gone);
+  if (run.escaped >= MAX_ESCAPED) gameOver();
+}
+function gameOver() {
+  state = 'over'; holding = false;
+  const rec = (k, v) => { if (!(best[k] >= v)) { best[k] = v; return true; } return false; };
+  run.newBest = rec('ego', run.ego); rec('kills', run.kills); rec('combo', run.bestCombo); rec('time', Math.floor(run.t)); saveBest();
+}
+
+// ---------- drawing ----------
+function drawAnt(a) {
+  const x = Math.round(a.x), y = Math.round(GROUND - 1 + a.y + (a.row || 0)), s = Math.floor(a.step) % 2, flip = a.panic > 0 ? (a.x < foot.x ? -1 : 1) : a.dir;
+  g.fillStyle = '#0d0a12';
+  if (a.stun > 0 && !a.y) { g.fillRect(x - 3, y - 2, 6, 2); g.fillRect(x + (flip > 0 ? 2 : -4), y - 3, 2, 2); return; } // knocked flat
+  g.fillRect(x - 1, y - 6, 2, 4); g.fillRect(x - 1, y - 9, 3, 3); // body + head
+  g.fillRect(x - 1 + (s ? -1 : 1), y - 2, 1, 2); g.fillRect(x + (s ? 1 : -1), y - 2, 1, 2); // legs
+  if (a.panic > 0) { g.fillRect(x - 2, y - 8, 1, 2); g.fillRect(x + 2, y - 8, 1, 2); } // arms up
+  g.fillStyle = '#ffffff'; g.fillRect(x + (flip > 0 ? 1 : -1), y - 8, 1, 1); // eye
+  if (a.kind === 'runner') { g.fillStyle = '#ff4d6d'; g.fillRect(x - (flip > 0 ? 3 : -1), y - 6, 3, 1); }
+  if (a.kind === 'trash') { g.fillStyle = '#e8e4ee'; g.fillRect(x - flip * 3 - 1, y - 6, 3, 4); g.fillStyle = '#9a90aa'; g.fillRect(x - flip * 3, y - 7, 1, 1); }
+  if (a.helmet) { g.fillStyle = '#ffcf3a'; g.fillRect(x - 2, y - 10, 5, 2); }
+}
+function drawFoot() {
+  const x = Math.round(foot.x), y = Math.round(foot.y), tw = foot.mode === 'charge' ? Math.round(Math.sin(time * 60) * foot.charge * 1.2) : 0, X = x + tw;
+  // the shadow on the street
+  const close = clamp(1 - (GROUND - y) / 160, 0.1, 1); g.fillStyle = `rgba(10,6,16,${0.18 + close * 0.35})`; g.beginPath(); g.ellipse(X + 6 * FS, GROUND + 3, 34 * FS * (0.6 + close * 0.4), 3, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.translate(X, y); g.scale(FS, FS); const top = -y / FS - 4; const X0 = X, y0 = y; { const X = 0, y = 0;
+  // trouser leg (navy with a faint pinstripe)
+  g.fillStyle = '#1d1b3a'; g.fillRect(X - 24, top, 32, -30 - top); g.fillStyle = '#2a2852'; for (let i = X - 20; i < X + 6; i += 7) g.fillRect(i, top, 1, -30 - top);
+  g.fillStyle = '#14122a'; g.fillRect(X - 26, y - 38, 36, 6); // cuff
+  // the sneaker: cyan high-top, white sole, toe to the right
+  g.fillStyle = '#2bb8e6'; g.beginPath(); g.moveTo(X - 24, y - 34); g.lineTo(X + 8, y - 34); g.lineTo(X + 12, y - 20); g.quadraticCurveTo(X + 36, y - 16, X + 39, y - 6); g.lineTo(X + 39, y - 4); g.lineTo(X - 26, y - 4); g.closePath(); g.fill();
+  g.fillStyle = '#5ee0ff'; g.fillRect(X - 22, y - 32, 4, 24); g.fillRect(X + 14, y - 15, 18, 2); // shine
+  g.fillStyle = '#ffffff'; for (let i = 0; i < 4; i++) g.fillRect(X - 4 + i * 4, y - 30 + i * 3, 6, 1); // laces
+  g.fillStyle = '#140d1f'; g.beginPath(); g.moveTo(X - 12, y - 18); g.lineTo(X + 6, y - 12); g.lineTo(X - 10, y - 10); g.fill(); // swoosh-ish stripe
+  g.fillStyle = '#f3ecff'; g.fillRect(X - 26, y - 5, 66, 4); g.fillStyle = '#b9b0c9'; g.fillRect(X - 26, y - 1, 66, 1); // sole
+  } g.restore();
+}
+function px(txt, x, y, col, size = 14, align = 'left') { g.font = `${size}px VT323, monospace`; g.textAlign = align; g.fillStyle = '#0d0a12'; g.fillText(txt, x + 1, y + 1); g.fillStyle = col; g.fillText(txt, x, y); }
+function fmtT(t) { t = Math.floor(t); return `${String(Math.floor(t / 3600)).padStart(2, '0')}:${String(Math.floor(t / 60) % 60).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`; }
+function draw() {
+  g.setTransform(1, 0, 0, 1, Math.round(rnd(-shake, shake)), Math.round(rnd(-shake, shake)));
+  g.drawImage(city, 0, 0);
+  for (const s of splats) { g.globalAlpha = Math.min(1, s.life / 3); g.fillStyle = '#0d0a12'; const sx = Math.round(s.x - s.w / 2); if (s.dot) { g.fillRect(sx, GROUND, s.w, 1); } else { g.fillRect(sx, GROUND, Math.round(s.w), 3); g.fillRect(sx + 2, GROUND - 1, Math.round(s.w) - 4, 1); for (let k = 0; k < 4; k++) g.fillRect(sx + Math.floor(((s.seed * 97 + k * 31) % 1) * s.w * 1.6 - s.w * 0.3), GROUND + 3 + (k % 2), 1 + (k % 2), 1); g.fillStyle = '#24305e'; g.fillRect(Math.round(s.x - 1), GROUND + 1, 2, 1); } g.globalAlpha = 1; }
+  for (const a of ants) drawAnt(a);
+  drawFoot();
+  g.strokeStyle = '#0d0a12'; for (const sr of strings) { const tx = foot.x + sr.dx, ty = foot.y - 1, len = GROUND - ty; if (len < 2) continue; const k = len / sr.max, sw = sr.sway * Math.sin(time * 3 + sr.ph) * Math.min(1, len / 30);
+    g.lineWidth = k > 0.7 ? 1 : sr.w; g.beginPath(); g.moveTo(sr.gx, GROUND); g.quadraticCurveTo((sr.gx + tx) / 2 + sw, GROUND - len / 2 + len * 0.1, tx, ty); g.stroke();
+    if (k < 0.7) { g.fillStyle = '#0d0a12'; g.fillRect(Math.round((sr.gx + tx) / 2 + sw / 2) - 1, Math.round(GROUND - len / 2), 2, 2); } }
+  g.fillStyle = '#0d0a12'; for (const st of stains) { g.globalAlpha = Math.min(1, st.life / 2); const x = Math.round(foot.x + st.dx), y = Math.round(foot.y + st.dy); g.fillRect(x, y, st.s + 1, st.s + 1); if (st.drip > 1) { const d = Math.round(st.drip); g.fillRect(x, y, 1, d); g.fillRect(x - (d > 6 ? 1 : 0), y + d - 1, d > 6 ? 2 : 1, 2); } } g.globalAlpha = 1;
+  for (const f of fx) {
+    g.globalAlpha = clamp(f.life * 2, 0, 1);
+    if (f.t === 'dust') { g.fillStyle = '#c9bfd8'; g.fillRect(Math.round(f.x), Math.round(f.y), 2, 2); }
+    else if (f.t === 'halo') { const x = Math.round(f.x + Math.sin(time * 4 + f.wob) * 2), y = Math.round(f.y); g.fillStyle = '#e8e4ee'; g.fillRect(x - 1, y - 4, 3, 4); g.fillStyle = '#ffd84a'; g.fillRect(x - 2, y - 7, 5, 1); }
+    else if (f.t === 'num') px(f.txt, f.x, f.y, '#5ee0ff', f.small ? 11 : 18, 'center');
+    else if (f.t === 'ink') { const col = Math.random() < 0.15 ? '#24305e' : '#0d0a12'; g.strokeStyle = col; g.lineWidth = Math.max(1, f.s - 1); g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x - f.vx * 0.035, f.y - f.vy * 0.035); g.stroke(); g.fillStyle = col; g.fillRect(Math.round(f.x), Math.round(f.y), f.s, f.s); }
+    else if (f.t === 'spike') { g.fillStyle = '#0d0a12'; const k = clamp(f.life / 0.4, 0, 1), h = f.h * (0.6 + 0.4 * (1 - k)); for (let j = 0; j < 8; j++) { const off = Math.sin(f.seed + j * 2.1) * 7, hh = h * (0.5 + 0.5 * Math.abs(Math.sin(f.seed * 3 + j))); g.fillRect(Math.round(f.x + off), Math.round(GROUND - hh), 1 + (j % 3), Math.round(hh)); g.fillRect(Math.round(f.x + off - 2), Math.round(GROUND - hh * 0.5), 5, 1); g.fillRect(Math.round(f.x + off + Math.sin(j + f.seed) * 2), Math.round(GROUND - hh - 2), 2, 2); } }
+    else if (f.t === 'helmet') { g.fillStyle = '#ffcf3a'; g.fillRect(Math.round(f.x) - 2, Math.round(f.y), 5, 2); }
+    else if (f.t === 'ring') { g.strokeStyle = '#5ee0ff'; g.lineWidth = 2; g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * 0.12, 0, 0, Math.PI * 2); g.stroke(); }
+    g.globalAlpha = 1;
+  }
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  // aim marker and pressure pips (fills as you hold)
+  if (state === 'play') {
+    const mx = Math.round(clamp(mouseX, 6, BW - 30)); g.strokeStyle = '#f3ecff'; g.lineWidth = 1; g.beginPath(); g.arc(mx, GROUND - 40, 3, 0, Math.PI * 2); g.stroke(); g.fillStyle = '#f3ecff'; g.fillRect(mx, GROUND - 40, 1, 1);
+    if (foot.mode === 'slide') for (let i = 0; i < 4; i++) { g.fillStyle = foot.slideT / SLIDE_TIME * 4 > i ? '#ff6b8a' : 'rgba(243,236,255,0.25)'; g.fillRect(mx + 8 + i * 5, GROUND - 42, 3, 3); } else
+    for (let i = 0; i < 4; i++) { const on = foot.charge * 4 > i + 0.01 || (foot.mode === 'charge' && foot.charge >= 1); g.fillStyle = on ? (foot.charge >= 1 ? '#5ee0ff' : '#f3ecff') : 'rgba(243,236,255,0.25)'; g.fillRect(mx + 8 + i * 5, GROUND - 42, 3, 3); }
+  }
+  // HUD: time, kills (+ combo), escaped
+  if (state !== 'title') {
+    let hx = 8; const hud = (t, col) => { px(t, hx, 15, col); hx += g.measureText(t).width + 12; };
+    hud(fmtT(run.t), '#f3ecff');
+    hud('KILLS ' + run.kills + (run.combo > 1 ? ' +' + run.combo : ''), run.combo > 1 ? '#ff6b8a' : '#f3ecff');
+    hud('AWAY ' + run.escaped + '/' + MAX_ESCAPED, run.escaped >= MAX_ESCAPED * 0.85 ? '#ff6b8a' : '#f3ecff');
+    px('EGO ' + run.ego, BW - 8, 15, '#5ee0ff', 16, 'right');
+    lines.forEach((l, i) => { g.globalAlpha = clamp(l.life * 1.5, 0, 1); px(l.txt, 14, 30 + i * 11, '#f3ecff', 14); g.globalAlpha = 1; });
+  }
+  if (state === 'title') {
+    g.fillStyle = 'rgba(20,13,31,0.55)'; g.fillRect(0, 0, BW, BH);
+    px('OTM STOMP', BW / 2, 62, '#5ee0ff', 48, 'center');
+    px('stomp the tiny people before they get away', BW / 2, 84, '#f3ecff', 14, 'center');
+    px('mouse or A/D to aim · hold click/Space: pressure', BW / 2, 102, '#a99bc4', 12, 'center');
+    px('let go to STOMP · 4 dots = shockwave', BW / 2, 113, '#a99bc4', 12, 'center');
+    px('click + HOLD right after a stomp to SLIDE', BW / 2, 137, '#ff6b8a', 13, 'center');
+    px('yellow hats need 4 dots · 1500 escape = game over', BW / 2, 124, '#a99bc4', 12, 'center');
+    px(Math.floor(time * 2) % 2 ? '▶ CLICK TO START' : '', BW / 2, 158, '#ffcf3a', 20, 'center');
+    if (best.ego) px(`best ego ${best.ego} · most kills ${best.kills} · best combo ${best.combo}`, BW / 2, 174, '#a99bc4', 12, 'center');
+  } else if (state === 'over') {
+    g.fillStyle = 'rgba(20,13,31,0.7)'; g.fillRect(0, 0, BW, BH);
+    px('TOO MANY GOT AWAY', BW / 2, 58, '#ff6b8a', 32, 'center');
+    px(`ego ${run.ego}${run.newBest ? '  ★ NEW BEST' : ''}`, BW / 2, 84, '#5ee0ff', 22, 'center');
+    px(`kills ${run.kills} · best combo ${run.bestCombo} · most in one stomp ${run.bestStomp}`, BW / 2, 102, '#f3ecff', 14, 'center');
+    px(`full pressure kills ${run.fullKills} · trash taken out ${run.trash} · slide kills ${run.slideKills} · time ${fmtT(run.t)}`, BW / 2, 116, '#f3ecff', 14, 'center');
+    px(`best ego ever ${best.ego || 0}`, BW / 2, 134, '#a99bc4', 14, 'center');
+    px(Math.floor(time * 2) % 2 ? '▶ CLICK TO STOMP AGAIN' : '', BW / 2, 160, '#ffcf3a', 20, 'center');
+  } else if (state === 'pause') { g.fillStyle = 'rgba(20,13,31,0.6)'; g.fillRect(0, 0, BW, BH); px('PAUSED · P or click to keep stomping', BW / 2, 112, '#f3ecff', 20, 'center'); }
+  // blow it up to the screen
+  out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#140d1f'; out.fillRect(0, 0, cv.width, cv.height);
+  out.imageSmoothingEnabled = false; out.drawImage(buf, OX, OY, BW * S, BH * S);
+}
+let last = performance.now();
+function loop(now) { if (quitted) return; const dt = Math.min(0.05, (now - last) / 1000); last = now; if (state !== 'pause') update(dt); draw(); requestAnimationFrame(loop); }
+requestAnimationFrame(loop);
+addEventListener('blur', () => { if (state === 'play') state = 'pause'; holding = false; });
+window.__stomp = { get run() { return run; }, get foot() { return foot; }, get ants() { return ants; }, get state() { return state; }, startGame, stomp, spawnGroup };
+
+console.log('OTM Stomp loaded! Esc or ✕ Close closes it.');
 })();
 </script>
 <script type="text/plain" id="otm-calc-code">// BIG TIME - OTM Games console calculator. Paste into the browser console and press Enter.
@@ -20906,6 +21905,12 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 <script>
 (() => {
   const RELEASES = [
+    { g: 'stomp', v: 'v1.5', t: 'Slide', n: ['Click and HOLD again right after a stomp to slide your shoe across the street', 'Everyone under the shoe gets squashed, and it smears an ink trail', 'Slides last 2.5 seconds (the pink dots show what is left). Hard hats get kicked away', 'New Slide Kills popup and stat'] },
+    { g: 'stomp', v: 'v1.4', t: '100x more people', n: ['Giant crowds: groups of 60 to 400 people, up to 3000 on the street at once', 'One stomp can squash hundreds', 'Game over is now 1500 escaped', 'The ink still flies, and it stays smooth even with huge crowds'] },
+    { g: 'stomp', v: 'v1.3', t: 'Console version', n: ['Copy the code and paste it into the console to stomp on any site', 'Works on strict sites too. Esc or ✕ Close closes it, and your best scores are saved on that site'] },
+    { g: 'stomp', v: 'v1.2', t: 'Stringy ink', n: ['Ink strands stretch between the shoe and the street when you lift your foot, then snap', 'Snapped strands hang off the sole and drip', 'Flying ink leaves streaky trails'] },
+    { g: 'stomp', v: 'v1.1', t: 'Way more people + ink splatter', n: ['Crowds are much bigger and keep coming faster (up to 280 on the street)', 'Every stomp sprays black ink splashes way up into the air like the clip', 'Ink sticks to the shoe and drips, and puddles stay on the street', 'Now 50 can get away before game over'] },
+    { g: 'stomp', v: 'v1.0', t: 'OTM Stomp', n: ['New: a giant sneaker stomping tiny people in a pixel city', 'Hold to load pressure, let go to stomp. Full pressure makes a shockwave', 'Combos, Most Killed in One Stomp, Full Pressure Kills and Trash Taken Out popups', 'Runners, trash carriers and hard-hat people. 20 get away and it\'s game over', 'Best ego, kills and combo are saved'] },
     { g: 'calc', v: 'v1.1', t: '7th grade math modes', n: ['New MODE button: pick what you are working on', 'Distributive property, combine like terms, factoring (GCF), solving equations and inequalities, fractions and mixed numbers', 'Percents (tax, tip, discount, % change, interest, percent error), ratios and proportions, circles, area and volume, angles, mean/median/mode and probability', 'Every answer shows the steps, so you can see how it was done'] },
     { g: 'calc', v: 'v1.0', t: 'Big Time', n: ['New: Big Time, a calculator you paste into the console on any site', 'Brackets, powers (^), square roots (√), %, π and factorials (!)', 'Type on your keyboard while hovering it, drag it anywhere, and click old answers to use them again', 'Works on strict sites like Google too'] },
     { g: 'speed', v: 'v2.5', t: 'Turns + 80 km/h wall jumps', n: ['The path turns more and more the further you get (in SLEEP and in later SLEEPRUNNING rounds), with shorter straights between turns', 'Every wall jump launches you at about 80 km/h (faster if you were already going faster)', 'Rounds give a little extra time for each turn'] },
@@ -20932,6 +21937,10 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     { g: 'mono', v: 'v1.7', t: 'Faster charts for intense songs', n: ['Fast songs get way more notes: Normal is about 50% faster on intense songs, Hard about 30%', 'When a song is too busy to chart every hit, it keeps the strongest beats instead of just the first one it finds', 'Quiet parts still stay empty'] },
     { g: 'mono', v: 'v1.6', t: 'Way more accurate custom songs', n: ['Custom songs now listen to every pitch (an FFT) instead of just bass and treble, so notes land on real hits', 'No more notes in quiet or silent parts of a song', 'Echoes and wobbles in held sounds no longer make notes', 'Notes are timed more exactly to the music', 'Songs you already saved get the new notes automatically'] },
     { g: 'stick', v: 'v12.4', t: 'Stage Builder in online games', n: ['Press B (or ✕ in the builder) during an online match for a 🧱 Build break', 'The fight freezes on both computers and you can both build at the same time', 'You see each other\'s blocks as you place them', 'Press B again to keep fighting on the new stage', 'The host\'s stage is still used when the match starts'] },
+    { g: 'anim', v: 'v2.0', t: '3D mode, like Eclipse', n: ['When the animator opens it asks: 2D or 3D?', 'New 3D mode: orbit the camera (drag empty space, Shift to pan, wheel to zoom) and pose the dots in 3D with IK', 'Rotate tool (R) with red/green/blue rings, a Parts list with R15 names, Turn/Flip/Lean sliders', 'Animate a camera: Camera view (C) keys the camera as you move it, with field of view; videos record through it', 'Graph editor (X) shows a part\'s rotation as curves, and J keys like in Eclipse'] },
+    { g: 'anim', v: 'v1.1', t: 'Console version', n: ['Copy the code and paste it into the console to animate on any site', 'Works on strict sites too. Esc or ✕ Close closes it, and your animation is saved on that site'] },
+    { g: 'anim', v: 'v1.0', t: 'OTM Stick Animator', n: ['New: a Roblox-style animation editor for stick figures', 'Drag joints to pose (hands and feet use IK), drag the hips to move, Shift to spin', 'A keyframe timeline with Roblox easing styles: Linear, Sine, Quad, Cubic, Back, Bounce, Elastic, Constant', 'Starter animations: Walk, Idle, Wave, Jump, Backflip, Punch', 'Onion skin, mirror, copy/paste poses, undo, save/open files and video export'] },
+    { g: 'lines', v: 'v1.1', t: 'Better hand tracking', n: ['Finds your hands more often, even when they are blurry, far away or partly hidden', 'No more flicker: if the camera loses your hand for a split second, the lines stay', 'Each hand keeps its own lines even when your hands cross', 'Smoother lines that still keep up when you move fast', 'Brightens the camera picture automatically in dark rooms'] },
     { g: 'lines', v: 'v1.0', t: '/open line engine', n: ['New: webcam hand tracking. Lines follow your fingers', 'Strings: rainbow strings between your fingertips', 'Window: a box between your hands that flips the video (invert, blue, pixel, thermal)', 'Laser: a red beam between your pointer fingers', 'Demo hands if you have no camera', 'Customize: colors, thickness, glow and more for every effect (press C)'] },
     { g: 'mori', v: 'v0.1', t: 'Moribund (in development)', n: ['New: a dark horror game. You wake up in a field of flowers outside a wall that never ends', 'Scan the dark with lidar dots, with Mori, God\'s assistant, guiding you', 'Act 1: the chase. Run from Rot, solve the lightbulb doors and find the power', 'Three save files'] },
     { g: 'stick', v: 'v12.2', t: 'More reliable room codes', n: ['Uses two matchmaking services at once, so one failing no longer stops you', 'New backup: 📋 Connect with codes (swap two codes through any chat)', 'Shows which step failed if it can\'t connect'] },
@@ -20972,11 +21981,13 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     gba: { title: 'Overlay GBA', ver: 'v1.0', code: $('otm-gba-code').textContent.replace(/^\n/, '') },
     snes: { title: 'Overlay SNES', ver: 'v1.0', code: $('otm-snes-code').textContent.replace(/^\n/, '') },
     mori: { title: 'Moribund', ver: 'v0.1', code: '' },
-    lines: { title: '/open line engine', ver: 'v1.0', code: '' },
+    lines: { title: '/open line engine', ver: 'v1.1', code: '' },
+    stomp: { title: 'OTM Stomp', ver: 'v1.5', code: $('otm-stomp-code').textContent.replace(/^\n/, '') },
+    anim: { title: 'OTM Stick Animator', ver: 'v2.0', code: $('otm-anim-code').textContent.replace(/^\n/, '') },
     speed: { title: 'Godspeed 💤 Good Try', ver: 'v2.5', code: $('otm-speed-code').textContent.replace(/^\n/, '') },
     calc: { title: 'Big Time', ver: 'v1.1', code: $('otm-calc-code').textContent.replace(/^\n/, '') },
   };
-  const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html';
+  const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html', ANIM_URL = 'stick-animator.html', STOMP_URL = 'otm-stomp.html';
   // creator code: unlocks the version of Moribund with the test buttons (checked by its SHA-256, the code isn't written here)
   const CREATOR_HASH = '64cf866e039356cca8d083eb06af1578cfaf365ab2a9621c17a7731603bd605f';
   let creator = null; try { localStorage.removeItem('moribund-creator'); creator = sessionStorage.getItem('moribund-creator'); } catch (e) {} // creator mode only lasts until you leave the site
@@ -20989,7 +22000,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
   };
   creatorMsg();
-  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.0', speed: 'v2.5', calc: 'v1.1' };
+  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v2.5', calc: 'v1.1', anim: 'v2.0', stomp: 'v1.5' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
@@ -21001,6 +22012,8 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     $('g-snes').setAttribute('aria-pressed', String(which === 'snes'));
     $('g-mori').setAttribute('aria-pressed', String(which === 'mori'));
     $('g-lines').setAttribute('aria-pressed', String(which === 'lines'));
+    $('g-anim').setAttribute('aria-pressed', String(which === 'anim'));
+    $('g-stomp').setAttribute('aria-pressed', String(which === 'stomp'));
     $('g-speed').setAttribute('aria-pressed', String(which === 'speed'));
     $('g-calc').setAttribute('aria-pressed', String(which === 'calc'));
     $('hint').hidden = true;
@@ -21015,9 +22028,11 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       $('code').value = g.code; $('code').scrollTop = 0;
       $('p-meta').textContent = `${g.code.split('\n').length.toLocaleString()} lines • ${Math.max(1, Math.round(g.code.length / 1024))} KB`;
       const page = which === 'mori' || which === 'lines'; // a full page: no code to paste
-      $('mori-note').hidden = which !== 'mori'; $('creator').hidden = which !== 'mori' && which !== 'mono'; $('lines-note').hidden = which !== 'lines'; $('speed-note').hidden = which !== 'speed'; $('calc-note').hidden = which !== 'calc'; $('copy').hidden = page; $('code').hidden = page;
+      $('mori-note').hidden = which !== 'mori'; $('creator').hidden = which !== 'mori' && which !== 'mono'; $('lines-note').hidden = which !== 'lines'; $('anim-note').hidden = which !== 'anim'; $('stomp-note').hidden = which !== 'stomp'; $('speed-note').hidden = which !== 'speed'; $('calc-note').hidden = which !== 'calc'; $('copy').hidden = page; $('code').hidden = page;
       for (const e of document.querySelectorAll('#panel .steps, #panel .note')) e.hidden = page;
       if (which === 'calc') $('play').textContent = '▶ Open here';
+      if (which === 'anim') $('play').textContent = '▶ Open the animator';
+      if (which === 'stomp') $('play').textContent = '▶ Open the game';
       if (page) { $('play').textContent = '▶ Play'; $('p-meta').textContent = 'opens the game'; }
     }
     try { localStorage.setItem('otm-games-pick', which); } catch (e) {}
@@ -21029,10 +22044,12 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-snes').onclick = () => choose('snes');
   $('g-mori').onclick = () => choose('mori');
   $('g-lines').onclick = () => choose('lines');
+  $('g-anim').onclick = () => choose('anim');
+  $('g-stomp').onclick = () => choose('stomp');
   $('g-speed').onclick = () => choose('speed');
   $('g-calc').onclick = () => choose('calc');
 
-  $('play').onclick = () => { if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !true) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
+  $('play').onclick = () => { if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !true) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'anim') { if (!window.open(ANIM_URL, '_blank')) location.href = ANIM_URL; return; } if (current === 'stomp') { if (!window.open(STOMP_URL, '_blank')) location.href = STOMP_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
   $('copy').onclick = () => {
     const box = $('code');
     const fallback = () => { box.focus(); box.select(); toast('Code selected — press Ctrl + C'); };
@@ -21050,7 +22067,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const head = document.createElement('div'); head.className = 'v';
       const num = document.createElement('span'); num.className = 'num'; num.textContent = r.v;
       const title = document.createElement('span'); title.className = 'title'; title.textContent = r.t;
-      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', mori: 'Moribund', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
+      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', mori: 'Moribund', anim: 'Stick Animator', stomp: 'OTM Stomp', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
       head.append(num, title, tag);
       const ul = document.createElement('ul');
       for (const n of r.n) { const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); }
@@ -21127,7 +22144,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     c.fillStyle = red(); c.beginPath(); c.arc(98, 78, 5, 0, Math.PI * 2); c.fill();
   };
   drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon();
-  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
+  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc'), $('g-anim'), $('g-stomp')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
   // Moribund: the teeth, shaking a little, red when picked
   const teeth = new Image(); teeth.src = 'data:image/png;base64,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';
   function drawMoriIcon() {
@@ -21152,6 +22169,37 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     requestAnimationFrame(drawLinesIcon);
   }
   requestAnimationFrame(drawLinesIcon);
+  // OTM Stick Animator: a stick figure walking, with keyframe diamonds on a little timeline
+  function drawAnimIcon(now) {
+    const c = $('ico-anim').getContext('2d'), on = $('g-anim').getAttribute('aria-pressed') === 'true', t = (now || 0) / 1000, w = Math.sin(t * 5);
+    c.clearRect(0, 0, 128, 128); c.fillStyle = on ? '#59d6ff' : '#f2f0ea'; c.beginPath(); c.roundRect(4, 4, 120, 120, 22); c.fill();
+    c.strokeStyle = '#15141a'; c.fillStyle = '#15141a'; c.lineWidth = 5; c.lineCap = 'round'; c.lineJoin = 'round';
+    const hip = [64, 66 - Math.abs(w) * 2], sh = [64, 40 - Math.abs(w) * 2];
+    const limb = (o, a1, a2, l) => { const k = [o[0] + Math.cos(a1) * l, o[1] + Math.sin(a1) * l], e = [k[0] + Math.cos(a2) * l, k[1] + Math.sin(a2) * l]; c.beginPath(); c.moveTo(o[0], o[1]); c.lineTo(k[0], k[1]); c.lineTo(e[0], e[1]); c.stroke(); };
+    c.beginPath(); c.moveTo(hip[0], hip[1]); c.lineTo(sh[0], sh[1]); c.stroke(); c.beginPath(); c.arc(64, sh[1] - 11, 9, 0, 7); c.fill();
+    limb(hip, Math.PI / 2 + w * 0.5, Math.PI / 2 + w * 0.5 + Math.max(0, -w) * 0.6, 13); limb(hip, Math.PI / 2 - w * 0.5, Math.PI / 2 - w * 0.5 + Math.max(0, w) * 0.6, 13);
+    limb(sh, Math.PI / 2 - w * 0.6, Math.PI / 2 - w * 0.6 - 0.4, 11); limb(sh, Math.PI / 2 + w * 0.6, Math.PI / 2 + w * 0.6 - 0.4, 11);
+    c.fillStyle = '#17151f'; c.fillRect(14, 100, 100, 14);
+    for (const x of [24, 50, 76, 102]) { c.save(); c.translate(x, 107); c.rotate(Math.PI / 4); c.fillStyle = '#ffcf4a'; c.fillRect(-3.5, -3.5, 7, 7); c.restore(); }
+    const ph = 18 + ((t * 0.35) % 1) * 92; c.fillStyle = '#59d6ff'; c.fillRect(ph - 1, 98, 2, 18);
+    requestAnimationFrame(drawAnimIcon);
+  }
+  requestAnimationFrame(drawAnimIcon);
+  // OTM Stomp: a cyan sneaker thumping down on a little crowd
+  function drawStompIcon(now) {
+    const c = $('ico-stomp').getContext('2d'), on = $('g-stomp').getAttribute('aria-pressed') === 'true', t = ((now || 0) / 1000) % 1.4;
+    c.clearRect(0, 0, 128, 128); const g = c.createLinearGradient(0, 0, 0, 128); g.addColorStop(0, on ? '#6e3d8b' : '#3b2350'); g.addColorStop(1, on ? '#b06a8a' : '#8a4f6a'); c.fillStyle = g; c.beginPath(); c.roundRect(4, 4, 120, 120, 22); c.fill();
+    c.fillStyle = '#2a2233'; c.fillRect(4, 98, 120, 22); for (let x = 8; x < 120; x += 10) { c.fillStyle = '#d9d2e3'; c.fillRect(x, 102, 5, 3); }
+    const down = t < 0.9 ? Math.max(0, (t - 0.6) / 0.3) ** 2 : 1, y = 58 + down * 40, hit = t > 0.9;
+    c.fillStyle = '#0d0a12'; for (const x of [18, 28, 100, 110]) { c.fillRect(x, 88, 4, 8); c.fillRect(x - 1, 83, 5, 5); }
+    if (!hit) for (const x of [52, 62, 72]) { c.fillRect(x, 88, 4, 8); c.fillRect(x - 1, 83, 5, 5); }
+    c.fillStyle = '#1d1b3a'; c.fillRect(42, 4, 30, y - 30);
+    c.fillStyle = '#2bb8e6'; c.beginPath(); c.moveTo(40, y - 32); c.lineTo(72, y - 32); c.lineTo(76, y - 18); c.quadraticCurveTo(96, y - 14, 98, y - 4); c.lineTo(38, y - 4); c.closePath(); c.fill();
+    c.fillStyle = '#f3ecff'; c.fillRect(38, y - 5, 61, 5);
+    if (hit) { c.fillStyle = '#c9bfd8'; for (let i = 0; i < 6; i++) c.fillRect(34 + i * 13 - (t - 0.9) * 30 * (i < 3 ? 1 : -1), 92 - (t - 0.9) * 20, 3, 3); }
+    requestAnimationFrame(drawStompIcon);
+  }
+  requestAnimationFrame(drawStompIcon);
   // Godspeed 💤 Good Try: a sleepy white face with a flower below it, gently breathing
   function drawSpeedIcon(now) {
     const c = $('ico-speed').getContext('2d'), on = $('g-speed').getAttribute('aria-pressed') === 'true', t = (now || 0) / 1000;
@@ -21209,7 +22257,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   if (document.fonts) document.fonts.ready.then(drawAll);
 
   // remember the last game you looked at
-  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
+  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc', 'anim', 'stomp'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
   drawAll();
 })();
 </script>
