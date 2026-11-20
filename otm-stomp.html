@@ -59,6 +59,11 @@ function sfx(type, k = 1) {
 }
 
 // ---------- game state ----------
+let gore = 'ink'; try { gore = localStorage.getItem('otm-stomp-gore') || 'ink'; } catch (e) {}
+let INK = '#0d0a12', INK2 = '#24305e';
+function applyGore() { if (gore === 'blood') { INK = '#9e1020'; INK2 = '#5c0710'; } else { INK = '#0d0a12'; INK2 = '#24305e'; } }
+applyGore();
+function toggleGore() { gore = gore === 'blood' ? 'ink' : 'blood'; applyGore(); try { localStorage.setItem('otm-stomp-gore', gore); } catch (e) {} }
 const MAX_ESCAPED = 1500, MAX_ANTS = 3000;
 let state = 'title', time = 0, ants = [], splats = [], fx = [], lines = [], stains = [], strings = [], shake = 0;
 let foot, run;
@@ -83,6 +88,11 @@ function spawnGroup() {
 // the giant sneaker (drawn 1.5x big): sole from x-39 (heel) to x+58 (toe)
 const SLIDE_TIME = 2.5, SLIDE_SPEED = 260, FS = 1.5, soleL = () => foot.x - 26 * FS, soleR = () => foot.x + 39 * FS;
 function stomp() { if (foot.mode !== 'hover' && foot.mode !== 'charge') return; foot.power = foot.charge; foot.mode = 'stomp'; foot.vy = 120 + foot.charge * 200; foot.charge = 0; }
+function spawnBits(x, out, p, many) {
+  if (fx.length > 5200 || Math.random() > many) return; const n = 3 + Math.floor(Math.random() * 2);
+  if (gore === 'blood') for (let i = 0; i < 2; i++) fx.push({ t: 'bit', organ: Math.random() < 0.5 ? '#d9607e' : '#6e0d1c', x: x + rnd(-2, 2), y: GROUND - 3, vx: (Math.random() < 0.6 ? out : -out) * rnd(15, 80), vy: -rnd(60, 180) * (0.7 + p * 0.5), a: 0, va: 0, len: 0, life: 9, bounced: 0, w: Math.random() < 0.5 ? 2 : 3 });
+  for (let i = 0; i < n; i++) { const head = i === 0 && Math.random() < 0.6; fx.push({ t: 'bit', head, x: x + rnd(-2, 2), y: GROUND - 3, vx: (Math.random() < 0.7 ? out : -out) * rnd(20, 110) * (1 + p * 0.5), vy: -rnd(70, 220) * (0.7 + p * 0.5), a: Math.random() * 6, va: rnd(-18, 18), len: head ? 0 : (Math.random() < 0.5 ? 3 : 4), life: 9, bounced: 0 }); }
+}
 function slideCrush(dx) {
   const L = soleL(), R = soleR(), front = dx > 0 ? R : L; let kills = 0, ego = 0;
   for (const a of ants) {
@@ -91,6 +101,7 @@ function slideCrush(dx) {
     a.dead = a.done = true; kills++; ego += KINDS[a.kind].ego; if (a.kind === 'trash') run.trash++;
     if (fx.length < 5000) for (let i = 0; i < (kills > 30 ? 1 : 4); i++) fx.push({ t: 'ink', x: front + rnd(-2, 2), y: GROUND - 2, vx: Math.sign(dx) * rnd(40, 160), vy: -rnd(40, 160), life: 2, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
     if (Math.random() < Math.min(1, 20 / Math.max(1, kills)) && stains.length < 400) stains.push({ dx: front - foot.x - Math.sign(dx) * rnd(0, 6), dy: -rnd(1, 10), life: rnd(4, 8), drip: 0, max: rnd(4, 14), s: 2 });
+    spawnBits(front, Math.sign(dx), 0.3, kills > 30 ? 0.15 : 0.6);
     if (Math.random() < 0.3) fx.push({ t: 'halo', x: a.x, y: GROUND - 6, vy: -rnd(14, 24), life: 1.6, wob: Math.random() * 6 });
   }
   if (!kills) return;
@@ -119,6 +130,7 @@ function impact() {
   for (const a of ants) if (a.dead && !a.done) { a.done = true; if (splats.length < 900) splats.push({ x: a.x, w: rnd(8, 15), life: 14, seed: Math.random() });
     const under = a.x >= L && a.x <= R, ex = under ? (a.x - L < R - a.x ? L - 1 : R + 1) : a.x, out = under ? (ex < foot.x ? -1 : 1) : (a.x < foot.x ? -1 : 1), many = kills > 400 ? 0.06 : kills > 150 ? 0.12 : kills > 60 ? 0.25 : kills > 25 ? 0.5 : 1; // lots of people: fewer drops each, so it stays smooth
     if (fx.length < 5000) for (let i = 0; i < Math.max(1, Math.round(20 * many)); i++) fx.push({ t: 'ink', x: ex + rnd(-2, 2), y: GROUND - 2, vx: (Math.random() < 0.75 ? out : -out) * rnd(10, 90) * (1 + p * 0.6), vy: -rnd(80, 300) * (0.7 + p * 0.5), life: 2.5, age: 0, s: Math.random() < 0.4 ? 3 : 2 });
+    spawnBits(ex, out, p, Math.min(1, 60 / kills));
     if (Math.random() < Math.min(1, 50 / kills)) fx.push({ t: 'spike', x: ex, h: rnd(30, 70) * (0.7 + p * 0.5), life: 0.45, seed: Math.random() * 99 });
     if (under) for (let i = 0; i < 2; i++) if (strings.length < 140) { const gx = a.x + rnd(-4, 4); strings.push({ gx, dx: gx - foot.x + rnd(-3, 3), max: rnd(30, 120), w: Math.random() < 0.4 ? 2 : 1, sway: rnd(-8, 8), ph: Math.random() * 6 }); }
     if (under) for (let i = 0; i < 4; i++) if (stains.length < 400) stains.push({ dx: a.x - foot.x + rnd(-4, 4), dy: -rnd(2, 18), life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: Math.random() < 0.5 ? 3 : 2 });
@@ -148,6 +160,7 @@ cv.addEventListener('pointerup', release); cv.addEventListener('pointercancel', 
 addEventListener('keydown', (e) => {
   keys[e.code] = true;
   if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') { e.preventDefault(); if (state !== 'play') { if (!e.repeat) startGame(); return; } if (!holding) { holding = true; press(); } }
+  if (e.code === 'KeyG' && state !== 'play') toggleGore();
   if (e.code === 'KeyP' && state === 'play') state = 'pause'; else if (e.code === 'KeyP' && state === 'pause') state = 'play';
 });
 addEventListener('keyup', (e) => { keys[e.code] = false; if (e.code === 'Space' || e.code === 'ArrowDown' || e.code === 'KeyS') release(); });
@@ -158,6 +171,7 @@ function update(dt) {
   time += dt; shake = Math.max(0, shake - dt * 20);
   for (const s of splats) s.life -= dt; splats = splats.filter((s) => s.life > 0);
   for (const f of fx) { f.life -= dt; if (f.t === 'dust') { f.x += f.vx * dt; f.y += f.vy * dt; f.vx *= 0.92; f.vy += 60 * dt; } else if (f.t === 'halo') { f.y += f.vy * dt; } else if (f.t === 'num') f.y -= 18 * dt; else if (f.t === 'helmet') { f.x += f.vx * dt; f.y += f.vy * dt; f.vy += 300 * dt; } else if (f.t === 'ring') f.r += 260 * dt;
+    else if (f.t === 'bit') { if (f.y < GROUND - 1 || f.vy < 0) { f.vy += 420 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.a += f.va * dt; if (f.y >= GROUND - 1 && f.vy > 0) { f.y = GROUND - 1; if (f.bounced++ < 2 && f.vy > 40) { f.vy *= -0.35; f.vx *= 0.5; f.va *= 0.5; } else { f.vy = 0; f.vx = 0; f.va = 0; } } } else if (foot.mode === 'slide' && f.x > soleL() && f.x < soleR()) f.x = foot.x + (f.x < foot.x + 6 * FS ? -26 : 39) * FS; }
     else if (f.t === 'ink') { f.vy += 420 * dt; f.x += f.vx * dt; f.y += f.vy * dt; f.age += dt;
       if (f.age > 0.04 && f.x > soleL() && f.x < soleR() && f.y > foot.y - 34 * FS && f.y < foot.y - 2 && Math.random() < 0.6) { if (stains.length < 400) stains.push({ dx: f.x - foot.x, dy: f.y - foot.y, life: rnd(5, 9), drip: 0, max: rnd(4, 18), s: f.s }); f.life = 0; }
       else if (f.y >= GROUND) { if (splats.length < 500) splats.push({ x: f.x, w: f.s + 1, life: 8, seed: Math.random(), dot: true }); f.life = 0; } } }
@@ -242,20 +256,21 @@ function fmtT(t) { t = Math.floor(t); return `${String(Math.floor(t / 3600)).pad
 function draw() {
   g.setTransform(1, 0, 0, 1, Math.round(rnd(-shake, shake)), Math.round(rnd(-shake, shake)));
   g.drawImage(city, 0, 0);
-  for (const s of splats) { g.globalAlpha = Math.min(1, s.life / 3); g.fillStyle = '#0d0a12'; const sx = Math.round(s.x - s.w / 2); if (s.dot) { g.fillRect(sx, GROUND, s.w, 1); } else { g.fillRect(sx, GROUND, Math.round(s.w), 3); g.fillRect(sx + 2, GROUND - 1, Math.round(s.w) - 4, 1); for (let k = 0; k < 4; k++) g.fillRect(sx + Math.floor(((s.seed * 97 + k * 31) % 1) * s.w * 1.6 - s.w * 0.3), GROUND + 3 + (k % 2), 1 + (k % 2), 1); g.fillStyle = '#24305e'; g.fillRect(Math.round(s.x - 1), GROUND + 1, 2, 1); } g.globalAlpha = 1; }
+  for (const s of splats) { g.globalAlpha = Math.min(1, s.life / 3); g.fillStyle = INK; const sx = Math.round(s.x - s.w / 2); if (s.dot) { g.fillRect(sx, GROUND, s.w, 1); } else { g.fillRect(sx, GROUND, Math.round(s.w), 3); g.fillRect(sx + 2, GROUND - 1, Math.round(s.w) - 4, 1); for (let k = 0; k < 4; k++) g.fillRect(sx + Math.floor(((s.seed * 97 + k * 31) % 1) * s.w * 1.6 - s.w * 0.3), GROUND + 3 + (k % 2), 1 + (k % 2), 1); g.fillStyle = INK2; g.fillRect(Math.round(s.x - 1), GROUND + 1, 2, 1); } g.globalAlpha = 1; }
   for (const a of ants) drawAnt(a);
   drawFoot();
-  g.strokeStyle = '#0d0a12'; for (const sr of strings) { const tx = foot.x + sr.dx, ty = foot.y - 1, len = GROUND - ty; if (len < 2) continue; const k = len / sr.max, sw = sr.sway * Math.sin(time * 3 + sr.ph) * Math.min(1, len / 30);
+  g.strokeStyle = INK; for (const sr of strings) { const tx = foot.x + sr.dx, ty = foot.y - 1, len = GROUND - ty; if (len < 2) continue; const k = len / sr.max, sw = sr.sway * Math.sin(time * 3 + sr.ph) * Math.min(1, len / 30);
     g.lineWidth = k > 0.7 ? 1 : sr.w; g.beginPath(); g.moveTo(sr.gx, GROUND); g.quadraticCurveTo((sr.gx + tx) / 2 + sw, GROUND - len / 2 + len * 0.1, tx, ty); g.stroke();
-    if (k < 0.7) { g.fillStyle = '#0d0a12'; g.fillRect(Math.round((sr.gx + tx) / 2 + sw / 2) - 1, Math.round(GROUND - len / 2), 2, 2); } }
-  g.fillStyle = '#0d0a12'; for (const st of stains) { g.globalAlpha = Math.min(1, st.life / 2); const x = Math.round(foot.x + st.dx), y = Math.round(foot.y + st.dy); g.fillRect(x, y, st.s + 1, st.s + 1); if (st.drip > 1) { const d = Math.round(st.drip); g.fillRect(x, y, 1, d); g.fillRect(x - (d > 6 ? 1 : 0), y + d - 1, d > 6 ? 2 : 1, 2); } } g.globalAlpha = 1;
+    if (k < 0.7) { g.fillStyle = INK; g.fillRect(Math.round((sr.gx + tx) / 2 + sw / 2) - 1, Math.round(GROUND - len / 2), 2, 2); } }
+  g.fillStyle = INK; for (const st of stains) { g.globalAlpha = Math.min(1, st.life / 2); const x = Math.round(foot.x + st.dx), y = Math.round(foot.y + st.dy); g.fillRect(x, y, st.s + 1, st.s + 1); if (st.drip > 1) { const d = Math.round(st.drip); g.fillRect(x, y, 1, d); g.fillRect(x - (d > 6 ? 1 : 0), y + d - 1, d > 6 ? 2 : 1, 2); } } g.globalAlpha = 1;
   for (const f of fx) {
     g.globalAlpha = clamp(f.life * 2, 0, 1);
     if (f.t === 'dust') { g.fillStyle = '#c9bfd8'; g.fillRect(Math.round(f.x), Math.round(f.y), 2, 2); }
     else if (f.t === 'halo') { const x = Math.round(f.x + Math.sin(time * 4 + f.wob) * 2), y = Math.round(f.y); g.fillStyle = '#e8e4ee'; g.fillRect(x - 1, y - 4, 3, 4); g.fillStyle = '#ffd84a'; g.fillRect(x - 2, y - 7, 5, 1); }
     else if (f.t === 'num') px(f.txt, f.x, f.y, '#5ee0ff', f.small ? 11 : 18, 'center');
-    else if (f.t === 'ink') { const col = Math.random() < 0.15 ? '#24305e' : '#0d0a12'; g.strokeStyle = col; g.lineWidth = Math.max(1, f.s - 1); g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x - f.vx * 0.035, f.y - f.vy * 0.035); g.stroke(); g.fillStyle = col; g.fillRect(Math.round(f.x), Math.round(f.y), f.s, f.s); }
-    else if (f.t === 'spike') { g.fillStyle = '#0d0a12'; const k = clamp(f.life / 0.4, 0, 1), h = f.h * (0.6 + 0.4 * (1 - k)); for (let j = 0; j < 8; j++) { const off = Math.sin(f.seed + j * 2.1) * 7, hh = h * (0.5 + 0.5 * Math.abs(Math.sin(f.seed * 3 + j))); g.fillRect(Math.round(f.x + off), Math.round(GROUND - hh), 1 + (j % 3), Math.round(hh)); g.fillRect(Math.round(f.x + off - 2), Math.round(GROUND - hh * 0.5), 5, 1); g.fillRect(Math.round(f.x + off + Math.sin(j + f.seed) * 2), Math.round(GROUND - hh - 2), 2, 2); } }
+    else if (f.t === 'bit') { g.globalAlpha = clamp(f.life / 2, 0, 1); g.fillStyle = '#0d0a12'; if (f.organ) { g.fillStyle = f.organ; g.fillRect(Math.round(f.x) - 1, Math.round(f.y) - 1, f.w, 2); g.fillStyle = INK; g.fillRect(Math.round(f.x) - 1, Math.round(f.y) + 1, f.w, 1); } else if (f.head) { g.fillRect(Math.round(f.x) - 1, Math.round(f.y) - 2, 3, 3); g.fillStyle = '#ffffff'; g.fillRect(Math.round(f.x), Math.round(f.y) - 1, 1, 1); } else { g.strokeStyle = '#0d0a12'; g.lineWidth = 1; g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x + Math.cos(f.a) * f.len, f.y + Math.sin(f.a) * f.len); g.stroke(); if (gore === 'blood') { g.fillStyle = INK; g.fillRect(Math.round(f.x), Math.round(f.y), 1, 1); } } }
+    else if (f.t === 'ink') { const col = Math.random() < 0.15 ? INK2 : INK; g.strokeStyle = col; g.lineWidth = Math.max(1, f.s - 1); g.beginPath(); g.moveTo(f.x, f.y); g.lineTo(f.x - f.vx * 0.035, f.y - f.vy * 0.035); g.stroke(); g.fillStyle = col; g.fillRect(Math.round(f.x), Math.round(f.y), f.s, f.s); }
+    else if (f.t === 'spike') { g.fillStyle = INK; const k = clamp(f.life / 0.4, 0, 1), h = f.h * (0.6 + 0.4 * (1 - k)); for (let j = 0; j < 8; j++) { const off = Math.sin(f.seed + j * 2.1) * 7, hh = h * (0.5 + 0.5 * Math.abs(Math.sin(f.seed * 3 + j))); g.fillRect(Math.round(f.x + off), Math.round(GROUND - hh), 1 + (j % 3), Math.round(hh)); g.fillRect(Math.round(f.x + off - 2), Math.round(GROUND - hh * 0.5), 5, 1); g.fillRect(Math.round(f.x + off + Math.sin(j + f.seed) * 2), Math.round(GROUND - hh - 2), 2, 2); } }
     else if (f.t === 'helmet') { g.fillStyle = '#ffcf3a'; g.fillRect(Math.round(f.x) - 2, Math.round(f.y), 5, 2); }
     else if (f.t === 'ring') { g.strokeStyle = '#5ee0ff'; g.lineWidth = 2; g.beginPath(); g.ellipse(f.x, f.y, f.r, f.r * 0.12, 0, 0, Math.PI * 2); g.stroke(); }
     g.globalAlpha = 1;
@@ -273,7 +288,7 @@ function draw() {
     hud(fmtT(run.t), '#f3ecff');
     hud('KILLS ' + run.kills + (run.combo > 1 ? ' +' + run.combo : ''), run.combo > 1 ? '#ff6b8a' : '#f3ecff');
     hud('AWAY ' + run.escaped + '/' + MAX_ESCAPED, run.escaped >= MAX_ESCAPED * 0.85 ? '#ff6b8a' : '#f3ecff');
-    px('EGO ' + run.ego, BW - 8, 15, '#5ee0ff', 16, 'right');
+    px('EGO ' + run.ego, BW - 8, 30, '#5ee0ff', 16, 'right');
     lines.forEach((l, i) => { g.globalAlpha = clamp(l.life * 1.5, 0, 1); px(l.txt, 14, 30 + i * 11, '#f3ecff', 14); g.globalAlpha = 1; });
   }
   if (state === 'title') {
@@ -283,6 +298,7 @@ function draw() {
     px('mouse or A/D to aim · hold click/Space: pressure', BW / 2, 102, '#a99bc4', 12, 'center');
     px('let go to STOMP · 4 dots = shockwave', BW / 2, 113, '#a99bc4', 12, 'center');
     px('click + HOLD right after a stomp to SLIDE', BW / 2, 137, '#ff6b8a', 13, 'center');
+    px('G: gore ' + (gore === 'blood' ? 'BLOOD (red + guts)' : 'INK (black)'), BW / 2, 192, gore === 'blood' ? '#ff4d5e' : '#a99bc4', 13, 'center');
     px('yellow hats need 4 dots · 1500 escape = game over', BW / 2, 124, '#a99bc4', 12, 'center');
     px(Math.floor(time * 2) % 2 ? '▶ CLICK TO START' : '', BW / 2, 158, '#ffcf3a', 20, 'center');
     if (best.ego) px(`best ego ${best.ego} · most kills ${best.kills} · best combo ${best.combo}`, BW / 2, 174, '#a99bc4', 12, 'center');
@@ -294,7 +310,8 @@ function draw() {
     px(`full pressure kills ${run.fullKills} · trash taken out ${run.trash} · slide kills ${run.slideKills} · time ${fmtT(run.t)}`, BW / 2, 116, '#f3ecff', 14, 'center');
     px(`best ego ever ${best.ego || 0}`, BW / 2, 134, '#a99bc4', 14, 'center');
     px(Math.floor(time * 2) % 2 ? '▶ CLICK TO STOMP AGAIN' : '', BW / 2, 160, '#ffcf3a', 20, 'center');
-  } else if (state === 'pause') { g.fillStyle = 'rgba(20,13,31,0.6)'; g.fillRect(0, 0, BW, BH); px('PAUSED · P or click to keep stomping', BW / 2, 112, '#f3ecff', 20, 'center'); }
+    px('G: gore ' + (gore === 'blood' ? 'BLOOD' : 'INK'), BW / 2, 192, '#a99bc4', 13, 'center');
+  } else if (state === 'pause') { g.fillStyle = 'rgba(20,13,31,0.6)'; g.fillRect(0, 0, BW, BH); px('PAUSED · P or click to keep stomping', BW / 2, 112, '#f3ecff', 20, 'center'); px('G: gore ' + (gore === 'blood' ? 'BLOOD' : 'INK'), BW / 2, 132, '#a99bc4', 13, 'center'); }
   // blow it up to the screen
   out.setTransform(1, 0, 0, 1, 0, 0); out.fillStyle = '#140d1f'; out.fillRect(0, 0, cv.width, cv.height);
   out.imageSmoothingEnabled = false; out.drawImage(buf, OX, OY, BW * S, BH * S);
