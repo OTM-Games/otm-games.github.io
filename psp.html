@@ -22,8 +22,8 @@ body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(-
 header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
 header h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: .01em; }
 header h1 span { color: var(--accent); }
-header a { color: var(--dim); text-decoration: none; font-size: 14px; }
-header a:hover { color: var(--ink); }
+header a.back { order: -1; color: #0b1020; background: var(--accent); text-decoration: none; font-weight: 600; font-size: 15px; padding: 8px 14px; border-radius: 10px; }
+header a.back:hover { filter: brightness(1.1); }
 .spacer { flex: 1; }
 .checks { display: flex; gap: 8px; flex-wrap: wrap; font: 12px var(--mono); }
 .chip { padding: 3px 9px; border-radius: 99px; background: var(--shell2); border: 1px solid var(--line); color: var(--dim); }
@@ -63,7 +63,7 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
       <span class="chip" id="c-cores">CPU …</span>
     </div>
     <div class="spacer"></div>
-    <a href="index.html">← OTM Games</a>
+    <a class="back" href="index.html">← Back to OTM Games</a>
   </header>
 
   <section class="shell">

@@ -41,6 +41,12 @@
 }
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
+#otm-game-view { position: fixed; inset: 0; z-index: 2147483000; display: flex; flex-direction: column; background: var(--paper); }
+#otm-game-view .gv-bar { display: flex; align-items: center; gap: 12px; padding: max(8px, env(safe-area-inset-top, 0px)) max(12px, env(safe-area-inset-right, 0px)) 8px max(12px, env(safe-area-inset-left, 0px)); background: var(--card); border-bottom: 2px solid var(--line); box-shadow: 0 2px 10px var(--shadow); }
+#otm-game-view .gv-back { font: 600 15px var(--body); color: #fff; background: var(--blue); border: 0; border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+#otm-game-view .gv-back:hover { filter: brightness(1.1); }
+#otm-game-view .gv-title { font: 800 17px var(--body); color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+#otm-game-view .gv-frame { flex: 1; width: 100%; border: 0; background: #000; }
 html, body { min-height: 100%; }
 body {
   margin: 0;
@@ -22768,6 +22774,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 <script>
 (() => {
   const RELEASES = [
+    { g: 'site', v: 'v1.1', t: 'OTM Games site', n: ['Games now open on top of the site, like Monochrome, instead of a new tab: Stick Animator, OTM Stomp, Open Line Engine and Moribund', 'A ← Back button (or your browser\'s Back) takes you right back to the menu', 'OTM PSP opens in the same tab and has a big Back button'] },
     { g: 'psp', v: 'v1.0', t: 'OTM PSP', n: ['New: a PSP emulator page (EmulatorJS PPSSPP) on the GitHub site', 'Load your own .iso or .cso game', 'Turns on browser threads with a helper file, so the PSP emulator can run on GitHub', 'Speed menu: Quality, Balanced, Speed and Turbo. Every preset keeps the PSP\'s own resolution for speed', 'Fullscreen, and the screen stays awake while you play'] },
     { g: 'ds', v: 'v1.7', t: 'Overlay DS', n: ['Really fixed sideways touch controls: up, down, left and right now go the way you move when the screens are turned'] },
     { g: 'ds', v: 'v1.6', t: 'Overlay DS', n: ['Fixed touch controls being upside down when the screens are turned'] },
@@ -22874,6 +22881,27 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     calc: { title: 'Big Time', ver: 'v1.2', code: $('otm-calc-code').textContent.replace(/^\n/, '') },
   };
   const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html', ANIM_URL = 'stick-animator.html', STOMP_URL = 'otm-stomp.html', PSP_URL = 'psp.html';
+  // Open a game page on top of the site (like Monochrome) with a Back button, instead of a new tab.
+  // Only on the GitHub site: the Claude version can't show other pages inside itself, so it still opens a new tab.
+  const IN_PAGE = true;
+  function openGame(url, title) {
+    if (!IN_PAGE) { if (!window.open(url, '_blank')) location.href = url; return; }
+    closeGame(true);
+    const wrap = document.createElement('div'); wrap.id = 'otm-game-view';
+    wrap.innerHTML = '<div class="gv-bar"><button type="button" class="gv-back">← Back to OTM Games</button><span class="gv-title"></span></div><iframe class="gv-frame" allow="fullscreen; autoplay; gamepad; pointer-lock; clipboard-write" allowfullscreen></iframe>';
+    wrap.querySelector('.gv-title').textContent = title;
+    const f = wrap.querySelector('iframe'); f.src = url; f.title = title;
+    wrap.querySelector('.gv-back').onclick = () => history.state && history.state.otmGame ? history.back() : closeGame();
+    document.body.appendChild(wrap); document.documentElement.style.overflow = 'hidden';
+    f.addEventListener('load', () => { try { f.contentWindow.focus(); } catch (e) {} });
+    try { history.pushState({ otmGame: 1 }, ''); } catch (e) {} // the browser's Back button closes the game too
+  }
+  function closeGame(quiet) {
+    const w = document.getElementById('otm-game-view'); if (!w) return;
+    w.remove(); document.documentElement.style.overflow = '';
+    if (!quiet) try { $('play').focus(); } catch (e) {}
+  }
+  window.addEventListener('popstate', () => closeGame());
   // creator code: unlocks the version of Moribund with the test buttons (checked by its SHA-256, the code isn't written here)
   const CREATOR_HASH = '64cf866e039356cca8d083eb06af1578cfaf365ab2a9621c17a7731603bd605f';
   let creator = null; try { localStorage.removeItem('moribund-creator'); creator = sessionStorage.getItem('moribund-creator'); } catch (e) {} // creator mode only lasts until you leave the site
@@ -22943,7 +22971,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-speed').onclick = () => choose('speed');
   $('g-calc').onclick = () => choose('calc');
 
-  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'psp') { if (!window.open(PSP_URL, '_blank')) location.href = PSP_URL; return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !true) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'anim') { if (!window.open(ANIM_URL, '_blank')) location.href = ANIM_URL; return; } if (current === 'stomp') { if (!window.open(STOMP_URL, '_blank')) location.href = STOMP_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
+  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'psp') { if (IN_PAGE) { location.href = PSP_URL; return; } if (!window.open(PSP_URL, '_blank')) location.href = PSP_URL; return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !IN_PAGE) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { openGame(LINES_URL, 'Open Line Engine'); return; } if (current === 'anim') { openGame(ANIM_URL, 'Stick Animator'); return; } if (current === 'stomp') { openGame(STOMP_URL, 'OTM Stomp'); return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); openGame(url, 'Moribund'); return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
   $('copy').onclick = () => {
     const box = $('code');
     const fallback = () => { box.focus(); box.select(); toast('Code selected — press Ctrl + C'); };
@@ -22961,7 +22989,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const head = document.createElement('div'); head.className = 'v';
       const num = document.createElement('span'); num.className = 'num'; num.textContent = r.v;
       const title = document.createElement('span'); title.className = 'title'; title.textContent = r.t;
-      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', ds: 'Overlay DS', mori: 'Moribund', anim: 'Stick Animator', stomp: 'OTM Stomp', utmod: 'Undertale Mod', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
+      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', ds: 'Overlay DS', psp: 'OTM PSP', site: 'OTM Games site', mori: 'Moribund', anim: 'Stick Animator', stomp: 'OTM Stomp', utmod: 'Undertale Mod', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
       head.append(num, title, tag);
       const ul = document.createElement('ul');
       for (const n of r.n) { const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); }
