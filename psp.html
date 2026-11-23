@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OTM PSP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* OTM PSP: a dark handheld shell around a 16:9 screen. Single dark look on purpose (it's a game screen). */
+:root {
+  --bg: #0e1118; --shell: #1a1f2b; --shell2: #232a39; --line: #313a4e; --ink: #eef2fa; --dim: #98a3ba;
+  --accent: #6c9bff; --good: #52d18a; --bad: #ff6b6b; --warn: #ffc857;
+  --body: 'Rubik', system-ui, -apple-system, 'Segoe UI', sans-serif; --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 var(--body); min-height: 100vh;
+  padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 32px max(16px, env(safe-area-inset-left, 0px)); }
+.wrap { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; }
+header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 28px; font-weight: 800; letter-spacing: .01em; }
+header h1 span { color: var(--accent); }
+header a { color: var(--dim); text-decoration: none; font-size: 14px; }
+header a:hover { color: var(--ink); }
+.spacer { flex: 1; }
+.checks { display: flex; gap: 8px; flex-wrap: wrap; font: 12px var(--mono); }
+.chip { padding: 3px 9px; border-radius: 99px; background: var(--shell2); border: 1px solid var(--line); color: var(--dim); }
+.chip.ok { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, var(--line)); }
+.chip.no { color: var(--bad); border-color: color-mix(in srgb, var(--bad) 40%, var(--line)); }
+.shell { background: var(--shell); border: 1px solid var(--line); border-radius: 28px; padding: 18px; box-shadow: 0 20px 60px rgba(0,0,0,.45); }
+.screen { position: relative; width: 100%; aspect-ratio: 480 / 272; background: #000; border-radius: 10px; overflow: hidden; }
+.screen:fullscreen { border-radius: 0; aspect-ratio: auto; }
+#game { position: absolute; inset: 0; }
+#cover { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; padding: 20px; color: var(--dim); }
+#cover b { color: var(--ink); font-size: 18px; }
+#cover .msg { max-width: 52ch; white-space: pre-line; }
+button, select { font: inherit; color: var(--ink); background: var(--shell2); border: 1px solid var(--line); border-radius: 10px; padding: 8px 14px; cursor: pointer; }
+button:hover, select:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #0b1020; font-weight: 700; padding: 10px 20px; }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+.bar label { color: var(--dim); font-size: 13px; display: flex; gap: 8px; align-items: center; }
+#status { font: 12.5px var(--mono); color: var(--dim); min-width: 0; }
+#status.bad { color: var(--bad); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.card { background: var(--shell); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; min-width: 0; }
+.card h2 { margin: 0 0 6px; font-size: 14px; text-transform: uppercase; letter-spacing: .08em; color: var(--accent); }
+.card ul { margin: 0; padding-left: 18px; color: var(--dim); }
+.card li + li { margin-top: 4px; }
+.card b { color: var(--ink); font-weight: 600; }
+kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; color: var(--ink); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>OTM <span>PSP</span></h1>
+    <div class="checks" aria-label="Browser checks">
+      <span class="chip" id="c-threads">threads …</span>
+      <span class="chip" id="c-gl">WebGL2 …</span>
+      <span class="chip" id="c-cores">CPU …</span>
+    </div>
+    <div class="spacer"></div>
+    <a href="index.html">← OTM Games</a>
+  </header>
+
+  <section class="shell">
+    <div class="screen" id="screen">
+      <div id="game"></div>
+      <div id="cover">
+        <b id="cover-title">Getting ready…</b>
+        <div class="msg" id="cover-msg">Checking your browser.</div>
+        <button class="primary" id="load" type="button" hidden>Load PSP game (.iso / .cso)</button>
+      </div>
+    </div>
+    <div class="bar">
+      <label>Speed
+        <select id="preset">
+          <option value="quality">Quality (every frame)</option>
+          <option value="balanced">Balanced (skips frames when it lags)</option>
+          <option value="speed">Speed (skips more, cheaper effects)</option>
+          <option value="turbo">Turbo (fastest, some games glitch)</option>
+        </select>
+      </label>
+      <button id="full" type="button" title="Fullscreen (F11 also works)">⛶ Fullscreen</button>
+      <div class="spacer"></div>
+      <span id="status">No game loaded</span>
+    </div>
+    <input type="file" id="file" accept=".iso,.cso,.pbp,.elf,.chd,.zip,.7z" hidden>
+  </section>
+
+  <div class="cards">
+    <div class="card">
+      <h2>Controls</h2>
+      <ul>
+        <li><b>D-pad</b> arrow keys · <b>Start</b> Enter</li>
+        <li>See or change every key in the game's bottom menu → <b>Control Settings</b></li>
+        <li>A <b>controller</b> works too: plug it in and press a button</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Make it run faster</h2>
+      <ul>
+        <li>Start on <b>Balanced</b>. If it still lags, try <b>Speed</b>, then <b>Turbo</b></li>
+        <li><b>Plug in your charger</b>: laptops and Chromebooks slow down on battery</li>
+        <li><b>Close other tabs</b>, and keep this tab in front</li>
+        <li>Lighter games (Patapon, LocoRoco, Lumines) run much better than big 3D ones (God of War, GTA)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h2>Saves</h2>
+      <ul>
+        <li>Save in the game like normal. Saves stay in this browser on this site</li>
+        <li>For a backup, use <b>Export Save File</b> in the game's bottom menu</li>
+        <li>Clearing your browser data deletes saves</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const CDN = 'https://cdn.emulatorjs.org/stable/data/';
+  const say = (t, bad) => { $('status').textContent = t; $('status').classList.toggle('bad', !!bad); };
+  const cover = (title, msg, showLoad) => { $('cover').hidden = false; $('cover-title').textContent = title; $('cover-msg').textContent = msg; $('load').hidden = !showLoad; };
+  const chip = (id, ok, text) => { const c = $(id); c.textContent = text; c.classList.toggle('ok', ok === true); c.classList.toggle('no', ok === false); };
+
+  // ---- speed presets (PPSSPP settings). Every preset keeps the PSP's own resolution (1x), which is the biggest speed win. ----
+  const BASE = { ppsspp_internal_resolution: '480x272', ppsspp_fast_memory: 'enabled', ppsspp_lazy_texture_caching: 'enabled', ppsspp_texture_scaling_level: 'disabled', ppsspp_texture_anisotropic_filtering: 'disabled', ppsspp_frameskiptype: 'Number of frames' };
+  const PRESETS = {
+    quality:  { ppsspp_auto_frameskip: 'disabled', ppsspp_frameskip: '0', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'High',   ppsspp_frame_duplication: 'disabled' },
+    balanced: { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '2', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'Medium', ppsspp_frame_duplication: 'enabled' },
+    speed:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '3', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'Low',    ppsspp_frame_duplication: 'enabled' },
+    turbo:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '4', ppsspp_skip_buffer_effects: 'enabled',  ppsspp_spline_quality: 'Low',    ppsspp_frame_duplication: 'enabled' },
+  };
+  const optionsFor = (p) => Object.assign({}, BASE, PRESETS[p] || PRESETS.balanced, { 'save-save-interval': '60' });
+  let preset = 'balanced'; try { preset = localStorage.getItem('otm-psp-preset') || 'balanced'; } catch (e) {}
+  if (!PRESETS[preset]) preset = 'balanced';
+  $('preset').value = preset;
+  $('preset').onchange = () => {
+    preset = $('preset').value; try { localStorage.setItem('otm-psp-preset', preset); } catch (e) {}
+    const em = window.EJS_emulator;
+    if (em && em.started && em.changeSettingOption) {
+      for (const [k, v] of Object.entries(optionsFor(preset))) { try { em.changeSettingOption(k, v); } catch (e) {} }
+      say('Speed set to ' + $('preset').selectedOptions[0].textContent.split(' (')[0] + '. Some changes need a restart (⟳ in the bottom menu)');
+    } else say('Speed: ' + $('preset').selectedOptions[0].textContent.split(' (')[0]);
+  };
+
+  // ---- browser checks ----
+  const gl = (() => { try { return !!document.createElement('canvas').getContext('webgl2'); } catch (e) { return false; } })();
+  chip('c-gl', gl, gl ? 'WebGL2 ✓' : 'WebGL2 ✗');
+  const cores = navigator.hardwareConcurrency || 0;
+  chip('c-cores', cores >= 4 ? true : null, 'CPU ' + (cores || '?') + ' cores');
+
+  // Threads need the page to be "cross-origin isolated". GitHub can't do that by itself, so coi-sw.js adds it, then we reload once.
+  async function getThreads() {
+    if (window.crossOriginIsolated) return true;
+    if (!('serviceWorker' in navigator) || !window.isSecureContext) return false;
+    let tried = false; try { tried = sessionStorage.getItem('otm-psp-coi') === '1'; } catch (e) {}
+    if (tried) return false;
+    try {
+      cover('Turning on threads…', 'The page will reload once. This only happens the first time.', false);
+      await navigator.serviceWorker.register('coi-sw.js');
+      await navigator.serviceWorker.ready;
+      try { sessionStorage.setItem('otm-psp-coi', '1'); } catch (e) {}
+      location.reload();
+      return new Promise(() => {}); // wait for the reload
+    } catch (e) { return false; }
+  }
+
+  (async () => {
+    const threads = await getThreads();
+    try { sessionStorage.removeItem('otm-psp-coi'); } catch (e) {}
+    chip('c-threads', threads, threads ? 'threads ✓' : 'threads ✗');
+    if (!gl) { cover("This browser can't run the PSP emulator", 'It needs WebGL2. Try the newest Chrome, and turn on "Use graphics acceleration" in Chrome settings → System.', false); say('WebGL2 is off', true); return; }
+    if (!threads) {
+      const where = location.protocol === 'file:' ? "You opened this as a file. It has to run from the OTM Games website (GitHub)." : "Threads couldn't be turned on here. Open it from the OTM Games GitHub site in Chrome, not in a private/incognito window.";
+      cover('The PSP emulator needs threads', where + '\n\nThen reload the page.', false); say('Threads are off', true); return;
+    }
+    cover('Pick a PSP game you own', 'No games are included. Load an .iso or .cso file.\nThe first load downloads the emulator, so give it a moment.', true);
+    say('Ready');
+  })();
+
+  // ---- load and start ----
+  let started = false;
+  $('load').onclick = () => $('file').click();
+  $('file').onchange = () => {
+    const f = $('file').files && $('file').files[0]; $('file').value = ''; if (!f || started) return;
+    started = true; $('cover').hidden = true; say('Loading the emulator… (first time takes a bit)');
+    const name = f.name.replace(/\.[^.]*$/, '');
+    document.title = name + ' · OTM PSP';
+    Object.assign(window, {
+      EJS_player: '#game', EJS_core: 'psp', EJS_gameUrl: URL.createObjectURL(f), EJS_gameName: name,
+      EJS_pathtodata: CDN, EJS_threads: true, EJS_startOnLoaded: true, EJS_color: '#6c9bff', EJS_backgroundColor: '#000',
+      EJS_defaultOptions: optionsFor(preset),
+      EJS_ready: () => say('Running: ' + f.name),
+      EJS_onGameStart: () => { say('Playing: ' + name + ' · Speed: ' + $('preset').selectedOptions[0].textContent.split(' (')[0]); keepAwake(); },
+    });
+    const s = document.createElement('script'); s.src = CDN + 'loader.js';
+    s.onerror = () => { started = false; cover("The emulator couldn't download", "Check your internet. If you're on a school network, it might block cdn.emulatorjs.org.", true); say("Couldn't load the emulator", true); };
+    document.head.appendChild(s);
+  };
+
+  // ---- keep the screen on while playing, and keep the tab fast ----
+  let lock = null;
+  async function keepAwake() { try { if ('wakeLock' in navigator && document.visibilityState === 'visible') lock = await navigator.wakeLock.request('screen'); } catch (e) {} }
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible' && started) keepAwake(); });
+
+  // ---- fullscreen ----
+  $('full').onclick = () => {
+    if (document.fullscreenElement) { document.exitFullscreen().catch(() => {}); return; }
+    $('screen').requestFullscreen().catch(() => say("Fullscreen isn't allowed here", true));
+  };
+  document.addEventListener('fullscreenchange', () => { $('full').textContent = document.fullscreenElement ? '🗗 Exit fullscreen' : '⛶ Fullscreen'; window.dispatchEvent(new Event('resize')); });
+})();
+</script>
+</body>
+</html>

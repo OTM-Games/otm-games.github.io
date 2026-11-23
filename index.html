@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Overlay DS, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
+<meta name="description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Overlay DS, OTM PSP, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
 <meta property="og:title" content="OTM Games">
-<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Overlay DS, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
+<meta property="og:description" content="OTM Games: free browser games. OTM Stickman Fight (7 fighters, 2 players, online with room codes), Monochrome OTM (a 4-lane rhythm game) Overlay GBA, Overlay SNES, Overlay DS, OTM PSP, Moribund (a horror game in development) /open line engine (webcam hand tracking), Godspeed (a 3D movement game), OTM Stomp (stomp the tiny people) and Big Time (a console calculator).">
 <title>OTM Games</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Doodle+Shadow&family=Rubik:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap">
@@ -211,6 +211,7 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <div class="variant" id="variant" role="group" aria-label="Which version" hidden>
       </div>
       <p class="site-note" id="gba-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .gba file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them.</p>
+      <p class="site-note" id="psp-note" hidden><b>OTM PSP is its own page</b> on the GitHub version of this site, so there's no console code. Press <b>▶ Open OTM PSP</b> and load a PSP game you own (.iso or .cso). It needs Chrome on a computer and loads the emulator from the internet. The PSP is heavy to emulate, so use the Speed menu and plug in your charger. If you're on the Claude version of this site, the button opens the GitHub one.</p>
       <p class="site-note" id="ds-note" hidden><b>Bring your own game:</b> no games are included. Press Load .nds game and pick a DS game you own, or a free homebrew game. The emulator (EmulatorJS) loads from its own website, so it needs internet. It works on the GitHub version of this site and on sites that allow outside code; strict sites (and the Claude version of this site) block it. Click the bottom screen to touch it.</p>
       <p class="site-note" id="snes-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .sfc or .smc file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them. Games with extra chips inside the cartridge (Star Fox, Super Mario Kart, Yoshi's Island) don't work yet.</p>
       <p class="site-note" id="mori-note" hidden><b>Moribund is a full game page</b>, so there's no console code to copy. Press <b>▶ Play</b> to open it. Use headphones, and click the game so the mouse can look around. Your save files stay in your browser.</p>
@@ -259,6 +260,11 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <canvas width="128" height="128" id="ico-ds" aria-hidden="true"></canvas>
       <span class="name">Overlay DS</span>
       <span class="sub">DS emulator • load your own game</span>
+    </button>
+    <button class="game" id="g-psp" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-psp" aria-hidden="true"></canvas>
+      <span class="name">OTM PSP</span>
+      <span class="sub">PSP emulator page • load your own game</span>
     </button>
     <button class="game" id="g-mori" type="button" aria-pressed="false">
       <canvas width="128" height="128" id="ico-mori" aria-hidden="true"></canvas>
@@ -312,6 +318,7 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
     <button type="button" data-g="gba" aria-pressed="false">GBA</button>
     <button type="button" data-g="snes" aria-pressed="false">SNES</button>
     <button type="button" data-g="ds" aria-pressed="false">DS</button>
+    <button type="button" data-g="psp" aria-pressed="false">PSP</button>
     <button type="button" data-g="mori" aria-pressed="false">Moribund</button>
     <button type="button" data-g="lines" aria-pressed="false">/open line engine</button>
     <button type="button" data-g="speed" aria-pressed="false">Godspeed 💤 Good Try</button>
@@ -8295,13 +8302,13 @@ window.URL=window.URL||window.webkitURL,this.video.vblankCallback=function(){t.s
   const bar = el('div', { display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 8px', background: '#25254a', cursor: 'move', touchAction: 'none', userSelect: 'none' });
   const title = el('div', { flex: '1', fontWeight: '600', letterSpacing: '.04em' }, 'DS');
   const tbtn = (t, tip) => { const b = el('button', { all: 'unset', cursor: 'pointer', color: TEXT, fontSize: '14px', width: '22px', height: '22px', textAlign: 'center', borderRadius: '5px' }, t); b.type = 'button'; b.title = tip; return b; };
-  const minBtn = tbtn('–', 'Minimize'), closeBtn = tbtn('×', 'Close and stop the emulator');
-  bar.append(title, minBtn, closeBtn); host.appendChild(bar);
+  const minBtn = tbtn('–', 'Minimize'), closeBtn = tbtn('×', 'Close and stop the emulator'), fullBtn = tbtn('⛶', 'Fullscreen (Alt+F, Esc to leave)'), rotBtn = tbtn('⟲', 'Rotate the screens (for sideways games like Rhythm Heaven)');
+  bar.append(title, rotBtn, fullBtn, minBtn, closeBtn); host.appendChild(bar);
   const body = el('div', { padding: '8px' }); host.appendChild(body);
 
   // where the emulator goes (both DS screens stacked)
   const frame = el('div', { position: 'relative', width: '404px', height: '560px', maxWidth: '100%', background: '#000', borderRadius: '6px', overflow: 'hidden' });
-  const game = el('div', { width: '100%', height: '100%' }); game.id = 'otm-ds-game';
+  const game = el('div', { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', transformOrigin: '50% 50%' }); game.id = 'otm-ds-game';
   const msg = el('div', { position: 'absolute', inset: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', textAlign: 'center', padding: '18px', color: DIM, fontSize: '13px', lineHeight: '1.5', whiteSpace: 'pre-line' });
   const msgText = el('div', null, 'Pick a .nds game you own\n(no games are included)');
   const btn = (t, tip, primary) => { const b = el('button', { all: 'unset', cursor: 'pointer', color: TEXT, background: primary ? ACCENT : '#34346a', padding: '7px 14px', borderRadius: '7px', border: '1px solid ' + BORDER, fontWeight: primary ? '700' : '400', fontSize: '12.5px' }, t); b.type = 'button'; if (tip) b.title = tip; return b; };
@@ -8313,8 +8320,21 @@ window.URL=window.URL||window.webkitURL,this.video.vblankCallback=function(){t.s
   msg.append(msgText, loadBtn, coreRow);
   frame.append(game, msg); body.appendChild(frame);
   const status = el('div', { marginTop: '6px', color: DIM, fontSize: '11px' }, 'No game loaded');
-  const help = el('div', { marginTop: '4px', color: DIM, fontSize: '10.5px', lineHeight: '1.45' }, 'Click the bottom screen to touch it. Keys and controller buttons can be changed in the emulator\'s ⚙ menu (bottom bar). To load a different game, reload the page and paste again.');
-  body.append(status, help);
+  // Speed: frameskip draws fewer frames so the game itself keeps full speed (a bit choppier, much less lag)
+  const speedRow = el('div', { display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px', fontSize: '11.5px' });
+  const speedSel = el('select', { background: '#25254a', color: TEXT, border: '1px solid ' + BORDER, borderRadius: '6px', padding: '4px', fontSize: '11.5px' });
+  for (const [v, t] of [['0', 'Smooth (no skip, laggy on slow computers)'], ['1', 'Faster (skip 1 frame)'], ['2', 'Fast (skip 2 frames)'], ['3', 'Fastest (skip 3 frames)']]) { const o = el('option', null, t); o.value = v; speedSel.appendChild(o); }
+  let savedSkip = '1'; try { savedSkip = localStorage.getItem('otm-ds-skip') || '1'; } catch (e) {}
+  speedSel.value = savedSkip;
+  speedRow.append(el('span', null, 'Speed:'), speedSel);
+  const setSkip = (v) => {
+    try { localStorage.setItem('otm-ds-skip', v); } catch (e) {}
+    window.EJS_defaultOptions = Object.assign(window.EJS_defaultOptions || {}, { desmume_frameskip: v });
+    try { const em = window.EJS_emulator; if (em && em.started && em.changeSettingOption) { em.changeSettingOption('desmume_frameskip', v); say('Speed changed (frameskip ' + v + ')'); } } catch (e) {}
+  };
+  speedSel.onchange = () => setSkip(speedSel.value);
+  const help = el('div', { marginTop: '4px', color: DIM, fontSize: '10.5px', lineHeight: '1.45' }, 'Lag? Pick a faster Speed, use the DeSmuME emulator (fastest), and close other tabs. Click the bottom screen to touch it. Keys and controller buttons can be changed in the emulator\'s ⚙ menu (bottom bar). To load a different game, reload the page and paste again.');
+  body.append(speedRow, status, help);
   const file = el('input', { display: 'none' }); file.type = 'file'; file.accept = '.nds,.zip,.7z'; host.appendChild(file);
   document.documentElement.appendChild(host);
 
@@ -8330,7 +8350,46 @@ window.URL=window.URL||window.webkitURL,this.video.vblankCallback=function(){t.s
     // EmulatorJS reads these settings when its loader starts
     window.EJS_player = '#otm-ds-game'; window.EJS_core = coreSel.value; window.EJS_gameUrl = URL.createObjectURL(f); window.EJS_gameName = f.name.replace(/\.[^.]*$/, '');
     window.EJS_pathtodata = CDN; window.EJS_startOnLoaded = true; window.EJS_color = ACCENT; window.EJS_backgroundColor = '#000';
-    window.EJS_ready = () => say('Running: ' + f.name);
+    setSkip(speedSel.value);
+    gameKey = f.name; let savedRot = 0; try { savedRot = +localStorage.getItem('otm-ds-rot:' + gameKey) || 0; } catch (e) {}
+    window.EJS_ready = () => { say('Running: ' + f.name + ' (if it lags, pick a faster Speed. Sideways game? press ⟲)'); setRot(savedRot); };
+    // sites with Trusted Types (like Google Docs) refuse plain script links; a "default" rule lets the emulator add its own scripts
+    try { if (window.trustedTypes && !trustedTypes.defaultPolicy) trustedTypes.createPolicy('default', { createScriptURL: (s) => s, createHTML: (s) => s, createScript: (s) => s }); } catch (e) {}
+    // the older DS core builds its helper functions with eval, which strict sites ban.
+    // So when the emulator sets up, swap in a version that calls the same functions without eval.
+    try {
+      let realGM;
+      Object.defineProperty(window, 'EJS_GameManager', { configurable: true, get: () => realGM, set: (GM) => {
+        if (typeof GM !== 'function') { realGM = GM; return; }
+        const Wrapped = function (Module, ...rest) {
+          if (Module && typeof Module.ccall === 'function') Module.cwrap = (id, ret, args) => (...a) => Module.ccall(id, ret, args || [], a);
+          return new GM(Module, ...rest);
+        };
+        Wrapped.prototype = GM.prototype; realGM = Wrapped;
+      } });
+    } catch (e) {}
+    // the core also uses cwrap inside its own code, so fix it in the core's text before it runs:
+    // the emulator turns the core into a Blob, so catch that Blob and make cwrap call ccall instead of eval
+    try {
+      if (!window.__otmDsBlobFix) {
+        const RealBlob = window.Blob, isText = (u8) => { for (let i = 0; i < Math.min(200, u8.length); i++) { const c = u8[i]; if (c < 9 || (c > 13 && c < 32) || c > 126) return false; } return true; };
+        const PatchedBlob = function (parts, opts) {
+          try {
+            const type = (opts && opts.type) || '';
+            if (parts && parts.length === 1 && (!type || /javascript/.test(type))) {
+              const p = parts[0], u8 = typeof p === 'string' ? null : p instanceof ArrayBuffer ? new Uint8Array(p) : ArrayBuffer.isView(p) ? new Uint8Array(p.buffer, p.byteOffset, p.byteLength) : null;
+              let txt = typeof p === 'string' ? p : (u8 && u8.length > 50000 && isText(u8)) ? new TextDecoder().decode(u8) : null;
+              if (txt && txt.includes('function cwrap')) {
+                const fixed = txt.replace(/function cwrap\s*\(\s*([\w$]+)\s*,\s*([\w$]+)\s*,\s*([\w$]+)\s*\)\s*\{/, (m, a, b, c) => m + 'return function(){return ccall(' + a + ',' + b + ',' + c + '||[],Array.prototype.slice.call(arguments));};');
+                if (fixed !== txt) parts = [fixed];
+              }
+            }
+          } catch (e) {}
+          return new RealBlob(parts, opts);
+        };
+        PatchedBlob.prototype = RealBlob.prototype; window.Blob = PatchedBlob; window.__otmDsBlobFix = true;
+      }
+    } catch (e) {}
     const onCsp = (e) => { if (String(e.blockedURI || '').includes('emulatorjs')) blocked(); };
     document.addEventListener('securitypolicyviolation', onCsp);
     try { const s = document.createElement('script'); s.src = CDN + 'loader.js'; s.onerror = blocked; document.head.appendChild(s); }
@@ -8344,12 +8403,73 @@ window.URL=window.URL||window.webkitURL,this.video.vblankCallback=function(){t.s
   const endDrag = () => { drag = null; }; bar.addEventListener('pointerup', endDrag); bar.addEventListener('pointercancel', endDrag);
 
   let mini = false;
-  minBtn.onclick = () => { mini = !mini; body.style.display = mini ? 'none' : 'block'; host.style.width = mini ? '200px' : '420px'; };
+  minBtn.onclick = () => { mini = !mini; body.style.display = mini ? 'none' : 'block'; host.style.width = mini ? '200px' : (rot ? '576px' : '420px'); };
   function close() {
     try { const em = window.EJS_emulator; if (em) { if (em.gameManager && em.gameManager.toggleMainLoop) em.gameManager.toggleMainLoop(0); if (em.Module && em.Module.AL && em.Module.AL.currentCtx) em.Module.AL.currentCtx.audioCtx.close(); } } catch (e) {}
     host.remove(); delete window.__overlayDS;
   }
   closeBtn.onclick = close;
+
+  // Rotate: some games (like Rhythm Heaven) are played holding the DS sideways like a book.
+  // Turn the screens with CSS, then turn each click/touch back so the emulator gets the spot on the un-turned screen.
+  let rot = 0, gameKey = '';
+  const isFullNow = () => document.fullscreenElement === frame;
+  function layout() {
+    const full = isFullNow(), side = rot !== 0;
+    if (!full) { frame.style.width = side ? '560px' : '404px'; frame.style.height = side ? '404px' : '560px'; host.style.width = mini ? '200px' : (side ? '576px' : '420px'); }
+    const fw = frame.clientWidth, fh = frame.clientHeight, gw = side ? fh : fw, gh = side ? fw : fh;
+    Object.assign(game.style, { width: gw + 'px', height: gh + 'px', left: (fw - gw) / 2 + 'px', top: (fh - gh) / 2 + 'px', transform: side ? 'rotate(' + rot + 'deg)' : '' });
+    rotBtn.textContent = rot === 0 ? '⟲' : rot === -90 ? '⟳' : '↺';
+    window.dispatchEvent(new Event('resize'));
+  }
+  const realRect = Element.prototype.getBoundingClientRect;
+  const canvasOf = () => game.querySelector('canvas');
+  function hookCanvas(c) {
+    if (!c || c.__otmRot) return; c.__otmRot = true;
+    // the emulator measures clicks against the canvas's box; give it the box the canvas would have if it wasn't turned
+    c.getBoundingClientRect = function () {
+      const b = realRect.call(this); if (!rot) return b;
+      const cx = b.left + b.width / 2, cy = b.top + b.height / 2, w = this.offsetWidth, h = this.offsetHeight;
+      return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2, width: w, height: h, x: cx - w / 2, y: cy - h / 2, toJSON() { return this; } };
+    };
+  }
+  const unturn = (c, x, y) => { // a spot you clicked on screen → the same spot on the un-turned canvas
+    const b = realRect.call(c), cx = b.left + b.width / 2, cy = b.top + b.height / 2, t = rot * Math.PI / 180, dx = x - cx, dy = y - cy;
+    return [cx + dx * Math.cos(t) + dy * Math.sin(t), cy - dx * Math.sin(t) + dy * Math.cos(t)];
+  };
+  const remap = (e) => {
+    const c = canvasOf(), tg = e.target;
+    // any click inside the game area (the emulator puts a see-through layer over the screen), but leave menu buttons and sliders alone
+    if (!rot || !e.isTrusted || !c || !(tg instanceof Element) || !game.contains(tg) || tg.closest('button,input,select,textarea,a,[class*="menu"],[class*="popup"]')) return;
+    hookCanvas(c); e.stopImmediatePropagation();
+    if (e.type.startsWith('touch')) {
+      e.preventDefault();
+      const mk = (l) => Array.from(l, (t) => { const [x, y] = unturn(c, t.clientX, t.clientY); return new Touch({ identifier: t.identifier, target: tg, clientX: x, clientY: y, pageX: x + scrollX, pageY: y + scrollY, screenX: t.screenX, screenY: t.screenY }); });
+      tg.dispatchEvent(new TouchEvent(e.type, { bubbles: true, cancelable: true, composed: true, touches: mk(e.touches), targetTouches: mk(e.targetTouches), changedTouches: mk(e.changedTouches) }));
+    } else {
+      const [x, y] = unturn(c, e.clientX, e.clientY), Ctor = e.type.startsWith('pointer') ? PointerEvent : MouseEvent;
+      tg.dispatchEvent(new Ctor(e.type, { bubbles: true, cancelable: true, composed: true, view: window, detail: e.detail, clientX: x, clientY: y, screenX: e.screenX, screenY: e.screenY, button: e.button, buttons: e.buttons, pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary, movementX: e.movementX, movementY: e.movementY, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, altKey: e.altKey, metaKey: e.metaKey }));
+    }
+  };
+  for (const t of ['mousedown', 'mouseup', 'mousemove', 'click', 'pointerdown', 'pointerup', 'pointermove', 'touchstart', 'touchmove', 'touchend', 'touchcancel']) window.addEventListener(t, remap, { capture: true, passive: false });
+  const setRot = (v) => { rot = v; hookCanvas(canvasOf()); try { if (gameKey) localStorage.setItem('otm-ds-rot:' + gameKey, String(v)); } catch (e) {} layout(); };
+  rotBtn.onclick = () => setRot(rot === 0 ? -90 : rot === -90 ? 90 : 0);
+
+  // fullscreen: the game box fills the whole screen (Esc or the button again to leave)
+  const isFull = () => document.fullscreenElement === frame;
+  fullBtn.onclick = () => {
+    if (isFull()) { document.exitFullscreen().catch(() => {}); return; }
+    if (mini) minBtn.click();
+    (frame.requestFullscreen ? frame.requestFullscreen() : Promise.reject()).catch(() => say("This site won't allow fullscreen", true));
+  };
+  document.addEventListener('fullscreenchange', () => {
+    const on = isFull();
+    Object.assign(frame.style, on ? { width: '100vw', height: '100vh', maxWidth: 'none', borderRadius: '0' } : { maxWidth: '100%', borderRadius: '6px' });
+    fullBtn.textContent = on ? '🗗' : '⛶';
+    layout(); // fit the screens (turned or not) and let the emulator resize
+  });
+  // Alt+F toggles fullscreen too (plain F might be a game button)
+  window.addEventListener('keydown', (e) => { if ((e.key === 'f' || e.key === 'F') && e.altKey && host.isConnected) { e.preventDefault(); fullBtn.click(); } });
   window.__overlayDS = { host, close, show() { if (mini) minBtn.click(); host.style.display = 'block'; } };
   console.log('Overlay DS loaded! Load a .nds game in the window. × closes it.');
 })();
@@ -15546,13 +15666,13 @@ console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Clos
   const bar = el('div', { display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 8px', background: '#25254a', cursor: 'move', touchAction: 'none', userSelect: 'none' });
   const title = el('div', { flex: '1', fontWeight: '600', letterSpacing: '.04em' }, 'DS');
   const tbtn = (t, tip) => { const b = el('button', { all: 'unset', cursor: 'pointer', color: TEXT, fontSize: '14px', width: '22px', height: '22px', textAlign: 'center', borderRadius: '5px' }, t); b.type = 'button'; b.title = tip; return b; };
-  const minBtn = tbtn('–', 'Minimize'), closeBtn = tbtn('×', 'Close and stop the emulator');
-  bar.append(title, minBtn, closeBtn); host.appendChild(bar);
+  const minBtn = tbtn('–', 'Minimize'), closeBtn = tbtn('×', 'Close and stop the emulator'), fullBtn = tbtn('⛶', 'Fullscreen (Alt+F, Esc to leave)'), rotBtn = tbtn('⟲', 'Rotate the screens (for sideways games like Rhythm Heaven)');
+  bar.append(title, rotBtn, fullBtn, minBtn, closeBtn); host.appendChild(bar);
   const body = el('div', { padding: '8px' }); host.appendChild(body);
 
   // where the emulator goes (both DS screens stacked)
   const frame = el('div', { position: 'relative', width: '404px', height: '560px', maxWidth: '100%', background: '#000', borderRadius: '6px', overflow: 'hidden' });
-  const game = el('div', { width: '100%', height: '100%' }); game.id = 'otm-ds-game';
+  const game = el('div', { position: 'absolute', left: '0', top: '0', width: '100%', height: '100%', transformOrigin: '50% 50%' }); game.id = 'otm-ds-game';
   const msg = el('div', { position: 'absolute', inset: '0', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px', textAlign: 'center', padding: '18px', color: DIM, fontSize: '13px', lineHeight: '1.5', whiteSpace: 'pre-line' });
   const msgText = el('div', null, 'Pick a .nds game you own\n(no games are included)');
   const btn = (t, tip, primary) => { const b = el('button', { all: 'unset', cursor: 'pointer', color: TEXT, background: primary ? ACCENT : '#34346a', padding: '7px 14px', borderRadius: '7px', border: '1px solid ' + BORDER, fontWeight: primary ? '700' : '400', fontSize: '12.5px' }, t); b.type = 'button'; if (tip) b.title = tip; return b; };
@@ -15564,8 +15684,21 @@ console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Clos
   msg.append(msgText, loadBtn, coreRow);
   frame.append(game, msg); body.appendChild(frame);
   const status = el('div', { marginTop: '6px', color: DIM, fontSize: '11px' }, 'No game loaded');
-  const help = el('div', { marginTop: '4px', color: DIM, fontSize: '10.5px', lineHeight: '1.45' }, 'Click the bottom screen to touch it. Keys and controller buttons can be changed in the emulator\'s ⚙ menu (bottom bar). To load a different game, reload the page and paste again.');
-  body.append(status, help);
+  // Speed: frameskip draws fewer frames so the game itself keeps full speed (a bit choppier, much less lag)
+  const speedRow = el('div', { display: 'flex', gap: '6px', alignItems: 'center', marginTop: '6px', fontSize: '11.5px' });
+  const speedSel = el('select', { background: '#25254a', color: TEXT, border: '1px solid ' + BORDER, borderRadius: '6px', padding: '4px', fontSize: '11.5px' });
+  for (const [v, t] of [['0', 'Smooth (no skip, laggy on slow computers)'], ['1', 'Faster (skip 1 frame)'], ['2', 'Fast (skip 2 frames)'], ['3', 'Fastest (skip 3 frames)']]) { const o = el('option', null, t); o.value = v; speedSel.appendChild(o); }
+  let savedSkip = '1'; try { savedSkip = localStorage.getItem('otm-ds-skip') || '1'; } catch (e) {}
+  speedSel.value = savedSkip;
+  speedRow.append(el('span', null, 'Speed:'), speedSel);
+  const setSkip = (v) => {
+    try { localStorage.setItem('otm-ds-skip', v); } catch (e) {}
+    window.EJS_defaultOptions = Object.assign(window.EJS_defaultOptions || {}, { desmume_frameskip: v });
+    try { const em = window.EJS_emulator; if (em && em.started && em.changeSettingOption) { em.changeSettingOption('desmume_frameskip', v); say('Speed changed (frameskip ' + v + ')'); } } catch (e) {}
+  };
+  speedSel.onchange = () => setSkip(speedSel.value);
+  const help = el('div', { marginTop: '4px', color: DIM, fontSize: '10.5px', lineHeight: '1.45' }, 'Lag? Pick a faster Speed, use the DeSmuME emulator (fastest), and close other tabs. Click the bottom screen to touch it. Keys and controller buttons can be changed in the emulator\'s ⚙ menu (bottom bar). To load a different game, reload the page and paste again.');
+  body.append(speedRow, status, help);
   const file = el('input', { display: 'none' }); file.type = 'file'; file.accept = '.nds,.zip,.7z'; host.appendChild(file);
   document.documentElement.appendChild(host);
 
@@ -15581,7 +15714,46 @@ console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Clos
     // EmulatorJS reads these settings when its loader starts
     window.EJS_player = '#otm-ds-game'; window.EJS_core = coreSel.value; window.EJS_gameUrl = URL.createObjectURL(f); window.EJS_gameName = f.name.replace(/\.[^.]*$/, '');
     window.EJS_pathtodata = CDN; window.EJS_startOnLoaded = true; window.EJS_color = ACCENT; window.EJS_backgroundColor = '#000';
-    window.EJS_ready = () => say('Running: ' + f.name);
+    setSkip(speedSel.value);
+    gameKey = f.name; let savedRot = 0; try { savedRot = +localStorage.getItem('otm-ds-rot:' + gameKey) || 0; } catch (e) {}
+    window.EJS_ready = () => { say('Running: ' + f.name + ' (if it lags, pick a faster Speed. Sideways game? press ⟲)'); setRot(savedRot); };
+    // sites with Trusted Types (like Google Docs) refuse plain script links; a "default" rule lets the emulator add its own scripts
+    try { if (window.trustedTypes && !trustedTypes.defaultPolicy) trustedTypes.createPolicy('default', { createScriptURL: (s) => s, createHTML: (s) => s, createScript: (s) => s }); } catch (e) {}
+    // the older DS core builds its helper functions with eval, which strict sites ban.
+    // So when the emulator sets up, swap in a version that calls the same functions without eval.
+    try {
+      let realGM;
+      Object.defineProperty(window, 'EJS_GameManager', { configurable: true, get: () => realGM, set: (GM) => {
+        if (typeof GM !== 'function') { realGM = GM; return; }
+        const Wrapped = function (Module, ...rest) {
+          if (Module && typeof Module.ccall === 'function') Module.cwrap = (id, ret, args) => (...a) => Module.ccall(id, ret, args || [], a);
+          return new GM(Module, ...rest);
+        };
+        Wrapped.prototype = GM.prototype; realGM = Wrapped;
+      } });
+    } catch (e) {}
+    // the core also uses cwrap inside its own code, so fix it in the core's text before it runs:
+    // the emulator turns the core into a Blob, so catch that Blob and make cwrap call ccall instead of eval
+    try {
+      if (!window.__otmDsBlobFix) {
+        const RealBlob = window.Blob, isText = (u8) => { for (let i = 0; i < Math.min(200, u8.length); i++) { const c = u8[i]; if (c < 9 || (c > 13 && c < 32) || c > 126) return false; } return true; };
+        const PatchedBlob = function (parts, opts) {
+          try {
+            const type = (opts && opts.type) || '';
+            if (parts && parts.length === 1 && (!type || /javascript/.test(type))) {
+              const p = parts[0], u8 = typeof p === 'string' ? null : p instanceof ArrayBuffer ? new Uint8Array(p) : ArrayBuffer.isView(p) ? new Uint8Array(p.buffer, p.byteOffset, p.byteLength) : null;
+              let txt = typeof p === 'string' ? p : (u8 && u8.length > 50000 && isText(u8)) ? new TextDecoder().decode(u8) : null;
+              if (txt && txt.includes('function cwrap')) {
+                const fixed = txt.replace(/function cwrap\s*\(\s*([\w$]+)\s*,\s*([\w$]+)\s*,\s*([\w$]+)\s*\)\s*\{/, (m, a, b, c) => m + 'return function(){return ccall(' + a + ',' + b + ',' + c + '||[],Array.prototype.slice.call(arguments));};');
+                if (fixed !== txt) parts = [fixed];
+              }
+            }
+          } catch (e) {}
+          return new RealBlob(parts, opts);
+        };
+        PatchedBlob.prototype = RealBlob.prototype; window.Blob = PatchedBlob; window.__otmDsBlobFix = true;
+      }
+    } catch (e) {}
     const onCsp = (e) => { if (String(e.blockedURI || '').includes('emulatorjs')) blocked(); };
     document.addEventListener('securitypolicyviolation', onCsp);
     try { const s = document.createElement('script'); s.src = CDN + 'loader.js'; s.onerror = blocked; document.head.appendChild(s); }
@@ -15595,12 +15767,73 @@ console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Clos
   const endDrag = () => { drag = null; }; bar.addEventListener('pointerup', endDrag); bar.addEventListener('pointercancel', endDrag);
 
   let mini = false;
-  minBtn.onclick = () => { mini = !mini; body.style.display = mini ? 'none' : 'block'; host.style.width = mini ? '200px' : '420px'; };
+  minBtn.onclick = () => { mini = !mini; body.style.display = mini ? 'none' : 'block'; host.style.width = mini ? '200px' : (rot ? '576px' : '420px'); };
   function close() {
     try { const em = window.EJS_emulator; if (em) { if (em.gameManager && em.gameManager.toggleMainLoop) em.gameManager.toggleMainLoop(0); if (em.Module && em.Module.AL && em.Module.AL.currentCtx) em.Module.AL.currentCtx.audioCtx.close(); } } catch (e) {}
     host.remove(); delete window.__overlayDS;
   }
   closeBtn.onclick = close;
+
+  // Rotate: some games (like Rhythm Heaven) are played holding the DS sideways like a book.
+  // Turn the screens with CSS, then turn each click/touch back so the emulator gets the spot on the un-turned screen.
+  let rot = 0, gameKey = '';
+  const isFullNow = () => document.fullscreenElement === frame;
+  function layout() {
+    const full = isFullNow(), side = rot !== 0;
+    if (!full) { frame.style.width = side ? '560px' : '404px'; frame.style.height = side ? '404px' : '560px'; host.style.width = mini ? '200px' : (side ? '576px' : '420px'); }
+    const fw = frame.clientWidth, fh = frame.clientHeight, gw = side ? fh : fw, gh = side ? fw : fh;
+    Object.assign(game.style, { width: gw + 'px', height: gh + 'px', left: (fw - gw) / 2 + 'px', top: (fh - gh) / 2 + 'px', transform: side ? 'rotate(' + rot + 'deg)' : '' });
+    rotBtn.textContent = rot === 0 ? '⟲' : rot === -90 ? '⟳' : '↺';
+    window.dispatchEvent(new Event('resize'));
+  }
+  const realRect = Element.prototype.getBoundingClientRect;
+  const canvasOf = () => game.querySelector('canvas');
+  function hookCanvas(c) {
+    if (!c || c.__otmRot) return; c.__otmRot = true;
+    // the emulator measures clicks against the canvas's box; give it the box the canvas would have if it wasn't turned
+    c.getBoundingClientRect = function () {
+      const b = realRect.call(this); if (!rot) return b;
+      const cx = b.left + b.width / 2, cy = b.top + b.height / 2, w = this.offsetWidth, h = this.offsetHeight;
+      return { left: cx - w / 2, top: cy - h / 2, right: cx + w / 2, bottom: cy + h / 2, width: w, height: h, x: cx - w / 2, y: cy - h / 2, toJSON() { return this; } };
+    };
+  }
+  const unturn = (c, x, y) => { // a spot you clicked on screen → the same spot on the un-turned canvas
+    const b = realRect.call(c), cx = b.left + b.width / 2, cy = b.top + b.height / 2, t = rot * Math.PI / 180, dx = x - cx, dy = y - cy;
+    return [cx + dx * Math.cos(t) + dy * Math.sin(t), cy - dx * Math.sin(t) + dy * Math.cos(t)];
+  };
+  const remap = (e) => {
+    const c = canvasOf(), tg = e.target;
+    // any click inside the game area (the emulator puts a see-through layer over the screen), but leave menu buttons and sliders alone
+    if (!rot || !e.isTrusted || !c || !(tg instanceof Element) || !game.contains(tg) || tg.closest('button,input,select,textarea,a,[class*="menu"],[class*="popup"]')) return;
+    hookCanvas(c); e.stopImmediatePropagation();
+    if (e.type.startsWith('touch')) {
+      e.preventDefault();
+      const mk = (l) => Array.from(l, (t) => { const [x, y] = unturn(c, t.clientX, t.clientY); return new Touch({ identifier: t.identifier, target: tg, clientX: x, clientY: y, pageX: x + scrollX, pageY: y + scrollY, screenX: t.screenX, screenY: t.screenY }); });
+      tg.dispatchEvent(new TouchEvent(e.type, { bubbles: true, cancelable: true, composed: true, touches: mk(e.touches), targetTouches: mk(e.targetTouches), changedTouches: mk(e.changedTouches) }));
+    } else {
+      const [x, y] = unturn(c, e.clientX, e.clientY), Ctor = e.type.startsWith('pointer') ? PointerEvent : MouseEvent;
+      tg.dispatchEvent(new Ctor(e.type, { bubbles: true, cancelable: true, composed: true, view: window, detail: e.detail, clientX: x, clientY: y, screenX: e.screenX, screenY: e.screenY, button: e.button, buttons: e.buttons, pointerId: e.pointerId, pointerType: e.pointerType, isPrimary: e.isPrimary, movementX: e.movementX, movementY: e.movementY, ctrlKey: e.ctrlKey, shiftKey: e.shiftKey, altKey: e.altKey, metaKey: e.metaKey }));
+    }
+  };
+  for (const t of ['mousedown', 'mouseup', 'mousemove', 'click', 'pointerdown', 'pointerup', 'pointermove', 'touchstart', 'touchmove', 'touchend', 'touchcancel']) window.addEventListener(t, remap, { capture: true, passive: false });
+  const setRot = (v) => { rot = v; hookCanvas(canvasOf()); try { if (gameKey) localStorage.setItem('otm-ds-rot:' + gameKey, String(v)); } catch (e) {} layout(); };
+  rotBtn.onclick = () => setRot(rot === 0 ? -90 : rot === -90 ? 90 : 0);
+
+  // fullscreen: the game box fills the whole screen (Esc or the button again to leave)
+  const isFull = () => document.fullscreenElement === frame;
+  fullBtn.onclick = () => {
+    if (isFull()) { document.exitFullscreen().catch(() => {}); return; }
+    if (mini) minBtn.click();
+    (frame.requestFullscreen ? frame.requestFullscreen() : Promise.reject()).catch(() => say("This site won't allow fullscreen", true));
+  };
+  document.addEventListener('fullscreenchange', () => {
+    const on = isFull();
+    Object.assign(frame.style, on ? { width: '100vw', height: '100vh', maxWidth: 'none', borderRadius: '0' } : { maxWidth: '100%', borderRadius: '6px' });
+    fullBtn.textContent = on ? '🗗' : '⛶';
+    layout(); // fit the screens (turned or not) and let the emulator resize
+  });
+  // Alt+F toggles fullscreen too (plain F might be a game button)
+  window.addEventListener('keydown', (e) => { if ((e.key === 'f' || e.key === 'F') && e.altKey && host.isConnected) { e.preventDefault(); fullBtn.click(); } });
   window.__overlayDS = { host, close, show() { if (mini) minBtn.click(); host.style.display = 'block'; } };
   console.log('Overlay DS loaded! Load a .nds game in the window. × closes it.');
 })();
@@ -22535,6 +22768,14 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 <script>
 (() => {
   const RELEASES = [
+    { g: 'psp', v: 'v1.0', t: 'OTM PSP', n: ['New: a PSP emulator page (EmulatorJS PPSSPP) on the GitHub site', 'Load your own .iso or .cso game', 'Turns on browser threads with a helper file, so the PSP emulator can run on GitHub', 'Speed menu: Quality, Balanced, Speed and Turbo. Every preset keeps the PSP\'s own resolution for speed', 'Fullscreen, and the screen stays awake while you play'] },
+    { g: 'ds', v: 'v1.7', t: 'Overlay DS', n: ['Really fixed sideways touch controls: up, down, left and right now go the way you move when the screens are turned'] },
+    { g: 'ds', v: 'v1.6', t: 'Overlay DS', n: ['Fixed touch controls being upside down when the screens are turned'] },
+    { g: 'ds', v: 'v1.5', t: 'Overlay DS', n: ['New Speed menu (frameskip) for less lag. Starts on Faster', 'New ⟲ Rotate button for sideways games like Rhythm Heaven. It remembers the turn for each game'] },
+    { g: 'ds', v: 'v1.4', t: 'Overlay DS', n: ['New ⛶ fullscreen button on the window (or Alt+F). Esc leaves fullscreen'] },
+    { g: 'ds', v: 'v1.3', t: 'Overlay DS', n: ['Second black screen fix for Google Docs: the DS core is fixed before it starts, so it never uses eval'] },
+    { g: 'ds', v: 'v1.2', t: 'Overlay DS', n: ['Fixed a black screen on strict sites like Google Docs (the default DS core no longer needs eval)'] },
+    { g: 'ds', v: 'v1.1', t: 'Overlay DS', n: ['Now works on sites with Trusted Types, like Google Docs'] },
     { g: 'ds', v: 'v1.0', t: 'Overlay DS', n: ['New: a Nintendo DS emulator window (EmulatorJS) that runs on the page or pasted into the console', 'Load your own .nds game (no games included). Click the bottom screen to touch it', 'Pick DeSmuME (no BIOS needed) or melonDS', 'It loads the emulator from the internet, so strict sites (and the Claude version of this site) block it. Use the GitHub site'] },
     { g: 'utmod', v: 'v1.0', t: 'Undertale Mod Menu', n: ['New on the site: a mod menu for Undertale on PC. Press TAB in the game', 'Sprint by holding X or Shift, at 2X or 3X speed. It stops at walls', 'Play as your own character from almost any sprite sheet, and switch back to Frisk any time', 'The download has the mod, a test character, a sprite sheet guide and full install steps'] },
     { g: 'stomp', v: 'v1.7', t: 'Blood mode', n: ['New gore setting: press G on the title, pause or game over screen', 'BLOOD turns all the splatter, strands, drips and puddles red and drops little guts', 'INK (black, like the clip) is still the default, and your choice is saved'] },
@@ -22620,7 +22861,8 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     stick: { title: 'OTM Stickman Fight', ver: 'v12.4', code: $('otm-online-code').textContent },
     online: { title: 'OTM Stickman Fight', ver: 'v12.4 online', code: $('otm-online-code').textContent },
     mono: { title: 'Monochrome OTM', ver: 'v2.2', code: $('otm-mono-code').textContent },
-    ds: { title: 'Overlay DS', ver: 'v1.0', code: $('otm-ds-code').textContent.replace(/^\n/, '') },
+    psp: { title: 'OTM PSP', ver: 'v1.0', code: '// OTM PSP is its own page, so there is no console code.\n// Open it here: https://otm-games.github.io/psp.html' },
+    ds: { title: 'Overlay DS', ver: 'v1.7', code: $('otm-ds-code').textContent.replace(/^\n/, '') },
     gba: { title: 'Overlay GBA', ver: 'v1.0', code: $('otm-gba-code').textContent.replace(/^\n/, '') },
     snes: { title: 'Overlay SNES', ver: 'v1.0', code: $('otm-snes-code').textContent.replace(/^\n/, '') },
     mori: { title: 'Moribund', ver: 'v0.1', code: '' },
@@ -22631,7 +22873,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     speed: { title: 'Godspeed 💤 Good Try', ver: 'v3.2', code: $('otm-speed-code').textContent.replace(/^\n/, '') },
     calc: { title: 'Big Time', ver: 'v1.2', code: $('otm-calc-code').textContent.replace(/^\n/, '') },
   };
-  const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html', ANIM_URL = 'stick-animator.html', STOMP_URL = 'otm-stomp.html';
+  const MORI_URL = 'moribund.html', LINES_URL = 'open-line-engine.html', SPEED_URL = 'godspeed.html', ANIM_URL = 'stick-animator.html', STOMP_URL = 'otm-stomp.html', PSP_URL = 'psp.html';
   // creator code: unlocks the version of Moribund with the test buttons (checked by its SHA-256, the code isn't written here)
   const CREATOR_HASH = '64cf866e039356cca8d083eb06af1578cfaf365ab2a9621c17a7731603bd605f';
   let creator = null; try { localStorage.removeItem('moribund-creator'); creator = sessionStorage.getItem('moribund-creator'); } catch (e) {} // creator mode only lasts until you leave the site
@@ -22644,7 +22886,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
   };
   creatorMsg();
-  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.0' };
+  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.7', psp: 'v1.0' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
@@ -22655,6 +22897,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     $('g-gba').setAttribute('aria-pressed', String(which === 'gba'));
     $('g-snes').setAttribute('aria-pressed', String(which === 'snes'));
     $('g-ds').setAttribute('aria-pressed', String(which === 'ds'));
+    $('g-psp').setAttribute('aria-pressed', String(which === 'psp'));
     $('g-mori').setAttribute('aria-pressed', String(which === 'mori'));
     $('g-lines').setAttribute('aria-pressed', String(which === 'lines'));
     $('g-anim').setAttribute('aria-pressed', String(which === 'anim'));
@@ -22669,17 +22912,18 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const g = GAMES[which];
       $('p-title').textContent = g.title; $('p-ver').textContent = g.ver;
       const stickish = which === 'stick' || which === 'online';
-      $('play').textContent = which === 'mono' || which === 'gba' || which === 'snes' || which === 'ds' ? '▶ Play here' : '▶ Play here (online)'; $('gba-note').hidden = which !== 'gba'; $('ds-note').hidden = which !== 'ds'; $('snes-note').hidden = which !== 'snes'; $('site-note').hidden = !stickish; $('variant').hidden = true; $('online-note').hidden = !stickish;
+      $('play').textContent = which === 'mono' || which === 'gba' || which === 'snes' || which === 'ds' ? '▶ Play here' : '▶ Play here (online)'; $('gba-note').hidden = which !== 'gba'; $('ds-note').hidden = which !== 'ds'; $('psp-note').hidden = which !== 'psp'; $('snes-note').hidden = which !== 'snes'; $('site-note').hidden = !stickish; $('variant').hidden = true; $('online-note').hidden = !stickish;
       for (const vb of $('variant').children) vb.setAttribute('aria-pressed', String(vb.dataset.v === which));
       $('code').value = g.code; $('code').scrollTop = 0;
       $('p-meta').textContent = `${g.code.split('\n').length.toLocaleString()} lines • ${Math.max(1, Math.round(g.code.length / 1024))} KB`;
-      const page = which === 'mori' || which === 'lines' || which === 'utmod'; // a full page: no code to paste
+      const page = which === 'mori' || which === 'lines' || which === 'utmod' || which === 'psp'; // a full page: no code to paste
       $('mori-note').hidden = which !== 'mori'; $('creator').hidden = which !== 'mori' && which !== 'mono'; $('lines-note').hidden = which !== 'lines'; $('anim-note').hidden = which !== 'anim'; $('stomp-note').hidden = which !== 'stomp'; $('utmod-note').hidden = which !== 'utmod'; $('speed-note').hidden = which !== 'speed'; $('calc-note').hidden = which !== 'calc'; $('copy').hidden = page; $('code').hidden = page;
       for (const e of document.querySelectorAll('#panel .steps, #panel .note')) e.hidden = page;
       if (which === 'calc') $('play').textContent = '▶ Open here';
       if (which === 'anim') $('play').textContent = '▶ Open the animator';
       if (which === 'stomp') $('play').textContent = '▶ Open the game';
       if (page) { $('play').textContent = '▶ Play'; $('p-meta').textContent = 'opens the game'; }
+      if (which === 'psp') { $('play').textContent = '▶ Open OTM PSP'; $('p-meta').textContent = 'opens the PSP page'; }
       if (which === 'utmod') { $('play').textContent = '⬇ Download'; $('p-meta').textContent = 'UndertaleModMenu.zip • 44 KB'; }
     }
     try { localStorage.setItem('otm-games-pick', which); } catch (e) {}
@@ -22690,6 +22934,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-gba').onclick = () => choose('gba');
   $('g-snes').onclick = () => choose('snes');
   $('g-ds').onclick = () => choose('ds');
+  $('g-psp').onclick = () => choose('psp');
   $('g-mori').onclick = () => choose('mori');
   $('g-lines').onclick = () => choose('lines');
   $('g-anim').onclick = () => choose('anim');
@@ -22698,7 +22943,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-speed').onclick = () => choose('speed');
   $('g-calc').onclick = () => choose('calc');
 
-  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !true) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'anim') { if (!window.open(ANIM_URL, '_blank')) location.href = ANIM_URL; return; } if (current === 'stomp') { if (!window.open(STOMP_URL, '_blank')) location.href = STOMP_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
+  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'psp') { if (!window.open(PSP_URL, '_blank')) location.href = PSP_URL; return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !true) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { if (!window.open(LINES_URL, '_blank')) location.href = LINES_URL; return; } if (current === 'anim') { if (!window.open(ANIM_URL, '_blank')) location.href = ANIM_URL; return; } if (current === 'stomp') { if (!window.open(STOMP_URL, '_blank')) location.href = STOMP_URL; return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); if (!window.open(url, '_blank')) location.href = url; return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
   $('copy').onclick = () => {
     const box = $('code');
     const fallback = () => { box.focus(); box.select(); toast('Code selected — press Ctrl + C'); };
@@ -22793,7 +23038,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     c.fillStyle = red(); c.beginPath(); c.arc(98, 78, 5, 0, Math.PI * 2); c.fill();
   };
   drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon();
-  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc'), $('g-anim'), $('g-stomp'), $('g-utmod'), $('g-ds')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
+  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc'), $('g-anim'), $('g-stomp'), $('g-utmod'), $('g-ds'), $('g-psp')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
   // Moribund: the teeth, shaking a little, red when picked
   const teeth = new Image(); teeth.src = 'data:image/png;base64,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';
   function drawMoriIcon() {
@@ -22874,6 +23119,18 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     c.fillStyle = '#e9e9f7'; c.fillRect(28, 84, 9, 3); c.fillRect(31, 81, 3, 9); for (const [x, y] of [[96, 80], [92, 85], [100, 85], [96, 90]]) { c.beginPath(); c.arc(x, y, 2.2, 0, 7); c.fill(); }
     c.fillStyle = '#25254a'; c.fillRect(24, 61, 80, 6);
   }
+  // OTM PSP: a wide handheld with a long screen (original drawing, no logos)
+  function drawPspIcon() {
+    const c = $('ico-psp').getContext('2d'), on = $('g-psp').getAttribute('aria-pressed') === 'true'; c.clearRect(0, 0, 128, 128);
+    c.fillStyle = on ? '#2f3a55' : '#1e2433'; c.beginPath(); c.roundRect(4, 38, 120, 52, 26); c.fill();
+    c.fillStyle = '#0b0f16'; c.fillRect(32, 44, 64, 40);
+    const g = c.createLinearGradient(32, 44, 96, 84); g.addColorStop(0, '#6c9bff'); g.addColorStop(1, '#b46cff'); c.fillStyle = g; c.fillRect(34, 46, 60, 36);
+    c.fillStyle = 'rgba(255,255,255,.25)'; c.beginPath(); c.moveTo(34, 46); c.lineTo(60, 46); c.lineTo(34, 66); c.fill();
+    c.fillStyle = '#d6e2ff'; c.fillRect(13, 61, 12, 4); c.fillRect(17, 57, 4, 12);
+    for (const [x, y, col] of [[113, 57, '#52d18a'], [107, 63, '#ff6b6b'], [119, 63, '#6c9bff'], [113, 69, '#ffc857']]) { c.fillStyle = col; c.beginPath(); c.arc(x, y, 2.6, 0, 7); c.fill(); }
+    c.fillStyle = '#3a4560'; c.beginPath(); c.arc(19, 79, 4, 0, 7); c.fill();
+  }
+  drawPspIcon(); for (const b of document.querySelectorAll('.game')) b.addEventListener('click', drawPspIcon);
   drawDsIcon(); for (const b of document.querySelectorAll('.game')) b.addEventListener('click', drawDsIcon);
   // Godspeed 💤 Good Try: a sleepy white face with a flower below it, gently breathing
   function drawSpeedIcon(now) {
@@ -22932,7 +23189,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   if (document.fonts) document.fonts.ready.then(drawAll);
 
   // remember the last game you looked at
-  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc', 'anim', 'stomp', 'utmod', 'ds'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
+  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc', 'anim', 'stomp', 'utmod', 'ds', 'psp'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
   drawAll();
 })();
 </script>
