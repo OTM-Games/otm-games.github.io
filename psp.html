@@ -128,13 +128,20 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
   const cover = (title, msg, showLoad) => { $('cover').hidden = false; $('cover-title').textContent = title; $('cover-msg').textContent = msg; $('load').hidden = !showLoad; };
   const chip = (id, ok, text) => { const c = $(id); c.textContent = text; c.classList.toggle('ok', ok === true); c.classList.toggle('no', ok === false); };
 
-  // ---- speed presets (PPSSPP settings). Every preset keeps the PSP's own resolution (1x), which is the biggest speed win. ----
-  const BASE = { ppsspp_internal_resolution: '480x272', ppsspp_fast_memory: 'enabled', ppsspp_lazy_texture_caching: 'enabled', ppsspp_texture_scaling_level: 'disabled', ppsspp_texture_anisotropic_filtering: 'disabled', ppsspp_frameskiptype: 'Number of frames' };
+  // ---- speed presets: real PPSSPP settings (from PPSSPP's libretro_core_options.h). ----
+  // Browsers can't run PPSSPP's JIT, so its default "JIT" falls back to the slow plain interpreter.
+  // "IR JIT" is the IR Interpreter: much faster when there's no JIT. That's the biggest win here.
+  const BASE = {
+    ppsspp_cpu_core: 'IR JIT', ppsspp_internal_resolution: '480x272', ppsspp_fast_memory: 'enabled', ppsspp_io_timing_method: 'Fast',
+    ppsspp_frameskiptype: 'Number of frames', ppsspp_texture_scaling_level: 'disabled', ppsspp_texture_shader: 'disabled',
+    ppsspp_texture_anisotropic_filtering: 'disabled', ppsspp_texture_deposterize: 'disabled', ppsspp_mulitsample_level: 'Disabled',
+    ppsspp_software_rendering: 'disabled', ppsspp_force_lag_sync: 'disabled', ppsspp_ignore_bad_memory_access: 'enabled', shader: 'disabled',
+  };
   const PRESETS = {
-    quality:  { ppsspp_auto_frameskip: 'disabled', ppsspp_frameskip: '0', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'High',   ppsspp_frame_duplication: 'disabled' },
-    balanced: { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '2', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'Medium', ppsspp_frame_duplication: 'enabled' },
-    speed:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '3', ppsspp_skip_buffer_effects: 'disabled', ppsspp_spline_quality: 'Low',    ppsspp_frame_duplication: 'enabled' },
-    turbo:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '4', ppsspp_skip_buffer_effects: 'enabled',  ppsspp_spline_quality: 'Low',    ppsspp_frame_duplication: 'enabled' },
+    quality:  { ppsspp_auto_frameskip: 'disabled', ppsspp_frameskip: 'disabled', ppsspp_inflight_frames: 'Up to 1', ppsspp_skip_buffer_effects: 'disabled', ppsspp_skip_gpu_readbacks: 'disabled', ppsspp_lower_resolution_for_effects: 'disabled',   ppsspp_depth_raster: 'default' },
+    balanced: { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '2',        ppsspp_inflight_frames: 'Up to 2', ppsspp_skip_buffer_effects: 'disabled', ppsspp_skip_gpu_readbacks: 'disabled', ppsspp_lower_resolution_for_effects: 'Safe',       ppsspp_depth_raster: 'low' },
+    speed:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '3',        ppsspp_inflight_frames: 'Up to 2', ppsspp_skip_buffer_effects: 'disabled', ppsspp_skip_gpu_readbacks: 'enabled',  ppsspp_lower_resolution_for_effects: 'Balanced',   ppsspp_depth_raster: 'off' },
+    turbo:    { ppsspp_auto_frameskip: 'enabled',  ppsspp_frameskip: '4',        ppsspp_inflight_frames: 'Up to 2', ppsspp_skip_buffer_effects: 'enabled',  ppsspp_skip_gpu_readbacks: 'enabled',  ppsspp_lower_resolution_for_effects: 'Aggressive', ppsspp_depth_raster: 'off' },
   };
   const optionsFor = (p) => Object.assign({}, BASE, PRESETS[p] || PRESETS.balanced, { 'save-save-interval': '60' });
   let preset = 'balanced'; try { preset = localStorage.getItem('otm-psp-preset') || 'balanced'; } catch (e) {}

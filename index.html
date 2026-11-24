@@ -22775,6 +22775,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 (() => {
   const RELEASES = [
     { g: 'site', v: 'v1.1', t: 'OTM Games site', n: ['Games now open on top of the site, like Monochrome, instead of a new tab: Stick Animator, OTM Stomp, Open Line Engine and Moribund', 'A ← Back button (or your browser\'s Back) takes you right back to the menu', 'OTM PSP opens in the same tab and has a big Back button'] },
+    { g: 'psp', v: 'v1.3', t: 'OTM PSP', n: ['Faster: uses the IR Interpreter CPU mode, which is much quicker than the plain interpreter browsers fell back to before', 'Fixed speed settings that weren\'t real PPSSPP settings, and added new ones: fast loading, an extra frame buffer, skipping slow GPU readbacks, cheaper effects and lens flares on Speed and Turbo', 'Turned off texture filtering and anti-aliasing work you can\'t see at PSP resolution'] },
     { g: 'psp', v: 'v1.2', t: 'OTM PSP', n: ['The "Leave site?" popup is now always on, even before you load a game'] },
     { g: 'psp', v: 'v1.1', t: 'OTM PSP', n: ['Asks "Leave site?" before you leave or press Back while a game is loaded, so you don\'t lose your game by accident', 'Big ← Back to OTM Games button'] },
     { g: 'psp', v: 'v1.0', t: 'OTM PSP', n: ['New: a PSP emulator page (EmulatorJS PPSSPP) on the GitHub site', 'Load your own .iso or .cso game', 'Turns on browser threads with a helper file, so the PSP emulator can run on GitHub', 'Speed menu: Quality, Balanced, Speed and Turbo. Every preset keeps the PSP\'s own resolution for speed', 'Fullscreen, and the screen stays awake while you play'] },
@@ -22870,7 +22871,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     stick: { title: 'OTM Stickman Fight', ver: 'v12.4', code: $('otm-online-code').textContent },
     online: { title: 'OTM Stickman Fight', ver: 'v12.4 online', code: $('otm-online-code').textContent },
     mono: { title: 'Monochrome OTM', ver: 'v2.2', code: $('otm-mono-code').textContent },
-    psp: { title: 'OTM PSP', ver: 'v1.2', code: '// OTM PSP is its own page, so there is no console code.\n// Open it here: https://otm-games.github.io/psp.html' },
+    psp: { title: 'OTM PSP', ver: 'v1.3', code: '// OTM PSP is its own page, so there is no console code.\n// Open it here: https://otm-games.github.io/psp.html' },
     ds: { title: 'Overlay DS', ver: 'v1.7', code: $('otm-ds-code').textContent.replace(/^\n/, '') },
     gba: { title: 'Overlay GBA', ver: 'v1.0', code: $('otm-gba-code').textContent.replace(/^\n/, '') },
     snes: { title: 'Overlay SNES', ver: 'v1.0', code: $('otm-snes-code').textContent.replace(/^\n/, '') },
@@ -22916,7 +22917,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
   };
   creatorMsg();
-  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.7', psp: 'v1.2' };
+  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.7', psp: 'v1.3' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
