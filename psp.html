@@ -204,6 +204,9 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
     document.head.appendChild(s);
   };
 
+  // ---- ask before leaving while a game is loaded (Chrome shows "Leave site? Changes you made may not be saved.") ----
+  window.addEventListener('beforeunload', (e) => { if (!started) return; e.preventDefault(); e.returnValue = ''; });
+
   // ---- keep the screen on while playing, and keep the tab fast ----
   let lock = null;
   async function keepAwake() { try { if ('wakeLock' in navigator && document.visibilityState === 'visible') lock = await navigator.wakeLock.request('screen'); } catch (e) {} }
