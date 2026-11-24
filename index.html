@@ -217,6 +217,7 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <div class="variant" id="variant" role="group" aria-label="Which version" hidden>
       </div>
       <p class="site-note" id="gba-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .gba file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them.</p>
+      <p class="site-note" id="leave-note" hidden><b>Leave Guard</b> makes Chrome ask <b>"Leave site? Changes you made may not be saved."</b> before you leave or close the page you paste it on. After pasting, <b>click the page once</b>: Chrome only shows the popup after you've clicked something on the page. To turn it off, type <code>__otmLeaveGuard.off()</code> in the console, or reload the page.</p>
       <p class="site-note" id="psp-note" hidden><b>OTM PSP is its own page</b> on the GitHub version of this site, so there's no console code. Press <b>▶ Open OTM PSP</b> and load a PSP game you own (.iso or .cso). It needs Chrome on a computer and loads the emulator from the internet. The PSP is heavy to emulate, so use the Speed menu and plug in your charger. If you're on the Claude version of this site, the button opens the GitHub one.</p>
       <p class="site-note" id="ds-note" hidden><b>Bring your own game:</b> no games are included. Press Load .nds game which you can get from here https://vimm.net/vault/DS The emulator (EmulatorJS) loads from its own website, so it needs internet. It works on the GitHub version of this site and on sites that allow outside code; strict sites (and the Claude version of this site) block it. Click the bottom screen to touch it.</p>
       <p class="site-note" id="snes-note" hidden><b>Bring your own game:</b> no games are included. Press Load ROM (or drop a file on the window) and pick a .sfc or .smc file of a game you own, or a free homebrew game. Your in-game saves stay in your browser, and Save ↓ downloads them. Games with extra chips inside the cartridge (Star Fox, Super Mario Kart, Yoshi's Island) don't work yet.</p>
@@ -272,6 +273,11 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
       <span class="name">OTM PSP</span>
       <span class="sub">PSP emulator page • load your own game</span>
     </button>
+    <button class="game" id="g-leave" type="button" aria-pressed="false">
+      <canvas width="128" height="128" id="ico-leave" aria-hidden="true"></canvas>
+      <span class="name">Leave Guard</span>
+      <span class="sub">Console tool • "Leave site?" popup on any site</span>
+    </button>
     <button class="game" id="g-mori" type="button" aria-pressed="false">
       <canvas width="128" height="128" id="ico-mori" aria-hidden="true"></canvas>
       <span class="name">Moribund</span>
@@ -325,6 +331,7 @@ footer .game:last-child:nth-child(odd) { grid-column: 1 / -1; }
     <button type="button" data-g="snes" aria-pressed="false">SNES</button>
     <button type="button" data-g="ds" aria-pressed="false">DS</button>
     <button type="button" data-g="psp" aria-pressed="false">PSP</button>
+    <button type="button" data-g="leave" aria-pressed="false">Leave Guard</button>
     <button type="button" data-g="mori" aria-pressed="false">Moribund</button>
     <button type="button" data-g="lines" aria-pressed="false">/open line engine</button>
     <button type="button" data-g="speed" aria-pressed="false">Godspeed 💤 Good Try</button>
@@ -15655,6 +15662,30 @@ console.log('Godspeed 💤 Good Try loaded! Esc on the title screen (or ✕ Clos
 })();
 
 };</script>
+<script type="text/plain" id="otm-leave-code">
+// Leave Guard: makes Chrome ask "Leave site? Changes you made may not be saved." before you leave this page.
+// Paste into the console (F12 → Console). Click the page once afterwards: Chrome only asks after you've clicked something on the page.
+// To turn it off: __otmLeaveGuard.off()   (reloading the page turns it off too)
+(function () {
+  if (window.__otmLeaveGuard) { console.log('Leave Guard is already on. To turn it off: __otmLeaveGuard.off()'); return; }
+  const ask = (e) => { e.preventDefault(); e.returnValue = ''; };
+  window.addEventListener('beforeunload', ask);
+  window.__otmLeaveGuard = { off() { window.removeEventListener('beforeunload', ask); delete window.__otmLeaveGuard; console.log('Leave Guard is off.'); } };
+  console.log('%cLeave Guard is on.', 'font-weight:bold;font-size:14px', 'Click the page once. To turn it off: __otmLeaveGuard.off()');
+})();
+</script>
+<script>window.__otmLaunchLeave = function () {
+// Leave Guard: makes Chrome ask "Leave site? Changes you made may not be saved." before you leave this page.
+// Paste into the console (F12 → Console). Click the page once afterwards: Chrome only asks after you've clicked something on the page.
+// To turn it off: __otmLeaveGuard.off()   (reloading the page turns it off too)
+(function () {
+  if (window.__otmLeaveGuard) { console.log('Leave Guard is already on. To turn it off: __otmLeaveGuard.off()'); return; }
+  const ask = (e) => { e.preventDefault(); e.returnValue = ''; };
+  window.addEventListener('beforeunload', ask);
+  window.__otmLeaveGuard = { off() { window.removeEventListener('beforeunload', ask); delete window.__otmLeaveGuard; console.log('Leave Guard is off.'); } };
+  console.log('%cLeave Guard is on.', 'font-weight:bold;font-size:14px', 'Click the page once. To turn it off: __otmLeaveGuard.off()');
+})();
+};</script>
 <script>window.__otmLaunchDs = function () {
 // Overlay DS: a Nintendo DS emulator window for the browser console.
 // Paste into the DevTools console (F12 → Console). No games included: load a .nds file you own.
@@ -22775,6 +22806,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
 (() => {
   const RELEASES = [
     { g: 'site', v: 'v1.1', t: 'OTM Games site', n: ['Games now open on top of the site, like Monochrome, instead of a new tab: Stick Animator, OTM Stomp, Open Line Engine and Moribund', 'A ← Back button (or your browser\'s Back) takes you right back to the menu', 'OTM PSP opens in the same tab and has a big Back button'] },
+    { g: 'leave', v: 'v1.0', t: 'Leave Guard', n: ['New console tool: paste it on any site and Chrome asks "Leave site?" before you leave or close it', 'Click the page once after pasting. Turn it off with __otmLeaveGuard.off() or by reloading'] },
     { g: 'psp', v: 'v1.3', t: 'OTM PSP', n: ['Faster: uses the IR Interpreter CPU mode, which is much quicker than the plain interpreter browsers fell back to before', 'Fixed speed settings that weren\'t real PPSSPP settings, and added new ones: fast loading, an extra frame buffer, skipping slow GPU readbacks, cheaper effects and lens flares on Speed and Turbo', 'Turned off texture filtering and anti-aliasing work you can\'t see at PSP resolution'] },
     { g: 'psp', v: 'v1.2', t: 'OTM PSP', n: ['The "Leave site?" popup is now always on, even before you load a game'] },
     { g: 'psp', v: 'v1.1', t: 'OTM PSP', n: ['Asks "Leave site?" before you leave or press Back while a game is loaded, so you don\'t lose your game by accident', 'Big ← Back to OTM Games button'] },
@@ -22871,6 +22903,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     stick: { title: 'OTM Stickman Fight', ver: 'v12.4', code: $('otm-online-code').textContent },
     online: { title: 'OTM Stickman Fight', ver: 'v12.4 online', code: $('otm-online-code').textContent },
     mono: { title: 'Monochrome OTM', ver: 'v2.2', code: $('otm-mono-code').textContent },
+    leave: { title: 'Leave Guard', ver: 'v1.0', code: $('otm-leave-code').textContent.replace(/^\n/, '') },
     psp: { title: 'OTM PSP', ver: 'v1.3', code: '// OTM PSP is its own page, so there is no console code.\n// Open it here: https://otm-games.github.io/psp.html' },
     ds: { title: 'Overlay DS', ver: 'v1.7', code: $('otm-ds-code').textContent.replace(/^\n/, '') },
     gba: { title: 'Overlay GBA', ver: 'v1.0', code: $('otm-gba-code').textContent.replace(/^\n/, '') },
@@ -22917,7 +22950,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     else { $('creator-msg').className = 'bad'; $('creator-msg').textContent = 'wrong code'; }
   };
   creatorMsg();
-  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.7', psp: 'v1.3' };
+  const LATEST = { stick: 'v12.4', mono: 'v2.2', gba: 'v1.0', snes: 'v1.0', mori: 'v0.1', lines: 'v1.1', speed: 'v3.2', calc: 'v1.2', anim: 'v2.0', stomp: 'v1.7', ds: 'v1.7', psp: 'v1.3', leave: 'v1.0' };
   let current = null;
   const toast = (msg) => { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.h); toast.h = setTimeout(() => t.classList.remove('show'), 1800); };
 
@@ -22929,6 +22962,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     $('g-snes').setAttribute('aria-pressed', String(which === 'snes'));
     $('g-ds').setAttribute('aria-pressed', String(which === 'ds'));
     $('g-psp').setAttribute('aria-pressed', String(which === 'psp'));
+    $('g-leave').setAttribute('aria-pressed', String(which === 'leave'));
     $('g-mori').setAttribute('aria-pressed', String(which === 'mori'));
     $('g-lines').setAttribute('aria-pressed', String(which === 'lines'));
     $('g-anim').setAttribute('aria-pressed', String(which === 'anim'));
@@ -22943,7 +22977,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const g = GAMES[which];
       $('p-title').textContent = g.title; $('p-ver').textContent = g.ver;
       const stickish = which === 'stick' || which === 'online';
-      $('play').textContent = which === 'mono' || which === 'gba' || which === 'snes' || which === 'ds' ? '▶ Play here' : '▶ Play here (online)'; $('gba-note').hidden = which !== 'gba'; $('ds-note').hidden = which !== 'ds'; $('psp-note').hidden = which !== 'psp'; $('snes-note').hidden = which !== 'snes'; $('site-note').hidden = !stickish; $('variant').hidden = true; $('online-note').hidden = !stickish;
+      $('play').textContent = which === 'mono' || which === 'gba' || which === 'snes' || which === 'ds' || which === 'leave' ? '▶ Play here' : '▶ Play here (online)'; $('gba-note').hidden = which !== 'gba'; $('ds-note').hidden = which !== 'ds'; $('psp-note').hidden = which !== 'psp'; $('leave-note').hidden = which !== 'leave'; $('snes-note').hidden = which !== 'snes'; $('site-note').hidden = !stickish; $('variant').hidden = true; $('online-note').hidden = !stickish;
       for (const vb of $('variant').children) vb.setAttribute('aria-pressed', String(vb.dataset.v === which));
       $('code').value = g.code; $('code').scrollTop = 0;
       $('p-meta').textContent = `${g.code.split('\n').length.toLocaleString()} lines • ${Math.max(1, Math.round(g.code.length / 1024))} KB`;
@@ -22966,6 +23000,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-snes').onclick = () => choose('snes');
   $('g-ds').onclick = () => choose('ds');
   $('g-psp').onclick = () => choose('psp');
+  $('g-leave').onclick = () => choose('leave');
   $('g-mori').onclick = () => choose('mori');
   $('g-lines').onclick = () => choose('lines');
   $('g-anim').onclick = () => choose('anim');
@@ -22974,7 +23009,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   $('g-speed').onclick = () => choose('speed');
   $('g-calc').onclick = () => choose('calc');
 
-  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'psp') { if (IN_PAGE) { location.href = PSP_URL; return; } if (!window.open(PSP_URL, '_blank')) location.href = PSP_URL; return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !IN_PAGE) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { openGame(LINES_URL, 'Open Line Engine'); return; } if (current === 'anim') { openGame(ANIM_URL, 'Stick Animator'); return; } if (current === 'stomp') { openGame(STOMP_URL, 'OTM Stomp'); return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); openGame(url, 'Moribund'); return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
+  $('play').onclick = () => { if (current === 'utmod') { try { const b64 = $('otm-utmod-zip').textContent.trim(), bin = atob(b64), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([u], { type: 'application/zip' })); a.download = 'UndertaleModMenu.zip'; document.body.appendChild(a); a.click(); a.remove(); } catch (e) { toast('Could not start the download'); } return; } if (current === 'psp') { if (IN_PAGE) { location.href = PSP_URL; return; } if (!window.open(PSP_URL, '_blank')) location.href = PSP_URL; return; } if (current === 'calc') { try { window.__otmLaunchCalc(); } catch (e) { toast('Could not open Big Time'); } return; } if (current === 'speed' && !IN_PAGE) { if (!window.open(SPEED_URL, '_blank')) location.href = SPEED_URL; return; } if (current === 'speed') { try { window.__otmLaunchSpeed(); } catch (e) { toast('Could not start the game'); } return; } if (current === 'lines') { openGame(LINES_URL, 'Open Line Engine'); return; } if (current === 'anim') { openGame(ANIM_URL, 'Stick Animator'); return; } if (current === 'stomp') { openGame(STOMP_URL, 'OTM Stomp'); return; } if (current === 'mori') { const url = MORI_URL + (creator ? '#c=' + encodeURIComponent(creator) : ''); openGame(url, 'Moribund'); return; } try { current === 'mono' ? window.__otmLaunchMono() : current === 'gba' ? window.__otmLaunchGba() : current === 'snes' ? window.__otmLaunchSnes() : current === 'ds' ? window.__otmLaunchDs() : current === 'leave' ? window.__otmLaunchLeave() : window.__otmLaunchSite(); } catch (e) { toast('Could not start the game'); } };
   $('copy').onclick = () => {
     const box = $('code');
     const fallback = () => { box.focus(); box.select(); toast('Code selected — press Ctrl + C'); };
@@ -22992,7 +23027,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
       const head = document.createElement('div'); head.className = 'v';
       const num = document.createElement('span'); num.className = 'num'; num.textContent = r.v;
       const title = document.createElement('span'); title.className = 'title'; title.textContent = r.t;
-      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', ds: 'Overlay DS', psp: 'OTM PSP', site: 'OTM Games site', mori: 'Moribund', anim: 'Stick Animator', stomp: 'OTM Stomp', utmod: 'Undertale Mod', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
+      const tag = document.createElement('span'); tag.className = 'game-tag'; tag.textContent = { stick: 'Stickman Fight', mono: 'Monochrome OTM', gba: 'Overlay GBA', snes: 'Overlay SNES', ds: 'Overlay DS', psp: 'OTM PSP', leave: 'Leave Guard', site: 'OTM Games site', mori: 'Moribund', anim: 'Stick Animator', stomp: 'OTM Stomp', utmod: 'Undertale Mod', lines: '/open line engine', speed: 'Godspeed 💤 Good Try', calc: 'Big Time' }[r.g];
       head.append(num, title, tag);
       const ul = document.createElement('ul');
       for (const n of r.n) { const li = document.createElement('li'); li.textContent = n; ul.appendChild(li); }
@@ -23069,7 +23104,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     c.fillStyle = red(); c.beginPath(); c.arc(98, 78, 5, 0, Math.PI * 2); c.fill();
   };
   drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon();
-  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc'), $('g-anim'), $('g-stomp'), $('g-utmod'), $('g-ds'), $('g-psp')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
+  for (const b of [$('g-stick'), $('g-mono'), $('g-gba'), $('g-snes'), $('g-mori'), $('g-lines'), $('g-speed'), $('g-calc'), $('g-anim'), $('g-stomp'), $('g-utmod'), $('g-ds'), $('g-psp'), $('g-leave')]) b.addEventListener('click', () => { drawIcons(); drawMonoIcon(); drawGbaIcon(); drawSnesIcon(); drawMoriIcon(); });
   // Moribund: the teeth, shaking a little, red when picked
   const teeth = new Image(); teeth.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADUAAAAtCAYAAAAOYyOGAAAYUklEQVR4Xl16CZBddZnv7+z33K3v7e70FjpLp7OQBbFJZyMbmwQFC56gIhgUhxlFHZyaUpyat5g3Vr0aUafEcoLliMu8QQtxWHwaQYwElCUJYUliZyNbp9NJL7n7vWc/r37f6c6z3oGT2/fce/7nW3/f7/v+V4EcavKvqiKKImiaJu/DMJRXZeZzIJJTUzX5Ho8YSnKvokKDgjDmPclnyb2AYaVhGAaCwIPjtqDrgB/weUCUPAKGbsAPkjemYcLzHei6ijCMgDiRJ0YMXdMRhAGUmefy2uzfiqIgjmcluiw0Ln+QCKaKokoMRHGElJWC4zrymWVa8LzgsiFihNAVFXEcIQawYEEvuro6MT1dwulTY1A0A1BoMCCTtbBwYB50zUC93sTZM+OoVBrQNVME5vqKQqUVhGEsBjMMC67nXjbWrGF1XYcf+Jev89ATDyXXaH2dFvN9GIYmC0ZRAHXGFo7bnLFUJA8wjRQ834OCOLH6jPfuuvMWbNq84T3L0nrGzk9871++/dhXnJaLKIphmBp6uor467/a7ra3d5p739j/wK7f7P63Q5XjUBHBoCIRoGuMlBj0EQ0VeA70GU8wkoLQF+MFQQRVmfFkzCt/cdAj4pUkmpLQmflbQkhXoanJK5U0NB0p04KpG9BVBh5gaoBtAc89/W9x4I3G01MH4uee2Rl3dVqwTSBtAf1z87jzI5tx+vSrcRxfiJ995gfxtetXQVeAlK4gn7ZQzFvo6kjLa1vWkusU2zZ0eTXV5D3l4XNnTyaAnLxAoRAxFhm/ieC8zpv4BcNQxHN0BC3DOGa4eb6LMPKhahHSGQ12GujqTqN3bjsUzUGrOY3TZ0dehOKB6VIoZrBy1RKsWz/0lGHSbLy/BcetgUbmqlHso39eD27ediPWrrsGqhpBNxTJQ01LsqdQyCNl6ZIhDDKeNAovUC6x+mx4zSrDz6kMT7GCwgWTV0OfSf7/7zWXU7Dx2itx9uzrcbm8P47jI7HrvB6ffO/ZePiaPuSywKc/dSvefvu3cal8ID599oW4UtsXP/Psv8Qb1g9C4zMUYG5vDl99+IHPnB87GO9+8Zfx6qElSBlAe1sKhgrMv2IOvvnP//PlT2+/O2+bCkw1ySHx3oznJKcECfj/TEzSKnfccTvWrFmzt7eve/j111+94bHHfrh74cI+3Hvv9n8dWDj4uXfeeefT3/72d3/MW0wLyOYyWLRoAfp6O6GgiVrtAtK2BiulYtHgPJw9dx5WSu+1UgqyOQuGlYdpaihXppzJqXEwWCgD11i8eOD7HR0FrB4ewvDw0GClUjlx8r2L6OrK4dpr12Pjxg2bVq1aVfE8R3nyyafFyooSizLETzWBSUvQRBJTAzrnFHHnXR+Ot3/qruHb77gZt2zb+vuOdgPFtiw2bhj+3Efvug3bbrn+R3OvKEA3AM9jPqnI5zLLPb+JCC3oRoiWU0UmbSKTNcRQ9VppvFYrQ1dDhLEDz6tj8ZJ5qRtv2tq1Zs1ipDPA0OoV165d/z4NqgM7rSLfZq/x/AaWLO3Bg59/4LvbP/WxeHBJP5avWITVw+97I4qBXM5ANmfDTqdgWTojzICmmrDtHHToEp/ZtIHNm1ZjTmcKptlELgfMnVtEqTSGKGrCsnz097dhePUKWKZYRuC90aj9OWUyYJvyPYIIkTTwWoKOuhojDFgSAuhaBEMLsHz5AL7w+b+6eM89dx4qFFQsXTL/+8uW9aPVmoKue5iePvdEFDaxevVK/Nf//uUvbN26GoWCDt1oQlWbLa5rmklaZOwU8rksVMIjASAKY2SzWdi2gRg+YqUFx7sEVXOhKi7q1UloSgjHqQOKD0OPsezKgXvzeSspmKZFqDWC0IPjNBHHoUAvC6LveYgDoNVqIWPbktpxEMIPXNimhXnz5uG667as6OzsRBQHzTD0YaUYjxGC0EVHMYfe7uL1NNbFiXNwvSo0PUJbIb2BeV4u+4iiEJZlwTRNOiZCIZ+B5zRQq5fBBXO5tMQ7laOQjUYNrVaMbFteYD8IQhTai3jwwQf/PZ/PJwVP12FZ9kJdsxFHOqJQg+dFcJ0Q1UodJCcpy4bnJkU9jFV4vsbKhMBX0WwEuDRdh67Z3aaRg2XkEQYaLDNt1+pVOG7juO+7SKcZPSZ27fq1859PP2V+cvsH8OSTP4jvueeemyhLqVSmpxR4noOBRQuw7MpBFNvz8IOWQDWtGMUBFi9bjK/t+MoYLX3w4MGdp8+MIp3OoKOjQ7zLJK9UKihdqh5zvAiW1QZVsaAoFtry7Vi3fuNXTYPFVIEQBtjwPRUU/q0DI/j2t7730Nf/6RGlXnOByLJcJ0LpUhM/e+IpHHx3pDUwMIAlSwZ/xLKSy+UwOTWBcrn8Ij3z4IMPxosXL4breufIXhgZqpUyRKhbbrnptk9+8u7nNm/ZIByN4cP/CEl9c3vwoQ/f2kelpqdLz7muj5SVhmYamDuvH+3tNpoNDxcuTGH0zARUJY1stgu6kYaiprBx49b/1T9/IfxQQSBeVBGHKehqDiOHT039+Ec/e/RXz+1BpRQi8LXWmVMTePyHT/zy+4/9WDl65AwGBgbU62/YeoPnOBJi+/bux4kTJx/s671i+dDQsKTPhQsXRkpT00LVVMJ4uVLG5i2bnvviF79427333hsztpvNpuSAoZuiPU87lYHvh9O+F2Nqqixc7fbbb48XLVoE1wVOnTyLw4dOoFr2UKsEaDZC2JkCtly/Dd3dc2GZWWTSBShIobNjLi6Ml3D2zMQ3Lo43Zoq9hlrVffuZp3/z1D989Zt3vnXgiCDr8itX/Grx4FIEgbgZL7zwYtfBg4dHC4XiTc1GC57nCSCRhgnt81pN+YMK8Eyn05g7tx8njp9G4MVyairjPiTNxMWJ6X1/+MPLe/58+CjJEj7xiXuwbPnKDssme9YwcuS9nxx46yhe2rMP+98cQflSC4Ebw3Ei5POda7u6r4CipTExUcXu3a/ilVf2PcLnx0Kedbzxxt47Xn31tbvsFFAs5oRpBAEaumEjnS0CsQ5NtYq+F2FyovSLo0ePY+9re0enJ6aFM1I5hRWZ7rt52w1YsOCKa4LQnXppz/Nn8gUTO7723+LrrtsETVdRrbSwbu2NSrXiSi7ZtoUVV61ANptf8ac/7j186OAJFPNZFIptKLTZCCNHinmhUAAUA0dGjqOvbx6Ghoa6CsX0pjff3P/L8fFxTE2WUK+Q7etCiAvFNExLQbVallBT1Ag7/sdXj/3NZz+zmK3Q8ePH8dDf/b3y9tuHUSi0IZ8rwml4zGcBJcdxIfyWdIgAQZw3LVVQ0PUcDA+vwg03bvnpVe9b8cmN127BzTd/RHn3nRGw+yB3y2RSgnq1qgNaLorYeoTCUGZaMvizXUEMZLMZdHa2ww88TE1NIPRj4YSGZiQthhqJElxbIXk2VGlf/uHhL8dbt27BCy+8UNu9e3f+wIG3cG6UoJCsb6eSsuS1QrkmNImoQk0bRl3oRjpjwk6lsX/fQRw+PLL943ff+cTa4c277rj9rpeq5Se2Hj16AqqiY3rKucwLY1GIMa0CMYnxbPMYSViwCWw2HYyNXZTiG5C9kO+pgB/60FUV6UxKFGENEpKcTqOrqwu6lsKRkffw/ccezx87dhKtVnKfSe5n0BhUg8SXJDspLzANA5ZpwnVdeF6MOHYRxyZjF5Wyi8OHjv/W0NP4/Oc+v+XAvndx4th7yNhZNJtlYQrs0VQSrhn+SFAhfEuuxOQoEeKIfVKMMPJgzDSeNAG727RpiRc7im1IpXSoWgxFDWHbKcyZM4fghLFzF/D22ydlTTvFWhmBgEXFyVzKlQp0XUHXnBz0XC4LU5c+IEkyhQ0gaY+HtoIFXVMxfn4Cu3b9DhvWbxJvcKF8vg2O64lVHIceU+RBCUIlbfUMGEGFLvVOIykzUtLDRwE9kZJwXLZsmTSPbBCjOITvt6SdZ+c723i6rj9NMwm+xewrYlipFNrbO3D+3Dkxbm9vNxYunA+dCW9oJqrVKizLnGkxFNi2ncB4ug2tpo9HvvEtZd26VzcfPTYin1GZlGkLFUpZltAU1/cE2sOA+aUAAR9N9ATCiB2qiihkFBBAcpjfP1cEsVNJs8BcIxEIfH4nhGro8F0PIyOH7/PccCKT0VBvhGJUI2nIpPQwRDs6i+ie04n2jgJ0Wpadh2UZYhXGMi3BgmyZKaRSltx48OBRhtfLrVYDpqmLJ0mZiEiWYYiHLVWDqhq0qjAH5l3i/dkWOpJ7Ojo6MTg4gK7Odslh0iDm9WzrI32tzCiSAc/o6OhPy+WqPBeNUKKBXDOTySQh2tku8iMOUatVoQeeDz/2JEkDl1/WZcjB2YSmKxJavuOjq6OITMqmyeE2K6jXKnC8ZPrDbpXGsG1TOtIkFBkmBlRHha6RxnNtTXJk8aJF6OvrkbXL5UvwZPaReN/QUoiMSBTUSeECH67bQrNZRSabRqPhygCHUdXZ2YH+/n5RZnp6EtVKCb4vKZEIQQuSV5HQcvjC8KnX60Iee3p6xOUEAk5/yPPI0yh32ibABMKqZ1lyFDORaWyGswNdZRiGAgZcK0l+H5cuXRLjZXLsDiyolIPMPp6VCdDcpkRFKpVCsdgG3wtYG7Fw4SK0FzvR1taGickLOH/+PC5cOA/PDaDM6+0QwWcVMC1dpkT0UhjEyObSwiiYc7yRwrCmUEmGBvOL8a8bZAQMY1tmeY7jybxudo5IhTmNooDMP4Ythezq7gS7XIZ7ytDhcaYXaRJavFful3GChkbLQb3WgGqYsEwb1WodFy9eFI8361XxbjZtQ6flAbYGoUB6yk/B0bwEOm2y6RChxi62gUaDFjOQy2USjqUSJV1BLsa5DEHjZCBKHkbklH4tDoT18zuJUYhwvswEaczxcQMGJ0U60dEQTun7gcjDCGrLZMQoumFKiKqxikqlhrGxMRLZy7mYMnXYmTR0oo3jxjJPkPyIohke6KNYDOQGMnnyQta0VMqUB/CB9DA/t1O2CMy/KSy7YHpEMTURlEDsug4cpyUhTEV5cp5XqzVQrsx0r4aaNHmqKmswLfi98mRJJklmykY6nYVupthqoNlykM2x7wrQajXl2TSSkiZoxEkRZJ3ha2JpIJ/PykNoaSIgCygVYvhRaCIOY10S3CDVCRHHLLxRUrs4g+P0jXUpCmT9pNMmC1Al2WmIer2KRjMAm2LmCD+jEfk8GYUHvJeG4myDRkkiIJcvoLu7W8Z758fPwW024Xo+VNIKJjlzwk4bEkr0DEfDisoCmixIYkqopjJEyGw2LcqUy2XUajWxEhWi0hSMr//PewliEQzo6TCkkRoC2cViO7q6eoR/pqysGKLVdFEpM4JaYjTmVyadE+bD6kCjO66PUqkiIZjOZtDV3Y1CRzt0U4VeLKRF8NlDapWahIHEr6rKwqVSSZSZ7a0ocKVSR7GYF9SkEvQu85CFkZ51HV/W8f2EsXNtepTfpaX5yrW5Znt7QTzH+3ht0eBCdHQUJZycFsOrhWgSCGp1KKoKllMakrl18OBBsJV3Wg0xrE6FuCgXmkWqWcETgXw0Gw6KhQ6hLtKMxQFy+Qxuv+PD8w8dOnTGaRHRmIsuqtWa/C3eC3wEdQ71OUUKBHS49qwysznJNWU+LmHmYdmVK/HAA/fH3T1z8J3vfEc5c/ocVCOGbnKGHCAKEs4cMG20GI0mp1UkAhwYASoXohDUlG7mh7QWHzI8PIyPfvSj22+88UZ5L+wXCWcjIxgauvod2TpRkxyZbTYJ/wwTspFZxOMzmHPMNU6bGMZETgLI7AxfqBHn8baJ9w+twubNGxCGLi5Ojck878rlS2QUvXLlMnT3dMk16TJ0DbV6Q8CDPZWq6Rw25sHXYnsnTMtGveFi9NwkPvih2+IvfPGhn3zi3nvoVZTKZUxOt9DT14s169Z87diJY/ePjp0VhqwZOgzLlDZCMzQEkY+QYc28JPCEyXYQc6veYD4Bly5NodmsC9VhaJPVkG5BCXCpNCmjuFw+JahZqU5jaPjqz975sY+c//i9H3vl6muuEvQkg+d0i4ppWqKkznkEw4AWZQhKndCTduHxxx9X9u7de30QBCVattViLeJUiK9KmtczmTQU2ZcK5T4Z2IQcbJJpz8zhFaCjI3t54y0IfDFQPm8LKJXKk1KYBwcXoVC00VbgdxWZam3avP7ksRPHB86dO493D771WLG97eZMuu0agg6N4PtNGcDOpgzrnc46kc9rkoi12mkJEdNMIZezcOzYCZw5M7qbSg8ODnJMhWPHRwSem636oaGhq3f/9re/USYmJjClTUntYidKL/T0tkvyEwn3731LjOawgDcjtLdbWL58GRqNBqdCqNUipFKUjPkds6cy6BkS8bHzZ79BJO7r7xPSOzZ27punT732pyNHTshORzZtJfMTKUPcHdGhcxrjOh50g5OcupBGsnPTNOC5Ps5cGMP7378K9913X0xa84unfq4c/vM7nCG8PHTN1QIY9Pa6dRv+S2dn513VavWPTzzxv7/3/qEVuO22W+NMJoujW04++vTTTz9UqZaw7ZZrsGnzxlNXXNG3YOfOnUpfaw5WrliFvr6+D42Pj/967PxZUrOhefP6xetB5Fc2bdr00LwFg49UK/VXL1yYfHx6uvQn8k86gGjbih0xaLIfA+jkakxshlsqlZZeKAw8uUFRNGQztlzTNAM33HADDh1+52enTh+/2/PcMVp706Zrr/e84OKyZUt+tnLlSrOnp+fjr/zx99/rn9e3ljPEgYElmLp46W9ffe3lh+Yt6Mb2++6O129YK/Vqz8u/u667p+MPn7n/gXj+/IXYuXPn/S2n+qPe3u6/4XCVqEkjrVqx5LX16zYZL720Z+DUyTM/ZdeQtmyUm/XLo23KKvtsMaAWi8VkyqrqorVtJzyLhTbRXsXp02fxpS99STl06BB7m6+zXTBNs0/VdHzlK1/+fRB4049885+tJ3/x8w/0ze0C8yyKgjp3QFyvgs7uDhimiv7+3qVLlg4g35ZBs1XBwKL537r11lvi9RuGccU8bgo0Rnp7e+cvXbr00wnlqWB6qjQ6Ojr+jZdffmXq2Wd+Ne/551/EkSNHhY0zTRhNlJ1hN7sBr/MC+RSpDwcjswWXmhM46EFCLkNvx44dyv4338D8Bb0sjt/lAKWndy6WL1/+3NGjR9dcujT1O5pq3fo1/6iofnjx4nksW7oEYdCAqgWYmh4/On7hLBYO9ENRA0xOnf+JYSgFRcFCICHR27ZtO33TB66TFmPXruc5+MErew48mi/MebQ8XUbWzso8nn0V93oZQXHoy7YoAUj2rdlOzE4+Z4shQ48oyEQmqhBuOaM7Pz4KVQuFnpw6efZhQLstCgOCwTC9TNZNHnnVVVd9fXp6ciqVysgPAjSdmw3s1/JGTy9zJZIxgaaahZYTnFVUcyFZ+YkTJ19fseqqlpVqs123iXVrt2BO57+jVrsovRlbGUK4rpvSQMpWbRzD9RMCwd0Vbj/o1UZdZgc8gogdZbIdIsMuPWnbvZYnqEQi2V4oIIo17Hvz4Mi/7vzBeGdnZ+/I0fc+W6rUEPkRpqYuYW7fAiq9d9evX3rD0PI7Vq5ciY45ffaCBQOPdnUvROAb2Pfmfhw9Mr4jUsZ3dP386Xh0bPyFdw8eQf+CkQ1dzz7/VtN1cGlqYrRai2UjwTQyUPUmdCXptmWaFCWtPWf+gZ8MdnRCetKOc6BMdh2KEjyoGBtB5lujWRMW0NZWkIaRjGNy5Dge2/mDPk5kGculUg2+4+L3L+6R93teeu1DIyNHuEVzYvN1U/8ho+JQczk/J1f89f958e//9NoBYRiH3j2hsC+qVht44/X9b7934qxCmsVrTANDT0lq0EtMBeY6T4Yac2/24IYF5f7LXxgkjZ+iSl4xnEibmFfshkulaVmwXC4l3pRZBL2XjMMIOKx1kuDVKmq1UPiZ7KqbQMsB1q1dhQ9+8IM/XLt27f0PP/ywwjk4B5PJbzBIj5KtVu5l8T7O8To7uqS4k1dyfcpFksvnUJ5E0aR9IiGWUfVf/GxCvMWRVvILk4RNU3OeHD3xPecAzDX2SKzoPMgFE1LMzToTxXybfGdychoTExfg+JxPWIJSjAa2MSzYkg9uLMobRqIY89eyUhIx7e3togA5WmKwQJBVGHuUpAN7t8u/jJFRNduTmV+R8Lg8ypo5EqKpwDKSUKTA7GQZx+Rs9CIRZ7ZRpGe5qG1z6tOA20wsW65VRMhEwFiQy7I0OA6TPlFm5scyQo9YOyk4led9DLWkqyaAJWBBb8z+wOUv/+bxfwE3xa9hn/8RVwAAAABJRU5ErkJggg==';
   function drawMoriIcon() {
@@ -23161,6 +23196,16 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
     for (const [x, y, col] of [[113, 57, '#52d18a'], [107, 63, '#ff6b6b'], [119, 63, '#6c9bff'], [113, 69, '#ffc857']]) { c.fillStyle = col; c.beginPath(); c.arc(x, y, 2.6, 0, 7); c.fill(); }
     c.fillStyle = '#3a4560'; c.beginPath(); c.arc(19, 79, 4, 0, 7); c.fill();
   }
+  // Leave Guard: a door with a little stop sign (original drawing)
+  function drawLeaveIcon() {
+    const c = $('ico-leave').getContext('2d'), on = $('g-leave').getAttribute('aria-pressed') === 'true'; c.clearRect(0, 0, 128, 128);
+    c.fillStyle = on ? '#3b4a6b' : '#2a3346'; c.fillRect(30, 14, 52, 100);
+    c.fillStyle = on ? '#8fb0ff' : '#6c86c4'; c.beginPath(); c.moveTo(36, 20); c.lineTo(70, 28); c.lineTo(70, 112); c.lineTo(36, 108); c.fill();
+    c.fillStyle = '#ffd76a'; c.beginPath(); c.arc(64, 70, 3.5, 0, 7); c.fill();
+    c.save(); c.translate(92, 44); c.fillStyle = '#ff5a5f'; c.beginPath(); for (let i = 0; i < 8; i++) { const a = Math.PI / 8 + i * Math.PI / 4; c.lineTo(Math.cos(a) * 24, Math.sin(a) * 24); } c.closePath(); c.fill();
+    c.strokeStyle = '#fff'; c.lineWidth = 3; c.stroke(); c.fillStyle = '#fff'; c.fillRect(-12, -3.5, 24, 7); c.restore();
+  }
+  drawLeaveIcon(); for (const b of document.querySelectorAll('.game')) b.addEventListener('click', drawLeaveIcon);
   drawPspIcon(); for (const b of document.querySelectorAll('.game')) b.addEventListener('click', drawPspIcon);
   drawDsIcon(); for (const b of document.querySelectorAll('.game')) b.addEventListener('click', drawDsIcon);
   // Godspeed 💤 Good Try: a sleepy white face with a flower below it, gently breathing
@@ -23220,7 +23265,7 @@ console.log('%cOTM Stickmen loaded! Type stickman.overlay() to fight on the webs
   if (document.fonts) document.fonts.ready.then(drawAll);
 
   // remember the last game you looked at
-  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc', 'anim', 'stomp', 'utmod', 'ds', 'psp'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
+  try { const last = localStorage.getItem('otm-games-pick'); if (['stick', 'online', 'mono', 'gba', 'snes', 'mori', 'lines', 'speed', 'calc', 'anim', 'stomp', 'utmod', 'ds', 'psp', 'leave'].includes(last)) choose(last === 'online' ? 'stick' : last); } catch (e) {}
   drawAll();
 })();
 </script>
