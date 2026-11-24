@@ -156,6 +156,7 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
   chip('c-cores', cores >= 4 ? true : null, 'CPU ' + (cores || '?') + ' cores');
 
   // Threads need the page to be "cross-origin isolated". GitHub can't do that by itself, so coi-sw.js adds it, then we reload once.
+  let reloading = false;
   async function getThreads() {
     if (window.crossOriginIsolated) return true;
     if (!('serviceWorker' in navigator) || !window.isSecureContext) return false;
@@ -166,7 +167,7 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
       await navigator.serviceWorker.register('coi-sw.js');
       await navigator.serviceWorker.ready;
       try { sessionStorage.setItem('otm-psp-coi', '1'); } catch (e) {}
-      location.reload();
+      reloading = true; location.reload();
       return new Promise(() => {}); // wait for the reload
     } catch (e) { return false; }
   }
@@ -204,8 +205,8 @@ kbd { font: 12px var(--mono); background: var(--shell2); border: 1px solid var(-
     document.head.appendChild(s);
   };
 
-  // ---- ask before leaving while a game is loaded (Chrome shows "Leave site? Changes you made may not be saved.") ----
-  window.addEventListener('beforeunload', (e) => { if (!started) return; e.preventDefault(); e.returnValue = ''; });
+  // ---- always ask before leaving (Chrome shows "Leave site? Changes you made may not be saved."), except our own one-time threads reload ----
+  window.addEventListener('beforeunload', (e) => { if (reloading) return; e.preventDefault(); e.returnValue = ''; });
 
   // ---- keep the screen on while playing, and keep the tab fast ----
   let lock = null;
